@@ -62,8 +62,39 @@ def test_json_output():
     print(f"  json response: {data}")
 
 
+def test_homework_generation():
+    """Full homework prompt returns valid parseable JSON with expected structure."""
+    import json
+    import sys, os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from prompts import homework_prompt
+    from storage import history_store
+    from services.dedup_service import check_duplicates
+
+    provider = MLXProvider()
+    next_day = history_store.get_total_days() + 1
+    forbidden = history_store.get_all_fingerprints()
+    recent_topics = history_store.get_recent_topics(past_days=14)
+
+    system = homework_prompt.system_prompt()
+    user = homework_prompt.user_prompt(next_day, "2099-01-01", recent_topics, forbidden)
+
+    raw = provider.complete(system=system, user=user)
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
+
+    hw = json.loads(raw)
+    parts = hw.get("parts", {})
+    total_q = sum(len(v) for v in parts.values())
+
+    assert "parts" in hw, "Missing 'parts' key"
+    assert total_q > 0, "No questions generated"
+    assert "day" in hw, "Missing 'day' key"
+    print(f"  day={hw['day']}, parts={list(parts.keys())}, questions={total_q}")
+
+
 if __name__ == "__main__":
-    tests = [test_server_reachable, test_is_available, test_basic_completion, test_json_output]
+    tests = [test_server_reachable, test_is_available, test_basic_completion, test_json_output, test_homework_generation]
     passed = 0
     for t in tests:
         try:

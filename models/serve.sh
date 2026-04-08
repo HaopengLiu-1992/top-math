@@ -13,4 +13,4 @@ if [ ! -d "$MODEL_DIR" ]; then
 fi
 
 echo "Starting MLX server with Qwen3.5-9B-4bit on port 8080..."
-python -m mlx_lm.server --model "$MODEL_DIR" --port 8080
+python -m mlx_lm server --model "$MODEL_DIR" --port 8080 --chat-template-args '{"enable_thinking":false}'
