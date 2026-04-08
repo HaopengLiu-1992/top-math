@@ -30,7 +30,7 @@ def render():
         mlx_ok = mlx_available()
         options = ["Claude (cloud)"]
         if mlx_ok:
-            options.append("Local MLX (Qwen)")
+            options.append("Local MLX (Qwen3.5-9B)")
 
         provider_choice = st.radio("Provider", options)
         if mlx_ok:
