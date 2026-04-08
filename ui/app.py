@@ -28,10 +28,9 @@ def render():
     with st.sidebar:
         st.title("Model")
         mlx_ok = mlx_available()
-        options = []
+        options = ["Claude (cloud)"]
         if mlx_ok:
             options.append("Local MLX (Qwen)")
-        options.append("Claude (cloud)")
 
         provider_choice = st.radio("Provider", options)
         if mlx_ok:
