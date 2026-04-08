@@ -1,0 +1,6 @@
+anthropic
+reportlab
+streamlit
+plotly
+pandas
+requests

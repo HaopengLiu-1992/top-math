@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Generated output
+output/
+
+# Data (per-day raw storage)
+data/
+
+# Environment / secrets
+.env
+*.env
+
+# macOS
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
