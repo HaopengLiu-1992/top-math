@@ -8,6 +8,9 @@ venv/
 # Generated output
 output/
 
+# Local model weights (downloaded separately)
+models/qwen3-9b-4bit/
+
 # Data (per-day raw storage)
 data/
 

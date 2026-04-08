@@ -1,13 +1,13 @@
 import requests
 from .base import ModelProvider
 
-MLX_SERVER_URL = "http://localhost:8000"
+MLX_SERVER_URL = "http://localhost:8080"
 
 
 def is_available() -> bool:
     try:
-        r = requests.get(f"{MLX_SERVER_URL}/health", timeout=2)
-        return r.status_code == 200 and r.json().get("status") == "ok"
+        r = requests.get(f"{MLX_SERVER_URL}/v1/models", timeout=2)
+        return r.status_code == 200
     except Exception:
         return False
 
@@ -19,29 +19,23 @@ class MLXProvider(ModelProvider):
 
     @property
     def name(self) -> str:
-        return "Local MLX (Qwen)"
+        return "Local MLX (Qwen3.5-9B)"
 
     def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
-        # Combine system + user into a single prompt since the MLX server
-        # takes a plain prompt string
-        combined = f"{system}\n\n{user}"
-
         response = requests.post(
-            f"{self.server_url}/stream",
+            f"{self.server_url}/v1/chat/completions",
             json={
-                "prompt": combined,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
                 "max_tokens": max_tokens,
-                "temp": 0.3,   # lower temp for more deterministic JSON output
+                "temperature": 0.3,
                 "top_p": 0.9,
+                "extra_body": {"thinking": False},  # skip reasoning trace
             },
-            stream=True,
-            timeout=120,
+            timeout=300,
         )
         response.raise_for_status()
-
-        chunks = []
-        for chunk in response.iter_content(chunk_size=None, decode_unicode=True):
-            if chunk:
-                chunks.append(chunk)
-
-        return "".join(chunks).strip()
+        msg = response.json()["choices"][0]["message"]
+        return (msg.get("content") or msg.get("reasoning", "")).strip()
