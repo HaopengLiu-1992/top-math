@@ -32,8 +32,10 @@ class MLXProvider(ModelProvider):
                 "max_tokens": max_tokens,
                 "temperature": 0.3,
                 "top_p": 0.9,
+                "extra_body": {"thinking": False},  # skip reasoning trace
             },
             timeout=300,
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"].strip()
+        msg = response.json()["choices"][0]["message"]
+        return (msg.get("content") or msg.get("reasoning", "")).strip()
