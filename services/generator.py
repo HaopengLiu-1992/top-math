@@ -44,9 +44,10 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
     system = homework_prompt.system_prompt()
 
     for attempt in range(1, MAX_RETRIES + 1):
-        # Rebuild prompt each attempt so updated forbidden hashes are included
+        # On retries, always include forbidden fingerprints so model can avoid them
+        include = INCLUDE_FORBIDDEN_IN_PROMPT or attempt > 1
         user = homework_prompt.user_prompt(day, date_str, recent_topics, forbidden,
-                                           include_forbidden=INCLUDE_FORBIDDEN_IN_PROMPT)
+                                           include_forbidden=include)
         print(f"  [{provider.name}] attempt {attempt}/{MAX_RETRIES}")
         raw = provider.complete(system=system, user=user)
 
