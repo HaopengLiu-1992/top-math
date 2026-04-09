@@ -6,6 +6,7 @@ from storage.history_store import migrate_from_old_history
 from services.feedback_service import hydrate_all_marks
 from ui.components.nav import render as render_nav
 from ui.pages import today, progress, history
+import services.generator as generator_module
 
 # One-time migration from old data/history.json → per-day fingerprints.json
 migrate_from_old_history()
@@ -37,6 +38,12 @@ def render():
             st.caption("Local MLX server detected")
         else:
             st.caption("MLX server offline — using cloud")
+
+        st.divider()
+        st.title("Dedup")
+        include_forbidden = st.toggle("Include forbidden fingerprints in prompt", value=False)
+        st.caption("Costs more tokens. Off by default.")
+        generator_module.INCLUDE_FORBIDDEN_IN_PROMPT = include_forbidden
 
     page = render_nav()
 

@@ -10,6 +10,7 @@ from pdf.questions_pdf import build as build_questions
 from pdf.answers_pdf import build as build_answers
 
 MAX_RETRIES = 3
+INCLUDE_FORBIDDEN_IN_PROMPT = False  # set True to pass fingerprints to model (costs more tokens)
 
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None) -> dict:
@@ -44,7 +45,8 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
 
     for attempt in range(1, MAX_RETRIES + 1):
         # Rebuild prompt each attempt so updated forbidden hashes are included
-        user = homework_prompt.user_prompt(day, date_str, recent_topics, forbidden)
+        user = homework_prompt.user_prompt(day, date_str, recent_topics, forbidden,
+                                           include_forbidden=INCLUDE_FORBIDDEN_IN_PROMPT)
         print(f"  [{provider.name}] attempt {attempt}/{MAX_RETRIES}")
         raw = provider.complete(system=system, user=user)
 
