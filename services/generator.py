@@ -9,7 +9,7 @@ from prompts import homework_prompt
 from pdf.questions_pdf import build as build_questions
 from pdf.answers_pdf import build as build_answers
 
-MAX_RETRIES = 5
+MAX_RETRIES = 3
 
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None) -> dict:
