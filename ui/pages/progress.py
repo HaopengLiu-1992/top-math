@@ -63,6 +63,18 @@ def _build_df() -> pd.DataFrame:
     return df
 
 
+def _get_available_sundays() -> list[str]:
+    """Return all Sundays that have a stored analysis or feedback report, newest first."""
+    from services import analysis_service
+    sundays = []
+    for d in history_store.get_all_dates():
+        if date.fromisoformat(d).weekday() == 6:  # Sunday
+            if (analysis_service.load_analysis(d) or
+                    feedback_report_service.load_report(d)):
+                sundays.append(d)
+    return sorted(sundays, reverse=True)
+
+
 def render(provider_choice: str):
     st.title("📊 Analysis")
 
@@ -72,6 +84,24 @@ def render(provider_choice: str):
         return
 
     df = _build_df()
+    today = date.today().isoformat()
+
+    # ── week selector ─────────────────────────────────────────────────────────
+    past_sundays = _get_available_sundays()
+    is_current_sunday = is_sunday()
+
+    if past_sundays:
+        options = past_sundays.copy()
+        if is_current_sunday and today not in options:
+            options = [today] + options
+        label_map = {d: f"{d} {'(today)' if d == today else ''}" for d in options}
+        selected_week = st.selectbox(
+            "Week", options, format_func=lambda d: label_map[d]
+        )
+    else:
+        selected_week = today
+
+    st.divider()
 
     _render_metrics(df)
     st.divider()
@@ -79,8 +109,8 @@ def render(provider_choice: str):
     st.divider()
     _render_daily_scores(df)
     _render_topic_coverage(df)
-    _render_weekly_feedback_report(provider_choice)
-    _render_weekly_analysis(provider_choice)
+    _render_weekly_feedback_report(provider_choice, selected_week)
+    _render_weekly_analysis(provider_choice, selected_week)
 
     st.subheader("All Days")
     display_df = df[["date", "day", "session_type", "score_pct", "topics"]].sort_values(
@@ -163,19 +193,24 @@ def _render_topic_coverage(df: pd.DataFrame):
     st.plotly_chart(fig, width="stretch")
 
 
-def _render_weekly_feedback_report(provider_choice: str):
+def _render_weekly_feedback_report(provider_choice: str, selected_week: str):
     st.subheader("Weekly Feedback Report")
     today = date.today().isoformat()
-    report = feedback_report_service.load_report(today)
+    report = feedback_report_service.load_report(selected_week)
 
     if report:
         _display_feedback_report(report)
-    elif is_sunday():
+    elif selected_week == today and is_sunday():
         if st.button("Generate Weekly Feedback Report", type="primary"):
             from providers.anthropic_provider import AnthropicProvider
+            from providers.gemini_provider import GeminiProvider
             from providers.mlx_provider import MLXProvider
-            provider = (MLXProvider() if provider_choice.startswith("Local")
-                        else AnthropicProvider())
+            if provider_choice.startswith("Local"):
+                provider = MLXProvider()
+            elif provider_choice.startswith("Gemini"):
+                provider = GeminiProvider()
+            else:
+                provider = AnthropicProvider()
             with st.spinner("Generating feedback report..."):
                 try:
                     report = feedback_report_service.generate_report(today, provider)
@@ -184,7 +219,8 @@ def _render_weekly_feedback_report(provider_choice: str):
                 except Exception as e:
                     st.error(f"Failed: {e}")
     else:
-        st.caption("Weekly feedback report is generated on Sundays.")
+        st.caption("No feedback report for this week." if selected_week != today
+                   else "Weekly feedback report is generated on Sundays.")
 
 
 def _display_feedback_report(report: dict):
@@ -222,19 +258,24 @@ def _display_feedback_report(report: dict):
     st.divider()
 
 
-def _render_weekly_analysis(provider_choice: str):
+def _render_weekly_analysis(provider_choice: str, selected_week: str):
     st.subheader("Weekly Analysis")
     today = date.today().isoformat()
-    existing = analysis_service.load_analysis(today)
+    existing = analysis_service.load_analysis(selected_week)
 
     if existing:
         _display_analysis(existing)
-    elif is_sunday():
+    elif selected_week == today and is_sunday():
         if st.button("Generate Weekly Analysis", type="primary"):
             from providers.anthropic_provider import AnthropicProvider
+            from providers.gemini_provider import GeminiProvider
             from providers.mlx_provider import MLXProvider
-            provider = (MLXProvider() if provider_choice.startswith("Local")
-                        else AnthropicProvider())
+            if provider_choice.startswith("Local"):
+                provider = MLXProvider()
+            elif provider_choice.startswith("Gemini"):
+                provider = GeminiProvider()
+            else:
+                provider = AnthropicProvider()
             with st.spinner("Analysing this week..."):
                 try:
                     analysis = analysis_service.generate_analysis(today, provider)
@@ -243,7 +284,8 @@ def _render_weekly_analysis(provider_choice: str):
                 except Exception as e:
                     st.error(f"Failed: {e}")
     else:
-        st.caption("Weekly analysis is generated on Sundays.")
+        st.caption("No analysis for this week." if selected_week != today
+                   else "Weekly analysis is generated on Sundays.")
 
 
 def _display_analysis(analysis: dict):

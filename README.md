@@ -8,8 +8,8 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
 - Questions and answers in separate PDFs stored under `output/pdf/YYYY/MM/DD/`
 - Per-question ✓/✗ marking with real-time score tracking
 - Sunday review: collects incorrectly marked questions from the past 7 days; skipped if no mistakes
-- Weekly feedback report and skills analysis generated on Sundays
-- Two AI providers: Claude API (cloud) or local MLX server (Qwen)
+- Weekly feedback report and skills analysis generated on Sundays; browseable by past week via date selector
+- Three AI providers: Claude API, Gemini API, or local MLX server (Qwen)
 
 ---
 
@@ -136,7 +136,7 @@ output/raw/
 |-------|------|----------------|
 | **UI** | `ui/pages/`, `ui/components/` | Streamlit pages and marking widgets |
 | **Services** | `services/` | Business logic — generation, dedup, scoring, review |
-| **Providers** | `providers/` | AI model abstraction (Claude API / local MLX) |
+| **Providers** | `providers/` | AI model abstraction (Claude API / Gemini API / local MLX) |
 | **Storage** | `storage/` | Mark buffer (source of truth), JSON I/O, flush thread |
 | **PDF** | `pdf/` | ReportLab PDF generation (questions and answers separate) |
 | **Prompts** | `prompts/` | Prompt builders for each generation task |
@@ -158,7 +158,8 @@ top-math/
 ├── providers/
 │   ├── base.py                        # Abstract ModelProvider
 │   ├── anthropic_provider.py          # Claude API
-│   └── mlx_provider.py               # Local Qwen via MLX FastAPI server
+│   ├── gemini_provider.py             # Gemini API
+│   └── mlx_provider.py               # Local Qwen via mlx_lm server
 ├── prompts/
 │   ├── homework_prompt.py             # day, date, recent_topics, forbidden_hashes
 │   ├── review_prompt.py
