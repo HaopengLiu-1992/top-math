@@ -1,5 +1,6 @@
 import streamlit as st
 
+import os
 from providers.mlx_provider import MLXProvider, is_available as mlx_available
 from storage import mark_flusher
 from storage.history_store import migrate_from_old_history
@@ -30,6 +31,8 @@ def render():
         st.title("Model")
         mlx_ok = mlx_available()
         options = ["Claude (cloud)"]
+        if os.environ.get("GEMINI_API_KEY"):
+            options.append("Gemini (cloud)")
         if mlx_ok:
             options.append("Local MLX (Qwen3.5-9B)")
 

@@ -5,6 +5,7 @@ from datetime import date
 import streamlit as st
 
 from providers.anthropic_provider import AnthropicProvider
+from providers.gemini_provider import GeminiProvider
 from providers.mlx_provider import MLXProvider
 from services import generator, review_service, generation_tracker
 from services.feedback_service import hydrate_marks
@@ -144,11 +145,16 @@ def _render_pdf_downloads(date_str):
 def _resolve_provider(choice: str):
     if choice.startswith("Local"):
         return MLXProvider()
+    if choice.startswith("Gemini"):
+        return GeminiProvider()
     return AnthropicProvider()
 
 
 def _check_api_key(provider) -> bool:
     if isinstance(provider, AnthropicProvider) and not os.environ.get("ANTHROPIC_API_KEY"):
         st.error("ANTHROPIC_API_KEY is not set.")
+        return False
+    if isinstance(provider, GeminiProvider) and not os.environ.get("GEMINI_API_KEY"):
+        st.error("GEMINI_API_KEY is not set.")
         return False
     return True
