@@ -56,7 +56,9 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
 
         try:
             homework = json.loads(raw)
-        except json.JSONDecodeError as e:
+            if not isinstance(homework, dict):
+                raise ValueError(f"expected JSON object, got {type(homework).__name__}")
+        except (json.JSONDecodeError, ValueError) as e:
             print(f"  JSON error: {e}")
             continue
 
