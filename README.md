@@ -267,6 +267,10 @@ MD5 hashes of question fingerprints for this day. Aggregated across all days for
 ## How to Run
 
 ```bash
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
 # Install dependencies
 pip install -r requirements.txt
 
@@ -274,8 +278,12 @@ pip install -r requirements.txt
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # Start the app
-streamlit run app.py
+python -m streamlit run app.py
 ```
+
+The app will be available at http://localhost:8501.
+
+> If you've already set up the venv, just activate it and run the last two commands.
 
 **Optional — local MLX model:**
 
