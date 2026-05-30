@@ -64,7 +64,7 @@ def _render_metrics(homework, today, is_sunday):
 
     if homework:
         c1.metric("Status", "Generated")
-        grade = homework.get("grade_level", "-")
+        grade = homework.get("grade_level", 6)
         session = "Review" if is_sunday else f"Grade {grade} · Day {homework.get('day', '-')}"
         c2.metric("Session", session)
         c3.metric("Est. minutes", homework.get("estimated_minutes", "—"))
@@ -82,23 +82,30 @@ def _render_metrics(homework, today, is_sunday):
 def _render_course_controls(homework):
     st.subheader("Course")
     current_grade = int(homework.get("grade_level", 6)) if homework else 6
+    current_mode = (homework or {}).get("mode", "lesson_practice")
+    mode_options = ["Lesson + Practice", "Practice Only", "Challenge"]
+    mode_by_value = {
+        "lesson_practice": "Lesson + Practice",
+        "practice_only": "Practice Only",
+        "challenge": "Challenge",
+    }
+    current_mode_label = mode_by_value.get(current_mode, "Lesson + Practice")
     grades = [5, 6, 7, 8]
     c1, c2, c3 = st.columns([1, 2, 2])
     grade_level = c1.selectbox(
         "Grade",
         grades,
         index=grades.index(current_grade) if current_grade in grades else 1,
-        disabled=bool(homework),
     )
     mode_label = c2.selectbox(
         "Mode",
-        ["Lesson + Practice", "Practice Only", "Challenge"],
-        disabled=bool(homework),
+        mode_options,
+        index=mode_options.index(current_mode_label),
     )
     include_lesson = c3.checkbox(
         "Include lesson",
-        value=mode_label == "Lesson + Practice",
-        disabled=bool(homework) or mode_label == "Practice Only",
+        value=bool((homework or {}).get("lesson")) or mode_label == "Lesson + Practice",
+        disabled=mode_label == "Practice Only",
     )
 
     topics = curriculum_service.list_topics("math", grade_level)
@@ -111,9 +118,8 @@ def _render_course_controls(homework):
         topic_options,
         index=topic_options.index(existing_topic_id) if existing_topic_id in topic_options else 0,
         format_func=lambda value: topic_labels[value],
-        disabled=bool(homework),
     )
-    include_hints = st.checkbox("Include hints", value=True, disabled=bool(homework))
+    include_hints = st.checkbox("Include hints", value=True)
 
     mode_map = {
         "Lesson + Practice": "lesson_practice",
