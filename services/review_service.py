@@ -85,7 +85,7 @@ def _generate_with_retry(date_str: str, incorrect: list[dict],
 
     for attempt in range(1, MAX_RETRIES + 1):
         print(f"  [Review/{provider.name}] attempt {attempt}/{MAX_RETRIES}")
-        raw = provider.complete(system=system, user=user)
+        raw = provider.complete(system=system, user=user, max_tokens=12000)
 
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
