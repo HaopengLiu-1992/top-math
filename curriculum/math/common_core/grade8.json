@@ -1,0 +1,57 @@
+{
+  "subject": "math",
+  "grade_level": 8,
+  "standards_body": "Common Core State Standards",
+  "topics": [
+    {
+      "id": "8.EE.A.1",
+      "domain": "Expressions and Equations",
+      "title": "Integer exponents",
+      "standard": "8.EE.A.1",
+      "description": "Know and apply properties of integer exponents to generate equivalent numerical expressions.",
+      "prerequisites": ["7.NS.A.2"],
+      "skills": ["exponent rules", "negative exponents", "equivalent expressions"],
+      "question_types": ["fluency", "error_analysis", "multi_step"]
+    },
+    {
+      "id": "8.EE.B.5",
+      "domain": "Expressions and Equations",
+      "title": "Slope and linear graphs",
+      "standard": "8.EE.B.5",
+      "description": "Graph proportional relationships and interpret unit rate as slope.",
+      "prerequisites": ["7.RP.A.2"],
+      "skills": ["slope", "graphs", "unit rate", "linear relationships"],
+      "question_types": ["conceptual", "word_problem", "multi_step"]
+    },
+    {
+      "id": "8.EE.C.7",
+      "domain": "Expressions and Equations",
+      "title": "Linear equations",
+      "standard": "8.EE.C.7",
+      "description": "Solve linear equations in one variable.",
+      "prerequisites": ["7.EE.B.4"],
+      "skills": ["combine like terms", "distributive property", "equations with variables on both sides"],
+      "question_types": ["fluency", "multi_step", "error_analysis"]
+    },
+    {
+      "id": "8.F.A.3",
+      "domain": "Functions",
+      "title": "Linear and nonlinear functions",
+      "standard": "8.F.A.3",
+      "description": "Interpret the equation y = mx + b as defining a linear function.",
+      "prerequisites": ["8.EE.B.5"],
+      "skills": ["function rules", "slope-intercept form", "compare representations"],
+      "question_types": ["conceptual", "comparison", "multi_step"]
+    },
+    {
+      "id": "8.G.B.7",
+      "domain": "Geometry",
+      "title": "Pythagorean theorem",
+      "standard": "8.G.B.7",
+      "description": "Apply the Pythagorean theorem to determine unknown side lengths.",
+      "prerequisites": ["7.G.B.4"],
+      "skills": ["right triangles", "squares and roots", "distance"],
+      "question_types": ["fluency", "word_problem", "challenge"]
+    }
+  ]
+}

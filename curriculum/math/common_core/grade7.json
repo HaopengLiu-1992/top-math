@@ -1,0 +1,57 @@
+{
+  "subject": "math",
+  "grade_level": 7,
+  "standards_body": "Common Core State Standards",
+  "topics": [
+    {
+      "id": "7.RP.A.2",
+      "domain": "Ratios and Proportional Relationships",
+      "title": "Proportional relationships",
+      "standard": "7.RP.A.2",
+      "description": "Recognize and represent proportional relationships between quantities.",
+      "prerequisites": ["6.RP.A.3"],
+      "skills": ["constant of proportionality", "tables", "graphs", "equations"],
+      "question_types": ["conceptual", "multi_step", "word_problem"]
+    },
+    {
+      "id": "7.NS.A.1",
+      "domain": "The Number System",
+      "title": "Add and subtract rational numbers",
+      "standard": "7.NS.A.1",
+      "description": "Apply and extend previous understandings of addition and subtraction to rational numbers.",
+      "prerequisites": ["6.NS.C.5"],
+      "skills": ["signed numbers", "number line", "absolute value"],
+      "question_types": ["fluency", "error_analysis", "word_problem"]
+    },
+    {
+      "id": "7.NS.A.2",
+      "domain": "The Number System",
+      "title": "Multiply and divide rational numbers",
+      "standard": "7.NS.A.2",
+      "description": "Apply and extend multiplication and division to rational numbers.",
+      "prerequisites": ["7.NS.A.1"],
+      "skills": ["sign rules", "fractions", "decimals", "real-world contexts"],
+      "question_types": ["fluency", "multi_step", "error_analysis"]
+    },
+    {
+      "id": "7.EE.B.4",
+      "domain": "Expressions and Equations",
+      "title": "Solve equations and inequalities",
+      "standard": "7.EE.B.4",
+      "description": "Use variables to represent quantities and solve equations and inequalities.",
+      "prerequisites": ["6.EE.A.2"],
+      "skills": ["two-step equations", "inequalities", "word problems"],
+      "question_types": ["multi_step", "word_problem", "error_analysis"]
+    },
+    {
+      "id": "7.G.B.4",
+      "domain": "Geometry",
+      "title": "Circles",
+      "standard": "7.G.B.4",
+      "description": "Know and use formulas for area and circumference of a circle.",
+      "prerequisites": ["6.G.A.1"],
+      "skills": ["radius", "diameter", "circumference", "area"],
+      "question_types": ["fluency", "word_problem", "challenge"]
+    }
+  ]
+}
