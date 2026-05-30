@@ -21,7 +21,7 @@
       "description": "Graph proportional relationships and interpret unit rate as slope.",
       "prerequisites": ["7.RP.A.2"],
       "skills": ["slope", "graphs", "unit rate", "linear relationships"],
-      "question_types": ["conceptual", "word_problem", "multi_step"]
+      "question_types": ["conceptual", "word_problem", "multi_step", "coordinate_graph", "table_analysis"]
     },
     {
       "id": "8.EE.C.7",
@@ -41,7 +41,7 @@
       "description": "Interpret the equation y = mx + b as defining a linear function.",
       "prerequisites": ["8.EE.B.5"],
       "skills": ["function rules", "slope-intercept form", "compare representations"],
-      "question_types": ["conceptual", "comparison", "multi_step"]
+      "question_types": ["conceptual", "comparison", "multi_step", "coordinate_graph", "table_analysis"]
     },
     {
       "id": "8.G.B.7",

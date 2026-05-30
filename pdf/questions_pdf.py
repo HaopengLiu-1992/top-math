@@ -58,6 +58,7 @@ def build(homework: dict) -> Path:
         story.append(Paragraph(label, section_style))
         for i, q in enumerate(questions, 1):
             story.append(Paragraph(f"{i}. {q['question']}", question_style))
+            _append_visual(story, q, question_style)
         story.append(Spacer(1, 6))
 
     challenge = homework.get("weekly_challenge")
@@ -69,3 +70,12 @@ def build(homework: dict) -> Path:
 
     doc.build(story)
     return filename
+
+
+def _append_visual(story: list, question: dict, question_style):
+    visual = question.get("visual")
+    if not visual:
+        return
+    plain_text = visual.get("plain_text")
+    if plain_text:
+        story.append(Paragraph(plain_text.replace("\n", "<br/>"), question_style))

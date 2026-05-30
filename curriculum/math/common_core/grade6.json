@@ -11,7 +11,7 @@
       "description": "Understand ratio concepts and use ratio language to describe relationships.",
       "prerequisites": ["5.NF.B.4"],
       "skills": ["write ratios", "interpret ratio language", "equivalent ratios"],
-      "question_types": ["conceptual", "word_problem", "multi_step"]
+      "question_types": ["conceptual", "word_problem", "multi_step", "double_number_line", "table_analysis"]
     },
     {
       "id": "6.RP.A.3",
@@ -21,7 +21,7 @@
       "description": "Use ratio and rate reasoning to solve real-world and mathematical problems.",
       "prerequisites": ["6.RP.A.1"],
       "skills": ["unit rates", "percent", "tables", "double number lines"],
-      "question_types": ["word_problem", "multi_step", "error_analysis"]
+      "question_types": ["word_problem", "multi_step", "error_analysis", "double_number_line", "table_analysis"]
     },
     {
       "id": "6.NS.B.3",
@@ -41,7 +41,7 @@
       "description": "Understand positive and negative numbers in real-world contexts.",
       "prerequisites": ["5.G.A.1"],
       "skills": ["number line", "opposites", "absolute value context"],
-      "question_types": ["conceptual", "word_problem", "comparison"]
+      "question_types": ["conceptual", "word_problem", "comparison", "number_line"]
     },
     {
       "id": "6.EE.A.2",
@@ -61,7 +61,7 @@
       "description": "Find the area of triangles, quadrilaterals, and polygons.",
       "prerequisites": ["5.MD.C.5"],
       "skills": ["decompose shapes", "triangle area", "coordinate area"],
-      "question_types": ["word_problem", "multi_step", "challenge"]
+      "question_types": ["word_problem", "multi_step", "challenge", "coordinate_graph"]
     }
   ]
 }

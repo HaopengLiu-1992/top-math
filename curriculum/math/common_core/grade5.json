@@ -31,7 +31,7 @@
       "description": "Add, subtract, multiply, and divide decimals to hundredths.",
       "prerequisites": ["5.NBT.A.3", "5.NBT.A.4"],
       "skills": ["decimal placement", "hundredths", "reasonableness checks"],
-      "question_types": ["fluency", "multi_step", "word_problem"]
+      "question_types": ["fluency", "multi_step", "word_problem", "data_display"]
     },
     {
       "id": "5.NF.A.1",
@@ -61,7 +61,7 @@
       "description": "Relate volume to multiplication and addition for rectangular prisms.",
       "prerequisites": ["5.MD.C.3"],
       "skills": ["volume formula", "composite prisms", "unit cubes"],
-      "question_types": ["word_problem", "multi_step", "challenge"]
+      "question_types": ["word_problem", "multi_step", "challenge", "data_display"]
     }
   ]
 }

@@ -18,6 +18,9 @@ def render_questions_tab(homework: dict):
         st.markdown(f"**{label}**")
         for i, q in enumerate(questions, 1):
             st.markdown(f"{i}. {q['question']}")
+            visual = q.get("visual")
+            if visual:
+                st.code(visual.get("plain_text", ""), language="text")
         st.markdown("")
 
     challenge = homework.get("weekly_challenge")
@@ -115,6 +118,9 @@ def _render_question_card(q: dict, index: int, date_str: str, allow_marking: boo
 
     with st.container(border=True):
         st.markdown(f"**{index}. {q['question']}**")
+        visual = q.get("visual")
+        if visual:
+            st.code(visual.get("plain_text", ""), language="text")
         hint = q.get("hint")
         if hint:
             with st.expander("Hint"):

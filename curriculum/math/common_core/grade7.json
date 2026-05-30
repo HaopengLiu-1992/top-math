@@ -11,7 +11,7 @@
       "description": "Recognize and represent proportional relationships between quantities.",
       "prerequisites": ["6.RP.A.3"],
       "skills": ["constant of proportionality", "tables", "graphs", "equations"],
-      "question_types": ["conceptual", "multi_step", "word_problem"]
+      "question_types": ["conceptual", "multi_step", "word_problem", "table_analysis", "coordinate_graph"]
     },
     {
       "id": "7.NS.A.1",
@@ -21,7 +21,7 @@
       "description": "Apply and extend previous understandings of addition and subtraction to rational numbers.",
       "prerequisites": ["6.NS.C.5"],
       "skills": ["signed numbers", "number line", "absolute value"],
-      "question_types": ["fluency", "error_analysis", "word_problem"]
+      "question_types": ["fluency", "error_analysis", "word_problem", "number_line"]
     },
     {
       "id": "7.NS.A.2",
@@ -51,7 +51,7 @@
       "description": "Know and use formulas for area and circumference of a circle.",
       "prerequisites": ["6.G.A.1"],
       "skills": ["radius", "diameter", "circumference", "area"],
-      "question_types": ["fluency", "word_problem", "challenge"]
+      "question_types": ["fluency", "word_problem", "challenge", "data_display"]
     }
   ]
 }

@@ -53,6 +53,10 @@ You must output EXACTLY this JSON structure and nothing else:
       {
         "id": "<unique string e.g. p1_001>",
         "question": "<question text in English>",
+        "visual": {
+          "type": "<table | coordinate_graph | line_plot | bar_chart | double_number_line>",
+          "plain_text": "<ASCII/plain-text representation of the table, graph data, or plotted points>"
+        },
         "answer": "<answer only>",
         "hint": "<brief hint if hints are enabled, otherwise omit or set to null>",
         "teaching_point": "<what this question practices>",
@@ -65,6 +69,10 @@ You must output EXACTLY this JSON structure and nothing else:
       {
         "id": "<unique string>",
         "question": "<English word problem>",
+        "visual": {
+          "type": "<table | coordinate_graph | line_plot | bar_chart | double_number_line>",
+          "plain_text": "<ASCII/plain-text representation of the table, graph data, or plotted points>"
+        },
         "answer": "<final answer>",
         "hint": "<brief hint if hints are enabled, otherwise omit or set to null>",
         "teaching_point": "<what this question practices>",
@@ -87,6 +95,8 @@ Difficulty standard:
 - NEVER generate single-digit arithmetic as a main skill check unless it is embedded in a higher-grade concept.
 - Part 1 should be challenging fluency aligned to the target grade and topic prerequisites.
 - Part 2 must include multi-step problems, not just one operation. At least 3 questions should require 2 or more steps.
+- Include at least 2 data/visual reasoning questions across Part 2 and Part 3 when the topic allows it.
+- Data/visual questions must use plain text only: tables, coordinate pairs, line plots, bar-chart data, or double number lines. Do not refer to an external image.
 - Part 3 word problems must involve multi-step reasoning, unit conversion, or comparison — not a single multiplication or division.
 - Weekly challenge must require creative thinking and cannot be solved in one step.
 
@@ -99,6 +109,7 @@ Rules:
 - lesson.plain_text is required when lesson is not null. It should be a student-facing handout in plain text, suitable to print before the questions.
 - If a cached lesson is provided, reuse its core teaching content instead of inventing a duplicate lesson.
 - If hints are disabled, set hint to null or omit it.
+- Use the optional visual object for graph, table, chart, coordinate plane, line plot, or double-number-line questions. Omit visual or set it to null for ordinary text-only questions.
 - Each question's fingerprint must be unique within the response AND must not appear in the forbidden fingerprints list provided
 - Topics must not repeat what was covered in the past 14 days unless it is a review day (day % 7 == 0)
 - Use the provided target_topic as the main Part 2 focus.

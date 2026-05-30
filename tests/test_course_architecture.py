@@ -78,6 +78,8 @@ class CourseArchitectureTests(unittest.TestCase):
 
         self.assertIn('"plain_text"', instruction)
         self.assertIn("lesson.plain_text is required", instruction)
+        self.assertIn('"visual"', instruction)
+        self.assertIn("at least 2 data/visual reasoning questions", instruction)
 
     def test_generator_retry_uses_course_context_and_long_output_budget(self):
         topic = curriculum_service.resolve_topic(
