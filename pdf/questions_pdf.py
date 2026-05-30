@@ -48,6 +48,16 @@ def build(homework: dict) -> Path:
     story.append(HRFlowable(width="100%", thickness=0.5, color=colors.black))
     story.append(Spacer(1, 6))
 
+    lesson = homework.get("lesson")
+    if lesson:
+        story.append(Paragraph("Lesson", section_style))
+        story.append(Paragraph(f"<b>{lesson.get('title', 'Lesson')}</b>", question_style))
+        objective = lesson.get("objective")
+        if objective:
+            story.append(Paragraph(f"Objective: {objective}", question_style))
+        for prompt in lesson.get("try_this_first", []):
+            story.append(Paragraph(f"Try first: {prompt}", question_style))
+
     for part_key, label in PART_LABELS.items():
         questions = homework.get("parts", {}).get(part_key, [])
         if not questions:

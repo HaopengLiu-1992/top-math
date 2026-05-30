@@ -27,6 +27,52 @@ def render_questions_tab(homework: dict):
         st.markdown(challenge["question"])
 
 
+def render_lesson_tab(homework: dict):
+    lesson = homework.get("lesson")
+    if not lesson:
+        st.info("No lesson was generated for this session.")
+        return
+
+    st.subheader(lesson.get("title", "Lesson"))
+    objective = lesson.get("objective")
+    if objective:
+        st.markdown(f"**Objective:** {objective}")
+
+    explanation = lesson.get("concept_explanation")
+    if explanation:
+        st.markdown(explanation)
+
+    examples = lesson.get("worked_examples", [])
+    if examples:
+        st.markdown("**Worked examples**")
+        for example in examples:
+            with st.expander(example.get("problem", "Example"), expanded=True):
+                for step in example.get("steps", []):
+                    st.markdown(f"- {step}")
+                note = example.get("teaching_note")
+                if note:
+                    st.caption(note)
+
+    mistakes = lesson.get("common_mistakes", [])
+    if mistakes:
+        st.markdown("**Common mistakes**")
+        for item in mistakes:
+            mistake = item.get("mistake", "")
+            fix = item.get("fix", "")
+            why = item.get("why_it_happens", "")
+            with st.expander(mistake or "Mistake"):
+                if why:
+                    st.markdown(f"**Why it happens:** {why}")
+                if fix:
+                    st.markdown(f"**Fix:** {fix}")
+
+    checks = lesson.get("try_this_first", [])
+    if checks:
+        st.markdown("**Try this first**")
+        for prompt in checks:
+            st.markdown(f"- {prompt}")
+
+
 def render_answers_tab(homework: dict, date_str: str, allow_marking: bool = True):
     if allow_marking:
         correct, total = feedback_service.calc_auto_score(date_str)
@@ -64,7 +110,14 @@ def _render_question_card(q: dict, index: int, date_str: str, allow_marking: boo
 
     with st.container(border=True):
         st.markdown(f"**{index}. {q['question']}**")
+        hint = q.get("hint")
+        if hint:
+            with st.expander("Hint"):
+                st.markdown(hint)
         st.markdown(f"**Answer:** {q['answer']}")
+        teaching_point = q.get("teaching_point")
+        if teaching_point:
+            st.caption(teaching_point)
         for step in q.get("solution_steps", []):
             st.markdown(f"- {step}")
 

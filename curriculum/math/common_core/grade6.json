@@ -1,0 +1,67 @@
+{
+  "subject": "math",
+  "grade_level": 6,
+  "standards_body": "Common Core State Standards",
+  "topics": [
+    {
+      "id": "6.RP.A.1",
+      "domain": "Ratios and Proportional Relationships",
+      "title": "Ratio concepts",
+      "standard": "6.RP.A.1",
+      "description": "Understand ratio concepts and use ratio language to describe relationships.",
+      "prerequisites": ["5.NF.B.4"],
+      "skills": ["write ratios", "interpret ratio language", "equivalent ratios"],
+      "question_types": ["conceptual", "word_problem", "multi_step"]
+    },
+    {
+      "id": "6.RP.A.3",
+      "domain": "Ratios and Proportional Relationships",
+      "title": "Rate and percent reasoning",
+      "standard": "6.RP.A.3",
+      "description": "Use ratio and rate reasoning to solve real-world and mathematical problems.",
+      "prerequisites": ["6.RP.A.1"],
+      "skills": ["unit rates", "percent", "tables", "double number lines"],
+      "question_types": ["word_problem", "multi_step", "error_analysis"]
+    },
+    {
+      "id": "6.NS.B.3",
+      "domain": "The Number System",
+      "title": "Decimal operations fluency",
+      "standard": "6.NS.B.3",
+      "description": "Fluently add, subtract, multiply, and divide multi-digit decimals.",
+      "prerequisites": ["5.NBT.B.7"],
+      "skills": ["decimal division", "decimal multiplication", "estimation"],
+      "question_types": ["fluency", "multi_step", "error_analysis"]
+    },
+    {
+      "id": "6.NS.C.5",
+      "domain": "The Number System",
+      "title": "Positive and negative numbers",
+      "standard": "6.NS.C.5",
+      "description": "Understand positive and negative numbers in real-world contexts.",
+      "prerequisites": ["5.G.A.1"],
+      "skills": ["number line", "opposites", "absolute value context"],
+      "question_types": ["conceptual", "word_problem", "comparison"]
+    },
+    {
+      "id": "6.EE.A.2",
+      "domain": "Expressions and Equations",
+      "title": "Write and evaluate expressions",
+      "standard": "6.EE.A.2",
+      "description": "Write, read, and evaluate expressions with variables.",
+      "prerequisites": ["5.OA.A.2"],
+      "skills": ["variables", "substitution", "expression structure"],
+      "question_types": ["fluency", "error_analysis", "multi_step"]
+    },
+    {
+      "id": "6.G.A.1",
+      "domain": "Geometry",
+      "title": "Area of polygons",
+      "standard": "6.G.A.1",
+      "description": "Find the area of triangles, quadrilaterals, and polygons.",
+      "prerequisites": ["5.MD.C.5"],
+      "skills": ["decompose shapes", "triangle area", "coordinate area"],
+      "question_types": ["word_problem", "multi_step", "challenge"]
+    }
+  ]
+}

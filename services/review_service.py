@@ -11,8 +11,6 @@ from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
 from storage.mark_buffer import get_marks
 from prompts import review_prompt
-from pdf.questions_pdf import build as build_questions
-from pdf.answers_pdf import build as build_answers
 
 MAX_RETRIES = 3
 
@@ -72,6 +70,8 @@ def generate_review(date_str: str | None = None,
 
     homework_store.save_questions(homework, today)
     homework_store.save_meta(homework_store.build_meta(homework), today)
+    from pdf.questions_pdf import build as build_questions
+    from pdf.answers_pdf import build as build_answers
     build_questions(homework)
     build_answers(homework)
 
@@ -105,5 +105,7 @@ def _generate_with_retry(date_str: str, incorrect: list[dict],
 def _ensure_pdfs(homework: dict, date_str: str):
     d = homework_store.pdf_dir(date_str)
     if not (d / "questions.pdf").exists() or not (d / "answers.pdf").exists():
+        from pdf.questions_pdf import build as build_questions
+        from pdf.answers_pdf import build as build_answers
         build_questions(homework)
         build_answers(homework)
