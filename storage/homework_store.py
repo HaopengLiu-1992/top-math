@@ -106,6 +106,20 @@ def save_analysis(analysis: dict, date_str: str):
     p.write_text(json.dumps(analysis, indent=2))
 
 
+# ── deletion ─────────────────────────────────────────────────────────────────
+
+def delete_for_date(date_str: str):
+    """Delete questions.json, meta.json, and PDFs for a date (for regeneration)."""
+    for p in [questions_path(date_str), meta_path(date_str)]:
+        if p.exists():
+            p.unlink()
+    pdf_d = pdf_dir(date_str)
+    for name in ["questions.pdf", "answers.pdf"]:
+        f = pdf_d / name
+        if f.exists():
+            f.unlink()
+
+
 # ── migration ─────────────────────────────────────────────────────────────────
 
 def migrate_split(date_str: str):

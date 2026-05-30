@@ -46,6 +46,12 @@ def get_marks(date_str: str) -> dict[str, bool | None]:
         return dict(entry["marks"]) if entry else {}
 
 
+def clear_date(date_str: str):
+    """Remove a date from the buffer entirely (used before regeneration)."""
+    with _lock:
+        _store.pop(date_str, None)
+
+
 def get_recently_updated(within_seconds: int) -> list[tuple[str, dict, str]]:
     """
     Return dates whose last_update falls within the past N seconds.

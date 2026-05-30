@@ -14,7 +14,7 @@ def _get_client():
 
 
 class GeminiProvider(ModelProvider):
-    def __init__(self, model: str = "gemini-3.1-flash-lite-preview"):
+    def __init__(self, model: str = "gemini-3.5-flash"):
         self.model = model
 
     @property

@@ -2,7 +2,7 @@ import json
 from datetime import date
 
 from providers.base import ModelProvider
-from providers.anthropic_provider import AnthropicProvider
+from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
 from services.dedup_service import check_duplicates, extract_all_fingerprints
 from prompts import homework_prompt
@@ -15,7 +15,7 @@ INCLUDE_FORBIDDEN_IN_PROMPT = False  # set True to pass fingerprints to model (c
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None) -> dict:
     today = date_str or date.today().isoformat()
-    provider = provider or AnthropicProvider()
+    provider = provider or get_default_provider()
 
     existing = homework_store.load_questions(today)
     if existing:
@@ -56,7 +56,9 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
 
         try:
             homework = json.loads(raw)
-        except json.JSONDecodeError as e:
+            if not isinstance(homework, dict):
+                raise ValueError(f"expected JSON object, got {type(homework).__name__}")
+        except (json.JSONDecodeError, ValueError) as e:
             print(f"  JSON error: {e}")
             continue
 

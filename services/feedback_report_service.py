@@ -7,7 +7,7 @@ import json
 from datetime import date
 
 from providers.base import ModelProvider
-from providers.anthropic_provider import AnthropicProvider
+from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
 from services.review_service import collect_incorrect_questions
 from prompts import feedback_report_prompt
@@ -39,7 +39,7 @@ def save_report(report: dict, date_str: str):
 def generate_report(date_str: str | None = None,
                     provider: ModelProvider | None = None) -> dict:
     today = date_str or date.today().isoformat()
-    provider = provider or AnthropicProvider()
+    provider = provider or get_default_provider()
 
     existing = load_report(today)
     if existing:
@@ -66,8 +66,11 @@ def _generate_with_retry(date_str: str, weekly_logs: list[dict],
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
 
         try:
-            return json.loads(raw)
-        except json.JSONDecodeError as e:
+            result = json.loads(raw)
+            if not isinstance(result, dict):
+                raise ValueError(f"expected JSON object, got {type(result).__name__}")
+            return result
+        except (json.JSONDecodeError, ValueError) as e:
             print(f"  JSON error: {e}")
             continue
 
