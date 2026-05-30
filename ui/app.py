@@ -30,9 +30,7 @@ def render():
     with st.sidebar:
         st.title("Model")
         mlx_ok = mlx_available()
-        options = ["Claude (cloud)"]
-        if os.environ.get("GEMINI_API_KEY"):
-            options.append("Gemini (cloud)")
+        options = ["Gemini (cloud)", "Claude (cloud)"]
         if mlx_ok:
             options.append("Local MLX (Qwen3.5-9B)")
 

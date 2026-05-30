@@ -9,7 +9,7 @@ from providers.gemini_provider import GeminiProvider
 from providers.mlx_provider import MLXProvider
 from services import generator, review_service, generation_tracker
 from services.feedback_service import hydrate_marks
-from storage import homework_store
+from storage import homework_store, mark_buffer, history_store
 from ui.components import question_card
 
 
@@ -43,11 +43,12 @@ def render(provider_choice: str):
     _render_metrics(homework, today, is_sunday)
     st.divider()
 
-    # ── generate button ───────────────────────────────────────────────────────
+    # ── generate / regenerate button ──────────────────────────────────────────
     if not homework:
         _render_generate_button(today, is_sunday, provider)
     else:
         st.info(f"{'Review' if is_sunday else 'Homework'} already generated for today.")
+        _render_regenerate_button(today, is_sunday, provider)
 
     # ── content ───────────────────────────────────────────────────────────────
     if homework:
@@ -100,6 +101,34 @@ def _run_review(today, provider):
     if not _check_api_key(provider):
         return
     generation_tracker.start(today, review_service.generate_review, today, provider)
+    st.rerun()
+
+
+def _render_regenerate_button(today, is_sunday, provider):
+    if st.button("Regenerate Today's Homework", type="secondary"):
+        st.session_state["confirm_regen"] = True
+
+    if st.session_state.get("confirm_regen"):
+        st.warning("This will delete today's homework and all marks. Continue?")
+        c1, c2 = st.columns(2)
+        if c1.button("Yes, regenerate", type="primary", width="stretch"):
+            _do_regenerate(today, is_sunday, provider)
+        if c2.button("Cancel", width="stretch"):
+            st.session_state.pop("confirm_regen", None)
+            st.rerun()
+
+
+def _do_regenerate(today, is_sunday, provider):
+    if not _check_api_key(provider):
+        return
+    mark_buffer.clear_date(today)
+    homework_store.delete_for_date(today)
+    history_store.delete_fingerprints(today)
+    st.session_state.pop("confirm_regen", None)
+    if is_sunday:
+        generation_tracker.start(today, review_service.generate_review, today, provider)
+    else:
+        generation_tracker.start(today, generator.generate, today, provider)
     st.rerun()
 
 

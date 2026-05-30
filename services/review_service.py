@@ -7,7 +7,7 @@ import json
 from datetime import date, timedelta
 
 from providers.base import ModelProvider
-from providers.anthropic_provider import AnthropicProvider
+from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
 from storage.mark_buffer import get_marks
 from prompts import review_prompt
@@ -53,7 +53,7 @@ def collect_incorrect_questions(date_str: str | None = None, past_days: int = 7)
 def generate_review(date_str: str | None = None,
                     provider: ModelProvider | None = None) -> dict | None:
     today = date_str or date.today().isoformat()
-    provider = provider or AnthropicProvider()
+    provider = provider or get_default_provider()
 
     existing = homework_store.load_questions(today)
     if existing:

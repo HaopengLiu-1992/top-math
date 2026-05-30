@@ -4,6 +4,7 @@ Module-level background generation tracker.
 States: idle → running → done | error
 """
 import threading
+import traceback
 from typing import Any
 
 _lock = threading.Lock()
@@ -30,6 +31,8 @@ def start(date_str: str, fn, *args, **kwargs) -> bool:
             with _lock:
                 _state["status"] = "done"
         except Exception as exc:
+            tb = traceback.format_exc()
+            print(f"[generation_tracker] error:\n{tb}")
             with _lock:
                 _state.update(status="error", error=str(exc))
 

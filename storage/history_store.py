@@ -50,6 +50,12 @@ def save_fingerprints(date_str: str, hashes: list[str]):
     p.write_text(json.dumps(hashes, indent=2))
 
 
+def delete_fingerprints(date_str: str):
+    p = _fp_path(date_str)
+    if p.exists():
+        p.unlink()
+
+
 def get_all_fingerprints() -> set[str]:
     """Collect fingerprints from all days for dedup."""
     hashes: set[str] = set()
