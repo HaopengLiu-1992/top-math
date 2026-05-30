@@ -34,6 +34,11 @@ def render_lesson_tab(homework: dict):
         return
 
     st.subheader(lesson.get("title", "Lesson"))
+    plain_text = lesson.get("plain_text")
+    if plain_text:
+        st.text(plain_text)
+        return
+
     objective = lesson.get("objective")
     if objective:
         st.markdown(f"**Objective:** {objective}")
