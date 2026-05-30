@@ -5,6 +5,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib import colors
 
+from pdf.lesson_pdf import append_lesson
 from storage.homework_store import pdf_dir
 
 PART_LABELS = {
@@ -48,15 +49,7 @@ def build(homework: dict) -> Path:
     story.append(HRFlowable(width="100%", thickness=0.5, color=colors.black))
     story.append(Spacer(1, 6))
 
-    lesson = homework.get("lesson")
-    if lesson:
-        story.append(Paragraph("Lesson", section_style))
-        story.append(Paragraph(f"<b>{lesson.get('title', 'Lesson')}</b>", question_style))
-        objective = lesson.get("objective")
-        if objective:
-            story.append(Paragraph(f"Objective: {objective}", question_style))
-        for prompt in lesson.get("try_this_first", []):
-            story.append(Paragraph(f"Try first: {prompt}", question_style))
+    append_lesson(story, homework.get("lesson"), section_style, question_style)
 
     for part_key, label in PART_LABELS.items():
         questions = homework.get("parts", {}).get(part_key, [])

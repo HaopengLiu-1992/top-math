@@ -29,8 +29,9 @@ You must output EXACTLY this JSON structure and nothing else:
   "lesson": {
     "lesson_id": "<stable id e.g. math_grade6_6.RP.A.1_intro_v1>",
     "title": "<short lesson title>",
-    "objective": "<what Jessie will learn>",
-    "concept_explanation": "<student-friendly teaching explanation>",
+    "plain_text": "<plain text handout: objective, explanation, worked examples, common mistakes, and try-first checks. Use simple line breaks. No markdown tables.>",
+    "objective": "<one sentence objective, also included in plain_text>",
+    "concept_explanation": "<optional short summary duplicated from plain_text>",
     "worked_examples": [
       {
         "problem": "<example problem>",
@@ -95,6 +96,7 @@ Rules:
 - Part 3 (Word Problems): 3-5 multi-step real-world word problems. Each must require at least 2 operations or logical steps.
 - weekly_challenge: only include when day number is a multiple of 5, otherwise set to null. Must be a rich open-ended problem.
 - lesson: include a complete lesson object only when include_lesson is true. If include_lesson is false, set lesson to null.
+- lesson.plain_text is required when lesson is not null. It should be a student-facing handout in plain text, suitable to print before the questions.
 - If a cached lesson is provided, reuse its core teaching content instead of inventing a duplicate lesson.
 - If hints are disabled, set hint to null or omit it.
 - Each question's fingerprint must be unique within the response AND must not appear in the forbidden fingerprints list provided

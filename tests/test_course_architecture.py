@@ -73,6 +73,12 @@ class CourseArchitectureTests(unittest.TestCase):
         self.assertIn("6.RP.A.1", prompt)
         self.assertIn("Cached ratio lesson", prompt)
 
+    def test_instruction_requires_plain_text_lesson(self):
+        instruction = homework_prompt.system_prompt()
+
+        self.assertIn('"plain_text"', instruction)
+        self.assertIn("lesson.plain_text is required", instruction)
+
     def test_generator_retry_uses_course_context_and_long_output_budget(self):
         topic = curriculum_service.resolve_topic(
             LearningContext(grade_level=6, target_topic_id="6.RP.A.1")
