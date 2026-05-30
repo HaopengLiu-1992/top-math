@@ -49,7 +49,7 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
         user = homework_prompt.user_prompt(day, date_str, recent_topics, forbidden,
                                            include_forbidden=include)
         print(f"  [{provider.name}] attempt {attempt}/{MAX_RETRIES}")
-        raw = provider.complete(system=system, user=user)
+        raw = provider.complete(system=system, user=user, max_tokens=12000)
 
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]

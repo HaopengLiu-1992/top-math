@@ -23,7 +23,8 @@ def render(provider_choice: str):
     gen = generation_tracker.get()
     if gen["status"] == "running":
         st.spinner("Generating homework in background...")
-        st.info(f"Generating with Claude... you can navigate away and come back.")
+        provider_name = gen.get("provider_name") or "selected provider"
+        st.info(f"Generating with {provider_name}... you can navigate away and come back.")
         time.sleep(2)
         st.rerun()
         return
