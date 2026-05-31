@@ -274,7 +274,10 @@ source .venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Set API key (required if using Claude)
+# Set API key. Gemini is the default cloud provider.
+export GEMINI_API_KEY=...
+
+# Optional, only needed if you choose Claude in the sidebar
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # Start the app
@@ -284,6 +287,9 @@ python -m streamlit run app.py
 The app will be available at http://localhost:8501.
 
 > If you've already set up the venv, just activate it and run the last two commands.
+
+Localhost runs without the app password by default. Set `AUTH_REQUIRED=true` only if
+you want to test the cloud password gate locally.
 
 **Optional — local MLX model:**
 
@@ -300,10 +306,74 @@ The app auto-detects it and offers it in the sidebar.
 
 | Provider | Details |
 |----------|---------|
+| **Gemini (cloud)** | Google Gemini API — requires `GEMINI_API_KEY` |
 | **Claude (cloud)** | Anthropic API — requires `ANTHROPIC_API_KEY` |
 | **Local MLX (Qwen)** | Streams from `http://localhost:8000/stream` — no API key needed |
 
 Both implement the same `ModelProvider` abstract interface (`providers/base.py`).
+
+---
+
+## Streamlit Community Cloud Deployment
+
+This deployment is intended for trial use. The app still writes homework,
+marks, summaries, and PDFs to the app's local filesystem. That is fine for
+testing, but Streamlit Community Cloud runtime files should not be treated as
+durable long-term storage. Keep the real long-term record on your local Mac.
+
+### 1. Prepare GitHub
+
+Merge the latest app changes into `main`, then deploy from:
+
+```text
+Repository: HaopengLiu-1992/top-math
+Branch: main
+Main file path: app.py
+```
+
+### 2. Create the Streamlit App
+
+1. Open https://share.streamlit.io.
+2. Choose **New app**.
+3. Select the GitHub repository.
+4. Set the branch to `main`.
+5. Set the main file path to `app.py`.
+6. Open **Advanced settings** before deploying.
+
+### 3. Configure Secrets
+
+Paste this into Streamlit's **Secrets** box:
+
+```toml
+AUTH_REQUIRED=true
+APP_PASSWORD="choose-a-private-password"
+
+GEMINI_API_KEY="your-gemini-api-key"
+
+# Optional, only needed if you want Claude available.
+ANTHROPIC_API_KEY="your-anthropic-api-key"
+```
+
+Never commit these values to GitHub. The app reads Streamlit secrets first and
+falls back to environment variables for local development.
+
+### 4. Local Secrets Option
+
+For local development, environment variables are enough. If you prefer a local
+Streamlit secrets file, create `.streamlit/secrets.toml`:
+
+```toml
+GEMINI_API_KEY="your-gemini-api-key"
+ANTHROPIC_API_KEY="your-anthropic-api-key"
+```
+
+`.streamlit/secrets.toml` is ignored by git.
+
+### 5. Password Behavior
+
+`AUTH_REQUIRED=false` by default, so localhost skips the app password.
+Streamlit Cloud should set `AUTH_REQUIRED=true`; if `APP_PASSWORD` is missing,
+the app stops before showing homework data.
 
 ---
 

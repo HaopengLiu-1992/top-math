@@ -1,4 +1,3 @@
-import os
 import time
 from datetime import date
 
@@ -8,6 +7,7 @@ from providers.anthropic_provider import AnthropicProvider
 from providers.gemini_provider import GeminiProvider
 from providers.provider_resolver import resolve_provider
 from domain.difficulty import DEFAULT_DIFFICULTY, get_difficulty_profile, list_difficulty_profiles
+from settings import secrets
 from services import curriculum_service
 from services import generator, generation_tracker
 from services.feedback_service import hydrate_marks
@@ -232,10 +232,10 @@ def _render_pdf_downloads(date_str):
                                mime="application/pdf", width="stretch")
 
 def _check_api_key(provider) -> bool:
-    if isinstance(provider, AnthropicProvider) and not os.environ.get("ANTHROPIC_API_KEY"):
+    if isinstance(provider, AnthropicProvider) and not secrets.anthropic_api_key():
         st.error("ANTHROPIC_API_KEY is not set.")
         return False
-    if isinstance(provider, GeminiProvider) and not os.environ.get("GEMINI_API_KEY"):
+    if isinstance(provider, GeminiProvider) and not secrets.gemini_api_key():
         st.error("GEMINI_API_KEY is not set.")
         return False
     return True

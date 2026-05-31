@@ -1,7 +1,7 @@
-import os
 from google import genai
 from google.genai import types
 from .base import ModelProvider
+from settings import secrets
 
 _client = None
 DEFAULT_THINKING_BUDGET = 512
@@ -10,7 +10,7 @@ DEFAULT_THINKING_BUDGET = 512
 def _get_client():
     global _client
     if _client is None:
-        _client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+        _client = genai.Client(api_key=secrets.require_secret("GEMINI_API_KEY"))
     return _client
 
 

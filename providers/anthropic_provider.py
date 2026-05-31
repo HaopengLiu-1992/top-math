@@ -1,6 +1,6 @@
-import os
 import anthropic
 from .base import ModelProvider
+from settings import secrets
 
 _client = None
 
@@ -8,7 +8,7 @@ _client = None
 def _get_client():
     global _client
     if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        _client = anthropic.Anthropic(api_key=secrets.require_secret("ANTHROPIC_API_KEY"))
     return _client
 
 

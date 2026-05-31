@@ -1,10 +1,10 @@
 import streamlit as st
 
-import os
-from providers.mlx_provider import MLXProvider, is_available as mlx_available
+from providers.mlx_provider import is_available as mlx_available
 from storage import mark_flusher
 from storage.history_store import migrate_from_old_history
 from services.feedback_service import hydrate_all_marks
+from ui.auth import require_app_password
 from ui.components.nav import render as render_nav
 from ui.pages import today, progress, history
 from ui.theme import apply_theme
@@ -28,6 +28,7 @@ def render():
         initial_sidebar_state="collapsed",
     )
     apply_theme()
+    require_app_password()
 
     with st.sidebar:
         st.title("Model")
