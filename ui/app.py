@@ -7,6 +7,7 @@ from storage.history_store import migrate_from_old_history
 from services.feedback_service import hydrate_all_marks
 from ui.components.nav import render as render_nav
 from ui.pages import today, progress, history
+from ui.theme import apply_theme
 import services.generator as generator_module
 
 # One-time migration from old data/history.json → per-day fingerprints.json
@@ -26,6 +27,7 @@ def render():
         layout="wide",
         initial_sidebar_state="collapsed",
     )
+    apply_theme()
 
     with st.sidebar:
         st.title("Model")

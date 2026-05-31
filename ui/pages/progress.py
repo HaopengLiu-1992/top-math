@@ -163,11 +163,16 @@ def _render_topic_coverage(df: pd.DataFrame):
 
 
 def _render_summary(provider_choice: str):
-    st.subheader("Summary")
     default_start, default_end = summary_service.default_range()
-    c1, c2 = st.columns(2)
-    start_value = c1.date_input("Start date", value=date.fromisoformat(default_start))
-    end_value = c2.date_input("End date", value=date.fromisoformat(default_end))
+    with st.container(border=True):
+        st.markdown('<div class="tm-section-label">Summary</div>', unsafe_allow_html=True)
+        c1, c2 = st.columns(2)
+        start_value = c1.date_input("Start date", value=date.fromisoformat(default_start))
+        end_value = c2.date_input("End date", value=date.fromisoformat(default_end))
+        c_generate, c_force = st.columns([2, 1])
+        generate = c_generate.button("Generate Summary", type="primary")
+        force = c_force.checkbox("Regenerate", value=False)
+
     start_date = start_value.isoformat()
     end_date = end_value.isoformat()
 
@@ -176,9 +181,6 @@ def _render_summary(provider_choice: str):
         return
 
     summary = summary_service.load_summary(start_date, end_date)
-    c_generate, c_force = st.columns([2, 1])
-    generate = c_generate.button("Generate Summary", type="primary")
-    force = c_force.checkbox("Regenerate", value=False)
 
     if generate:
         provider = resolve_provider(provider_choice)
