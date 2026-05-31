@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from domain.curriculum import CurriculumTopic
+from domain.difficulty import get_difficulty_profile
 from domain.learning_context import LearningContext
 
 _INSTRUCTION = Path("config/instruction.md")
@@ -23,6 +24,7 @@ def user_prompt(day: int, date_str: str, recent_topics: list[str], forbidden: se
                                          recent_topics=recent_topics)
 
     topic_section = topic.to_prompt_dict() if topic else None
+    difficulty = get_difficulty_profile(context.difficulty_policy)
 
     forbidden_section = ""
     if include_forbidden:
@@ -41,6 +43,8 @@ Subject: {context.subject}
 Grade level: {context.grade_level}
 Mode: {context.mode}
 Difficulty policy: {context.difficulty_policy}
+Difficulty profile:
+{difficulty.prompt}
 Include lesson: {context.include_lesson}
 Include hints: {context.include_hints}
 

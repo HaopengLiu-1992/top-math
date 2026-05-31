@@ -16,7 +16,8 @@ INCLUDE_FORBIDDEN_IN_PROMPT = False  # set True to pass fingerprints to model (c
 def generate(date_str: str | None = None, provider: ModelProvider | None = None,
              grade_level: int = 6, include_lesson: bool = True,
              include_hints: bool = True, target_topic_id: str | None = None,
-             mode: str = "lesson_practice") -> dict:
+             mode: str = "lesson_practice",
+             difficulty_policy: str = "standard") -> dict:
     today = date_str or date.today().isoformat()
     provider = provider or get_default_provider()
 
@@ -34,6 +35,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
         include_lesson=include_lesson,
         include_hints=include_hints,
         target_topic_id=target_topic_id,
+        difficulty_policy=difficulty_policy,
         recent_topics=recent_topics,
     )
     topic = curriculum_service.resolve_topic(context)
@@ -47,6 +49,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
     homework["subject"] = context.subject
     homework["grade_level"] = context.grade_level
     homework["mode"] = context.mode
+    homework["difficulty_policy"] = context.difficulty_policy
     homework["target_topic"] = {
         "id": topic.id,
         "title": topic.title,
