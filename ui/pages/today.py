@@ -7,6 +7,7 @@ import streamlit as st
 from providers.anthropic_provider import AnthropicProvider
 from providers.gemini_provider import GeminiProvider
 from providers.mlx_provider import MLXProvider
+from domain.difficulty import DEFAULT_DIFFICULTY, get_difficulty_profile, list_difficulty_profiles
 from services import curriculum_service
 from services import generator, review_service, generation_tracker
 from services.feedback_service import hydrate_marks
@@ -60,7 +61,7 @@ def render(provider_choice: str):
 
 def _render_metrics(homework, today, is_sunday):
     from services.feedback_service import calc_auto_score
-    c1, c2, c3, c4, c5 = st.columns(5)
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     if homework:
         c1.metric("Status", "Generated")
@@ -70,19 +71,23 @@ def _render_metrics(homework, today, is_sunday):
         c3.metric("Est. minutes", homework.get("estimated_minutes", "—"))
         correct, total = calc_auto_score(today)
         c4.metric("Marked", f"{correct}/{total}" if total else "—")
-        c5.metric("Model", homework.get("model", "—"))
+        difficulty = get_difficulty_profile(homework.get("difficulty_policy"))
+        c5.metric("Difficulty", difficulty.label)
+        c6.metric("Model", homework.get("model", "—"))
     else:
         c1.metric("Status", "Not generated")
         c2.metric("Session", "Sunday Review" if is_sunday else "Normal")
         c3.metric("Est. minutes", "~40")
         c4.metric("Marked", "—")
-        c5.metric("Model", "—")
+        c5.metric("Difficulty", get_difficulty_profile(DEFAULT_DIFFICULTY).label)
+        c6.metric("Model", "—")
 
 
 def _render_course_controls(homework):
     st.subheader("Course")
     current_grade = int(homework.get("grade_level", 6)) if homework else 6
     current_mode = (homework or {}).get("mode", "lesson_practice")
+    current_difficulty = (homework or {}).get("difficulty_policy", DEFAULT_DIFFICULTY)
     mode_options = ["Lesson + Practice", "Practice Only", "Challenge"]
     mode_by_value = {
         "lesson_practice": "Lesson + Practice",
@@ -91,7 +96,7 @@ def _render_course_controls(homework):
     }
     current_mode_label = mode_by_value.get(current_mode, "Lesson + Practice")
     grades = [5, 6, 7, 8]
-    c1, c2, c3 = st.columns([1, 2, 2])
+    c1, c2, c3, c4 = st.columns([1, 2, 2, 2])
     grade_level = c1.selectbox(
         "Grade",
         grades,
@@ -106,6 +111,16 @@ def _render_course_controls(homework):
         "Include lesson",
         value=bool((homework or {}).get("lesson")) or mode_label == "Lesson + Practice",
         disabled=mode_label == "Practice Only",
+    )
+    difficulties = list_difficulty_profiles()
+    difficulty_ids = [d.id for d in difficulties]
+    difficulty_labels = {d.id: d.label for d in difficulties}
+    difficulty_policy = c4.selectbox(
+        "Difficulty",
+        difficulty_ids,
+        index=difficulty_ids.index(current_difficulty)
+        if current_difficulty in difficulty_ids else difficulty_ids.index(DEFAULT_DIFFICULTY),
+        format_func=lambda value: difficulty_labels[value],
     )
 
     topics = curriculum_service.list_topics("math", grade_level)
@@ -132,6 +147,7 @@ def _render_course_controls(homework):
         "include_lesson": include_lesson,
         "include_hints": include_hints,
         "target_topic_id": selected_topic,
+        "difficulty_policy": difficulty_policy,
     }
 
 

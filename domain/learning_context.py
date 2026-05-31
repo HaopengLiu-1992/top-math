@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from domain.difficulty import DEFAULT_DIFFICULTY
+
 
 @dataclass(frozen=True)
 class LearningContext:
@@ -10,7 +12,7 @@ class LearningContext:
     include_lesson: bool = True
     include_hints: bool = True
     target_topic_id: str | None = None
-    difficulty_policy: str = "advanced"
+    difficulty_policy: str = DEFAULT_DIFFICULTY
     recent_topics: list[str] = field(default_factory=list)
 
     def normalized_subject(self) -> str:

@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from curriculum.registry import get_provider
+from domain.difficulty import DEFAULT_DIFFICULTY, get_difficulty_profile, list_difficulty_profiles
 from domain.learning_context import LearningContext
 from prompts import homework_prompt
 from services import curriculum_service
@@ -68,6 +69,8 @@ class CourseArchitectureTests(unittest.TestCase):
         )
 
         self.assertIn("Grade level: 6", prompt)
+        self.assertIn(f"Difficulty policy: {DEFAULT_DIFFICULTY}", prompt)
+        self.assertIn("Use grade-level numbers and contexts", prompt)
         self.assertIn("Include lesson: True", prompt)
         self.assertIn("Include hints: False", prompt)
         self.assertIn("6.RP.A.1", prompt)
@@ -76,8 +79,17 @@ class CourseArchitectureTests(unittest.TestCase):
     def test_instruction_requires_plain_text_lesson(self):
         instruction = homework_prompt.system_prompt()
 
+        self.assertIn('"difficulty_policy"', instruction)
         self.assertIn('"plain_text"', instruction)
         self.assertIn("lesson.plain_text is required", instruction)
+
+    def test_difficulty_profiles_are_ordered_and_default_standard(self):
+        profiles = list_difficulty_profiles()
+
+        self.assertEqual([p.id for p in profiles],
+                         ["guided", "standard", "advanced", "challenge"])
+        self.assertEqual(DEFAULT_DIFFICULTY, "standard")
+        self.assertEqual(get_difficulty_profile("unknown").id, "standard")
 
     def test_generator_retry_uses_course_context_and_long_output_budget(self):
         topic = curriculum_service.resolve_topic(
@@ -99,6 +111,7 @@ class CourseArchitectureTests(unittest.TestCase):
         self.assertEqual(homework["grade_level"], 6)
         self.assertEqual(provider.max_tokens_seen, 12000)
         self.assertIn("6.RP.A.1", provider.user_prompt_seen)
+        self.assertIn("Difficulty policy: standard", provider.user_prompt_seen)
 
 
 class _FakeProvider:
