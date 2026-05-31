@@ -83,7 +83,6 @@ def _render_metrics(homework, today):
 
 
 def _render_course_controls(homework):
-    st.subheader("Course")
     current_grade = int(homework.get("grade_level", 6)) if homework else 6
     current_mode = (homework or {}).get("mode", "lesson_practice")
     current_difficulty = (homework or {}).get("difficulty_policy", DEFAULT_DIFFICULTY)
@@ -95,45 +94,47 @@ def _render_course_controls(homework):
     }
     current_mode_label = mode_by_value.get(current_mode, "Lesson + Practice")
     grades = [5, 6, 7, 8]
-    c1, c2, c3, c4 = st.columns([1, 2, 2, 2])
-    grade_level = c1.selectbox(
-        "Grade",
-        grades,
-        index=grades.index(current_grade) if current_grade in grades else 1,
-    )
-    mode_label = c2.selectbox(
-        "Mode",
-        mode_options,
-        index=mode_options.index(current_mode_label),
-    )
-    include_lesson = c3.checkbox(
-        "Include lesson",
-        value=bool((homework or {}).get("lesson")) or mode_label == "Lesson + Practice",
-        disabled=mode_label == "Practice Only",
-    )
-    difficulties = list_difficulty_profiles()
-    difficulty_ids = [d.id for d in difficulties]
-    difficulty_labels = {d.id: d.label for d in difficulties}
-    difficulty_policy = c4.selectbox(
-        "Difficulty",
-        difficulty_ids,
-        index=difficulty_ids.index(current_difficulty)
-        if current_difficulty in difficulty_ids else difficulty_ids.index(DEFAULT_DIFFICULTY),
-        format_func=lambda value: difficulty_labels[value],
-    )
+    with st.container(border=True):
+        st.markdown('<div class="tm-section-label">Task setup</div>', unsafe_allow_html=True)
+        c1, c2, c3, c4 = st.columns([1, 2, 2, 2])
+        grade_level = c1.selectbox(
+            "Grade",
+            grades,
+            index=grades.index(current_grade) if current_grade in grades else 1,
+        )
+        mode_label = c2.selectbox(
+            "Mode",
+            mode_options,
+            index=mode_options.index(current_mode_label),
+        )
+        include_lesson = c3.checkbox(
+            "Include lesson",
+            value=bool((homework or {}).get("lesson")) or mode_label == "Lesson + Practice",
+            disabled=mode_label == "Practice Only",
+        )
+        difficulties = list_difficulty_profiles()
+        difficulty_ids = [d.id for d in difficulties]
+        difficulty_labels = {d.id: d.label for d in difficulties}
+        difficulty_policy = c4.selectbox(
+            "Difficulty",
+            difficulty_ids,
+            index=difficulty_ids.index(current_difficulty)
+            if current_difficulty in difficulty_ids else difficulty_ids.index(DEFAULT_DIFFICULTY),
+            format_func=lambda value: difficulty_labels[value],
+        )
 
-    topics = curriculum_service.list_topics("math", grade_level)
-    topic_options = [None] + [t.id for t in topics]
-    topic_labels = {None: "Auto"}
-    topic_labels.update({t.id: f"{t.id} — {t.title}" for t in topics})
-    existing_topic_id = (homework or {}).get("target_topic", {}).get("id")
-    selected_topic = st.selectbox(
-        "Topic",
-        topic_options,
-        index=topic_options.index(existing_topic_id) if existing_topic_id in topic_options else 0,
-        format_func=lambda value: topic_labels[value],
-    )
-    include_hints = st.checkbox("Include hints", value=True)
+        topics = curriculum_service.list_topics("math", grade_level)
+        topic_options = [None] + [t.id for t in topics]
+        topic_labels = {None: "Auto"}
+        topic_labels.update({t.id: f"{t.id} — {t.title}" for t in topics})
+        existing_topic_id = (homework or {}).get("target_topic", {}).get("id")
+        selected_topic = st.selectbox(
+            "Topic",
+            topic_options,
+            index=topic_options.index(existing_topic_id) if existing_topic_id in topic_options else 0,
+            format_func=lambda value: topic_labels[value],
+        )
+        include_hints = st.checkbox("Include hints", value=True)
 
     mode_map = {
         "Lesson + Practice": "lesson_practice",

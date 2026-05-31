@@ -13,7 +13,9 @@ def render():
         st.info("No homework generated yet.")
         return
 
-    selected = st.selectbox("Select a date", sorted(dates, reverse=True))
+    with st.container(border=True):
+        st.markdown('<div class="tm-section-label">Archive</div>', unsafe_allow_html=True)
+        selected = st.selectbox("Select a date", sorted(dates, reverse=True))
     if not selected:
         return
 
