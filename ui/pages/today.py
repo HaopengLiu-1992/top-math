@@ -6,10 +6,10 @@ import streamlit as st
 
 from providers.anthropic_provider import AnthropicProvider
 from providers.gemini_provider import GeminiProvider
-from providers.mlx_provider import MLXProvider
+from providers.provider_resolver import resolve_provider
 from domain.difficulty import DEFAULT_DIFFICULTY, get_difficulty_profile, list_difficulty_profiles
 from services import curriculum_service
-from services import generator, review_service, generation_tracker
+from services import generator, generation_tracker
 from services.feedback_service import hydrate_marks
 from storage import homework_store, mark_buffer, history_store
 from ui.components import question_card
@@ -17,9 +17,8 @@ from ui.components import question_card
 
 def render(provider_choice: str):
     today = date.today().isoformat()
-    is_sunday = review_service.is_sunday()
 
-    st.title(f"{'🔄 Sunday Review' if is_sunday else '📚 Today'} — {today}")
+    st.title(f"📚 Today — {today}")
 
     # ── background generation status ──────────────────────────────────────────
     gen = generation_tracker.get()
@@ -40,33 +39,33 @@ def render(provider_choice: str):
         generation_tracker.reset()
 
     homework = homework_store.load_questions(today)
-    provider = _resolve_provider(provider_choice)
+    provider = resolve_provider(provider_choice)
     course_options = _render_course_controls(homework)
 
     # ── metrics ──────────────────────────────────────────────────────────────
-    _render_metrics(homework, today, is_sunday)
+    _render_metrics(homework, today)
     st.divider()
 
     # ── generate / regenerate button ──────────────────────────────────────────
     if not homework:
-        _render_generate_button(today, is_sunday, provider, course_options)
+        _render_generate_button(today, provider, course_options)
     else:
-        st.info(f"{'Review' if is_sunday else 'Homework'} already generated for today.")
-        _render_regenerate_button(today, is_sunday, provider, course_options)
+        st.info("Task already generated for today.")
+        _render_regenerate_button(today, provider, course_options)
 
     # ── content ───────────────────────────────────────────────────────────────
     if homework:
-        _render_homework(homework, today, is_sunday)
+        _render_homework(homework, today)
 
 
-def _render_metrics(homework, today, is_sunday):
+def _render_metrics(homework, today):
     from services.feedback_service import calc_auto_score
     c1, c2, c3, c4, c5, c6 = st.columns(6)
 
     if homework:
         c1.metric("Status", "Generated")
         grade = homework.get("grade_level", 6)
-        session = "Review" if is_sunday else f"Grade {grade} · Day {homework.get('day', '-')}"
+        session = f"Grade {grade} · Day {homework.get('day', '-')}"
         c2.metric("Session", session)
         c3.metric("Est. minutes", homework.get("estimated_minutes", "—"))
         correct, total = calc_auto_score(today)
@@ -76,7 +75,7 @@ def _render_metrics(homework, today, is_sunday):
         c6.metric("Model", homework.get("model", "—"))
     else:
         c1.metric("Status", "Not generated")
-        c2.metric("Session", "Sunday Review" if is_sunday else "Normal")
+        c2.metric("Session", "Task")
         c3.metric("Est. minutes", "~40")
         c4.metric("Marked", "—")
         c5.metric("Difficulty", get_difficulty_profile(DEFAULT_DIFFICULTY).label)
@@ -151,20 +150,9 @@ def _render_course_controls(homework):
     }
 
 
-def _render_generate_button(today, is_sunday, provider, course_options):
-    if is_sunday:
-        incorrect = review_service.collect_incorrect_questions(today)
-        if not incorrect:
-            st.balloons()
-            st.success("No mistakes this week — great job! No review needed. Enjoy your Sunday!")
-            return
-
-        st.warning(f"{len(incorrect)} incorrect question(s) from this week. Generating review...")
-        if st.button("Generate Sunday Review", type="primary", width="stretch"):
-            _run_review(today, provider)
-    else:
-        if st.button("Generate Today's Homework", type="primary", width="stretch"):
-            _run_generate(today, provider, course_options)
+def _render_generate_button(today, provider, course_options):
+    if st.button("Generate Task", type="primary", width="stretch"):
+        _run_generate(today, provider, course_options)
 
 
 def _run_generate(today, provider, course_options):
@@ -174,42 +162,32 @@ def _run_generate(today, provider, course_options):
     st.rerun()
 
 
-def _run_review(today, provider):
-    if not _check_api_key(provider):
-        return
-    generation_tracker.start(today, review_service.generate_review, today, provider)
-    st.rerun()
-
-
-def _render_regenerate_button(today, is_sunday, provider, course_options):
-    if st.button("Regenerate Today's Homework", type="secondary"):
+def _render_regenerate_button(today, provider, course_options):
+    if st.button("Regenerate Task", type="secondary"):
         st.session_state["confirm_regen"] = True
 
     if st.session_state.get("confirm_regen"):
-        st.warning("This will delete today's homework and all marks. Continue?")
+        st.warning("This will delete today's task and all marks. Continue?")
         c1, c2 = st.columns(2)
         if c1.button("Yes, regenerate", type="primary", width="stretch"):
-            _do_regenerate(today, is_sunday, provider, course_options)
+            _do_regenerate(today, provider, course_options)
         if c2.button("Cancel", width="stretch"):
             st.session_state.pop("confirm_regen", None)
             st.rerun()
 
 
-def _do_regenerate(today, is_sunday, provider, course_options):
+def _do_regenerate(today, provider, course_options):
     if not _check_api_key(provider):
         return
     mark_buffer.clear_date(today)
     homework_store.delete_for_date(today)
     history_store.delete_fingerprints(today)
     st.session_state.pop("confirm_regen", None)
-    if is_sunday:
-        generation_tracker.start(today, review_service.generate_review, today, provider)
-    else:
-        generation_tracker.start(today, generator.generate, today, provider, **course_options)
+    generation_tracker.start(today, generator.generate, today, provider, **course_options)
     st.rerun()
 
 
-def _render_homework(homework, today, is_sunday):
+def _render_homework(homework, today):
     session_type = homework.get("session_type", "normal")
     encouragement = homework.get("encouragement", "")
 
@@ -251,15 +229,6 @@ def _render_pdf_downloads(date_str):
             c2.download_button("Download Answers PDF", f,
                                file_name=f"answers_{date_str}.pdf",
                                mime="application/pdf", width="stretch")
-
-
-def _resolve_provider(choice: str):
-    if choice.startswith("Local"):
-        return MLXProvider()
-    if choice.startswith("Gemini"):
-        return GeminiProvider()
-    return AnthropicProvider()
-
 
 def _check_api_key(provider) -> bool:
     if isinstance(provider, AnthropicProvider) and not os.environ.get("ANTHROPIC_API_KEY"):
