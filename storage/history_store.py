@@ -110,6 +110,36 @@ def get_weekly_logs(date_str: str, past_days: int = 7) -> list[dict]:
     return sorted(logs, key=lambda x: x["date"])
 
 
+def get_logs_for_range(start_date: str, end_date: str) -> list[dict]:
+    """Build log entries for an inclusive date range."""
+    from storage import homework_store, mark_buffer
+    start = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+    if start > end:
+        raise ValueError("start_date must be on or before end_date")
+
+    logs = []
+    current = start
+    while current <= end:
+        d = current.isoformat()
+        hw = homework_store.load_questions(d)
+        if hw:
+            meta = homework_store.load_meta(d)
+            topics = list({data["topic"] for data in meta.values() if data.get("topic")})
+            marks = mark_buffer.get_marks(d)
+            total = len(marks)
+            correct = sum(1 for v in marks.values() if v is True)
+            logs.append({
+                "date": d,
+                "day": hw.get("day"),
+                "session_type": hw.get("session_type", "normal"),
+                "topics": topics,
+                "auto_score_pct": round(correct / total * 100, 1) if total > 0 else None,
+            })
+        current += timedelta(days=1)
+    return logs
+
+
 # ── migration ─────────────────────────────────────────────────────────────────
 
 def migrate_from_old_history():

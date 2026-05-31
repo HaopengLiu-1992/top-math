@@ -8,13 +8,22 @@ def system_prompt() -> str:
     return _INSTRUCTION.read_text()
 
 
-def user_prompt(date_str: str, weekly_logs: list[dict], incorrect_questions: list[dict]) -> str:
-    return f"""Analyze Jessie's math performance for the week ending {date_str}.
+def user_prompt(start_date: str, end_date_or_logs, logs_or_incorrect=None,
+                incorrect_questions: list[dict] | None = None) -> str:
+    if incorrect_questions is None:
+        end_date = start_date
+        weekly_logs = end_date_or_logs
+        incorrect_questions = logs_or_incorrect
+    else:
+        end_date = end_date_or_logs
+        weekly_logs = logs_or_incorrect
 
-Weekly homework logs (scores, topics, incorrect question IDs):
+    return f"""Analyze Jessie's math performance for {start_date} through {end_date}.
+
+Task logs (scores and topics):
 {json.dumps(weekly_logs, indent=2)}
 
-Full incorrect questions from this week:
+Full incorrect questions from this range:
 {json.dumps(incorrect_questions, indent=2)}
 
 Output ONLY valid JSON. No markdown, no explanation."""

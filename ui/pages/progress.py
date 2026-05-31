@@ -4,8 +4,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from services import analysis_service, feedback_report_service, feedback_service
-from services.review_service import is_sunday
+from providers.provider_resolver import resolve_provider
+from services import feedback_service, summary_service
 from storage import history_store, homework_store
 
 TOPIC_NAMES = {
@@ -63,18 +63,6 @@ def _build_df() -> pd.DataFrame:
     return df
 
 
-def _get_available_sundays() -> list[str]:
-    """Return all Sundays that have a stored analysis or feedback report, newest first."""
-    from services import analysis_service
-    sundays = []
-    for d in history_store.get_all_dates():
-        if date.fromisoformat(d).weekday() == 6:  # Sunday
-            if (analysis_service.load_analysis(d) or
-                    feedback_report_service.load_report(d)):
-                sundays.append(d)
-    return sorted(sundays, reverse=True)
-
-
 def render(provider_choice: str):
     st.title("📊 Analysis")
 
@@ -84,24 +72,6 @@ def render(provider_choice: str):
         return
 
     df = _build_df()
-    today = date.today().isoformat()
-
-    # ── week selector ─────────────────────────────────────────────────────────
-    past_sundays = _get_available_sundays()
-    is_current_sunday = is_sunday()
-
-    if past_sundays:
-        options = past_sundays.copy()
-        if is_current_sunday and today not in options:
-            options = [today] + options
-        label_map = {d: f"{d} {'(today)' if d == today else ''}" for d in options}
-        selected_week = st.selectbox(
-            "Week", options, format_func=lambda d: label_map[d]
-        )
-    else:
-        selected_week = today
-
-    st.divider()
 
     _render_metrics(df)
     st.divider()
@@ -109,8 +79,7 @@ def render(provider_choice: str):
     st.divider()
     _render_daily_scores(df)
     _render_topic_coverage(df)
-    _render_weekly_feedback_report(provider_choice, selected_week)
-    _render_weekly_analysis(provider_choice, selected_week)
+    _render_summary(provider_choice)
 
     st.subheader("All Days")
     display_df = df[["date", "day", "session_type", "score_pct", "topics"]].sort_values(
@@ -193,34 +162,47 @@ def _render_topic_coverage(df: pd.DataFrame):
     st.plotly_chart(fig, width="stretch")
 
 
-def _render_weekly_feedback_report(provider_choice: str, selected_week: str):
-    st.subheader("Weekly Feedback Report")
-    today = date.today().isoformat()
-    report = feedback_report_service.load_report(selected_week)
+def _render_summary(provider_choice: str):
+    st.subheader("Summary")
+    default_start, default_end = summary_service.default_range()
+    c1, c2 = st.columns(2)
+    start_value = c1.date_input("Start date", value=date.fromisoformat(default_start))
+    end_value = c2.date_input("End date", value=date.fromisoformat(default_end))
+    start_date = start_value.isoformat()
+    end_date = end_value.isoformat()
+
+    if date.fromisoformat(start_date) > date.fromisoformat(end_date):
+        st.error("Start date must be on or before end date.")
+        return
+
+    summary = summary_service.load_summary(start_date, end_date)
+    c_generate, c_force = st.columns([2, 1])
+    generate = c_generate.button("Generate Summary", type="primary")
+    force = c_force.checkbox("Regenerate", value=False)
+
+    if generate:
+        provider = resolve_provider(provider_choice)
+        with st.spinner("Generating summary..."):
+            try:
+                summary = summary_service.generate_summary(
+                    start_date, end_date, provider, force=force
+                )
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed: {e}")
+                return
+
+    report = summary.get("feedback_report")
+    analysis = summary.get("analysis")
+    if not report and not analysis:
+        st.caption("No summary for this range yet. Default range is the most recent week.")
+        st.divider()
+        return
 
     if report:
         _display_feedback_report(report)
-    elif selected_week == today and is_sunday():
-        if st.button("Generate Weekly Feedback Report", type="primary"):
-            from providers.anthropic_provider import AnthropicProvider
-            from providers.gemini_provider import GeminiProvider
-            from providers.mlx_provider import MLXProvider
-            if provider_choice.startswith("Local"):
-                provider = MLXProvider()
-            elif provider_choice.startswith("Gemini"):
-                provider = GeminiProvider()
-            else:
-                provider = AnthropicProvider()
-            with st.spinner("Generating feedback report..."):
-                try:
-                    report = feedback_report_service.generate_report(today, provider)
-                    _display_feedback_report(report)
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Failed: {e}")
-    else:
-        st.caption("No feedback report for this week." if selected_week != today
-                   else "Weekly feedback report is generated on Sundays.")
+    if analysis:
+        _display_analysis(analysis)
 
 
 def _display_feedback_report(report: dict):
@@ -256,37 +238,6 @@ def _display_feedback_report(report: dict):
 
     st.info(report.get("encouragement", ""))
     st.divider()
-
-
-def _render_weekly_analysis(provider_choice: str, selected_week: str):
-    st.subheader("Weekly Analysis")
-    today = date.today().isoformat()
-    existing = analysis_service.load_analysis(selected_week)
-
-    if existing:
-        _display_analysis(existing)
-    elif selected_week == today and is_sunday():
-        if st.button("Generate Weekly Analysis", type="primary"):
-            from providers.anthropic_provider import AnthropicProvider
-            from providers.gemini_provider import GeminiProvider
-            from providers.mlx_provider import MLXProvider
-            if provider_choice.startswith("Local"):
-                provider = MLXProvider()
-            elif provider_choice.startswith("Gemini"):
-                provider = GeminiProvider()
-            else:
-                provider = AnthropicProvider()
-            with st.spinner("Analysing this week..."):
-                try:
-                    analysis = analysis_service.generate_analysis(today, provider)
-                    _display_analysis(analysis)
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Failed: {e}")
-    else:
-        st.caption("No analysis for this week." if selected_week != today
-                   else "Weekly analysis is generated on Sundays.")
-
 
 def _display_analysis(analysis: dict):
     st.markdown(f"> {analysis.get('week_summary', '')}")

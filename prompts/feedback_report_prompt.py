@@ -8,13 +8,22 @@ def system_prompt() -> str:
     return _INSTRUCTION.read_text()
 
 
-def user_prompt(date_str: str, weekly_logs: list[dict], incorrect_questions: list[dict]) -> str:
-    return f"""Generate the weekly feedback report for the week ending {date_str}.
+def user_prompt(start_date: str, end_date_or_logs, logs_or_incorrect=None,
+                incorrect_questions: list[dict] | None = None) -> str:
+    if incorrect_questions is None:
+        end_date = start_date
+        weekly_logs = end_date_or_logs
+        incorrect_questions = logs_or_incorrect
+    else:
+        end_date = end_date_or_logs
+        weekly_logs = logs_or_incorrect
 
-Weekly homework logs:
+    return f"""Generate a parent-facing feedback summary for {start_date} through {end_date}.
+
+Task logs:
 {json.dumps(weekly_logs, indent=2)}
 
-Incorrect questions this week (full detail):
+Incorrect questions in this range (full detail):
 {json.dumps(incorrect_questions, indent=2)}
 
 Output ONLY valid JSON. No markdown, no explanation."""

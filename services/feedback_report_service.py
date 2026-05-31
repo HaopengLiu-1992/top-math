@@ -53,10 +53,26 @@ def generate_report(date_str: str | None = None,
     return report
 
 
+def generate_report_from_data(start_date: str, end_date: str,
+                              logs: list[dict], incorrect: list[dict],
+                              provider: ModelProvider | None = None) -> dict:
+    provider = provider or get_default_provider()
+    report = _generate_with_retry_for_range(start_date, end_date, logs, incorrect, provider)
+    report["generated_date"] = date.today().isoformat()
+    report["range"] = {"start_date": start_date, "end_date": end_date}
+    return report
+
+
 def _generate_with_retry(date_str: str, weekly_logs: list[dict],
                          incorrect: list[dict], provider: ModelProvider) -> dict:
+    return _generate_with_retry_for_range(date_str, date_str, weekly_logs, incorrect, provider)
+
+
+def _generate_with_retry_for_range(start_date: str, end_date: str,
+                                   weekly_logs: list[dict],
+                                   incorrect: list[dict], provider: ModelProvider) -> dict:
     system = feedback_report_prompt.system_prompt()
-    user = feedback_report_prompt.user_prompt(date_str, weekly_logs, incorrect)
+    user = feedback_report_prompt.user_prompt(start_date, end_date, weekly_logs, incorrect)
 
     for attempt in range(1, MAX_RETRIES + 1):
         print(f"  [FeedbackReport/{provider.name}] attempt {attempt}/{MAX_RETRIES}")
