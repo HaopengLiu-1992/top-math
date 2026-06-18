@@ -17,6 +17,9 @@ import copy
 import json
 from pathlib import Path
 
+from domain.daily_task import MATH_HOMEWORK
+from storage import daily_task_store
+
 
 # ── path helpers ──────────────────────────────────────────────────────────────
 
@@ -38,6 +41,10 @@ def analysis_path(date_str: str) -> Path:
 
 
 def pdf_dir(date_str: str) -> Path:
+    return daily_task_store.pdf_day_dir(MATH_HOMEWORK, date_str)
+
+
+def legacy_pdf_dir(date_str: str) -> Path:
     y, m, d = date_str.split("-")
     return Path(f"output/pdf/{y}/{m}/{d}")
 
@@ -45,6 +52,9 @@ def pdf_dir(date_str: str) -> Path:
 # ── questions (static) ────────────────────────────────────────────────────────
 
 def load_questions(date_str: str) -> dict | None:
+    task = daily_task_store.load_task(MATH_HOMEWORK, date_str)
+    if task:
+        return task
     p = questions_path(date_str)
     if not p.exists():
         return None
@@ -61,12 +71,16 @@ def save_questions(hw: dict, date_str: str):
     p = questions_path(date_str)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+    daily_task_store.save_task(MATH_HOMEWORK, date_str, data)
 
 
 # ── meta (marks + topics) ─────────────────────────────────────────────────────
 
 def load_meta(date_str: str) -> dict:
     """Returns { qid: { correct: null|true|false, topic: str } } or {} if missing."""
+    meta = daily_task_store.load_meta(MATH_HOMEWORK, date_str)
+    if meta:
+        return meta
     p = meta_path(date_str)
     if not p.exists():
         return {}
@@ -77,6 +91,7 @@ def save_meta(meta: dict, date_str: str):
     p = meta_path(date_str)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(meta, indent=2, ensure_ascii=False))
+    daily_task_store.save_meta(MATH_HOMEWORK, date_str, meta)
 
 
 def build_meta(hw: dict) -> dict:
@@ -110,14 +125,15 @@ def save_analysis(analysis: dict, date_str: str):
 
 def delete_for_date(date_str: str):
     """Delete questions.json, meta.json, and PDFs for a date (for regeneration)."""
+    daily_task_store.delete_for_date(MATH_HOMEWORK, date_str)
     for p in [questions_path(date_str), meta_path(date_str)]:
         if p.exists():
             p.unlink()
-    pdf_d = pdf_dir(date_str)
-    for name in ["questions.pdf", "answers.pdf"]:
-        f = pdf_d / name
-        if f.exists():
-            f.unlink()
+    for pdf_d in [pdf_dir(date_str), legacy_pdf_dir(date_str)]:
+        for name in ["questions.pdf", "answers.pdf"]:
+            f = pdf_d / name
+            if f.exists():
+                f.unlink()
 
 
 # ── migration ─────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ from storage.history_store import migrate_from_old_history
 from services.feedback_service import hydrate_all_marks
 from ui.auth import require_app_password
 from ui.components.nav import render as render_nav
-from ui.pages import today, progress, history
+from ui.pages import today, progress, history, vocabulary
 from ui.theme import apply_theme
 import services.generator as generator_module
 
@@ -53,6 +53,8 @@ def render():
 
     if page == "Today":
         today.render(provider_choice)
+    elif page == "Vocabulary":
+        vocabulary.render(provider_choice)
     elif page == "History":
         history.render()
     elif page == "Analysis":

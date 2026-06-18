@@ -8,6 +8,9 @@ import json
 from pathlib import Path
 from datetime import date, timedelta
 
+from domain.daily_task import MATH_HOMEWORK
+from storage import daily_task_store
+
 RAW_ROOT = Path("output/raw")
 
 
@@ -15,10 +18,10 @@ RAW_ROOT = Path("output/raw")
 
 def get_all_dates() -> list[str]:
     """Return all homework dates sorted oldest first."""
-    dates = []
+    dates = set(daily_task_store.list_dates(MATH_HOMEWORK))
     for p in RAW_ROOT.glob("*/*/*/questions.json"):
         parts = p.parts  # (..., raw, YYYY, MM, DD, questions.json)
-        dates.append(f"{parts[-4]}-{parts[-3]}-{parts[-2]}")
+        dates.add(f"{parts[-4]}-{parts[-3]}-{parts[-2]}")
     return sorted(dates)
 
 
@@ -38,6 +41,9 @@ def get_total_days() -> int:
 # ── fingerprints (dedup) ──────────────────────────────────────────────────────
 
 def load_fingerprints(date_str: str) -> list[str]:
+    fps = daily_task_store.load_fingerprints(MATH_HOMEWORK, date_str)
+    if fps:
+        return fps
     p = _fp_path(date_str)
     if not p.exists():
         return []
@@ -45,12 +51,14 @@ def load_fingerprints(date_str: str) -> list[str]:
 
 
 def save_fingerprints(date_str: str, hashes: list[str]):
+    daily_task_store.save_fingerprints(MATH_HOMEWORK, date_str, hashes)
     p = _fp_path(date_str)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(hashes, indent=2))
 
 
 def delete_fingerprints(date_str: str):
+    daily_task_store.delete_fingerprints(MATH_HOMEWORK, date_str)
     p = _fp_path(date_str)
     if p.exists():
         p.unlink()
@@ -59,6 +67,8 @@ def delete_fingerprints(date_str: str):
 def get_all_fingerprints() -> set[str]:
     """Collect fingerprints from all days for dedup."""
     hashes: set[str] = set()
+    for date_str in daily_task_store.list_dates(MATH_HOMEWORK):
+        hashes.update(daily_task_store.load_fingerprints(MATH_HOMEWORK, date_str))
     for p in RAW_ROOT.glob("*/*/*/fingerprints.json"):
         try:
             hashes.update(json.loads(p.read_text()))

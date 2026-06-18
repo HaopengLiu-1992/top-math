@@ -8,7 +8,8 @@ import threading
 import time
 import logging
 
-from storage import mark_buffer, homework_store
+from domain.daily_task import MATH_HOMEWORK, TaskScope
+from storage import daily_task_store, homework_store, mark_buffer
 
 logger = logging.getLogger(__name__)
 
@@ -35,16 +36,16 @@ def _run():
 
 
 def _flush():
-    for date_str, marks, last_update in mark_buffer.get_recently_updated(_FLUSH_INTERVAL):
+    for scope, date_str, marks, last_update in mark_buffer.get_recently_updated(_FLUSH_INTERVAL):
         try:
-            _write_meta(date_str, marks)
+            _write_meta(scope, date_str, marks)
         except Exception:
-            logger.exception("Failed to flush marks for %s", date_str)
+            logger.exception("Failed to flush marks for %s/%s", scope.key, date_str)
 
 
-def _write_meta(date_str: str, marks: dict):
+def _write_meta(scope: TaskScope, date_str: str, marks: dict):
     """Full overwrite of meta.json with current marks from buffer."""
-    meta = homework_store.load_meta(date_str)
+    meta = homework_store.load_meta(date_str) if scope == MATH_HOMEWORK else daily_task_store.load_meta(scope, date_str)
     if not meta:
         return
 
@@ -52,5 +53,8 @@ def _write_meta(date_str: str, marks: dict):
         if qid in marks:
             data["correct"] = marks[qid]
 
-    homework_store.save_meta(meta, date_str)
-    logger.debug("Flushed meta for %s", date_str)
+    if scope == MATH_HOMEWORK:
+        homework_store.save_meta(meta, date_str)
+    else:
+        daily_task_store.save_meta(scope, date_str, meta)
+    logger.debug("Flushed meta for %s/%s", scope.key, date_str)

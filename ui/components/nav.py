@@ -2,6 +2,7 @@ import streamlit as st
 
 PAGES = [
     ("📚  Today", "Today"),
+    ("🔤  Vocabulary", "Vocabulary"),
     ("📅  History", "History"),
     ("📊  Analysis", "Analysis"),
 ]

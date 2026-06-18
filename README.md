@@ -5,7 +5,8 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
 ## Features
 
 - Daily Grade 5 math homework following CCSS standards — one generation per day (idempotent/cached)
-- Questions and answers in separate PDFs stored under `output/pdf/YYYY/MM/DD/`
+- Daily math/science academic vocabulary practice — 20 words with matching, fill-in-the-blank, and reading-bridge questions
+- Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
 - Sunday review: collects incorrectly marked questions from the past 7 days; skipped if no mistakes
 - Weekly feedback report and skills analysis generated on Sundays; browseable by past week via date selector
@@ -101,9 +102,27 @@ UI reads (score bar, badges, analysis page)
 
 ---
 
-## Per-Day Storage
+## Daily Task Storage
 
-No central history file. All data lives in `output/raw/YYYY/MM/DD/`:
+New generated work uses a scoped daily task tree so multiple subjects can share
+the same app structure without colliding by date:
+
+```
+output/tasks/
+└── math/
+    └── homework/
+        ├── raw/YYYY/MM/DD/task.json
+        ├── raw/YYYY/MM/DD/meta.json
+        └── pdf/YYYY/MM/DD/questions.pdf
+└── english/
+    └── vocabulary/
+        ├── raw/YYYY/MM/DD/task.json
+        ├── raw/YYYY/MM/DD/meta.json
+        └── pdf/YYYY/MM/DD/vocabulary.pdf
+```
+
+Older math homework files are still read from the legacy layout for history
+compatibility:
 
 ```
 output/raw/
@@ -119,8 +138,8 @@ output/raw/
             └── fingerprints.json
 ```
 
-`history_store` scans this directory tree at runtime:
-- `get_all_dates()` → glob `*/*/*/homework.json`
+`history_store` scans both the new math task tree and legacy tree at runtime:
+- `get_all_dates()` → scoped math tasks plus legacy `questions.json`
 - `get_total_days()` → max `day` field across non-review sessions
 - `get_all_fingerprints()` → union of all per-day `fingerprints.json`
 - `get_recent_topics(14)` → topics from past 14 days' homework.json
@@ -309,7 +328,7 @@ The app auto-detects it and offers it in the sidebar.
 
 | Provider | Details |
 |----------|---------|
-| **DeepSeek (cloud)** | DeepSeek API — requires `DEEPSEEK_API_KEY`; default model is `deepseek-v4-flash` |
+| **DeepSeek (cloud)** | DeepSeek API — requires `DEEPSEEK_API_KEY`; default model is `deepseek-v4-flash` with thinking `high` |
 | **Gemini (cloud)** | Google Gemini API — requires `GEMINI_API_KEY` |
 | **Claude (cloud)** | Anthropic API — requires `ANTHROPIC_API_KEY` |
 | **Local MLX (Qwen)** | OpenAI-compatible local server at `http://localhost:8080` — no API key needed |

@@ -54,7 +54,7 @@ def _render_day_header(homework: dict, date_str: str):
 
 
 def _render_pdf_downloads(date_str: str):
-    pdf_d = homework_store.pdf_dir(date_str)
+    pdf_d = _existing_pdf_dir(date_str)
     q_pdf = pdf_d / "questions.pdf"
     a_pdf = pdf_d / "answers.pdf"
 
@@ -69,3 +69,11 @@ def _render_pdf_downloads(date_str: str):
             c2.download_button("Download Answers PDF", f,
                                file_name=f"answers_{date_str}.pdf",
                                mime="application/pdf", width="stretch")
+
+
+def _existing_pdf_dir(date_str):
+    pdf_d = homework_store.pdf_dir(date_str)
+    legacy = homework_store.legacy_pdf_dir(date_str)
+    if not (pdf_d / "questions.pdf").exists() and (legacy / "questions.pdf").exists():
+        return legacy
+    return pdf_d
