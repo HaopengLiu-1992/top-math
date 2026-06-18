@@ -6,7 +6,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 
-from pdf.fonts import register_cjk_font
+from pdf.fonts import paragraph_text
 from storage import vocabulary_store
 
 
@@ -20,23 +20,23 @@ def build_vocabulary(task: dict) -> Path:
     for idx, item in enumerate(task.get("words", []), 1):
         label = "Review" if item.get("is_review") else "New"
         story.append(Paragraph(
-            f"{idx}. <b>{item['word']}</b> ({label}) - {item.get('chinese', '')}<br/>"
-            f"{item.get('definition', '')}<br/><i>{item.get('example', '')}</i>",
+            f"{idx}. <b>{paragraph_text(item['word'])}</b> ({label}) - {paragraph_text(item.get('chinese', ''))}<br/>"
+            f"{paragraph_text(item.get('definition', ''))}<br/><i>{paragraph_text(item.get('example', ''))}</i>",
             normal,
         ))
 
     practice = task.get("practice", {})
     story.append(Paragraph("Matching", section))
     for item in practice.get("matching", []):
-        story.append(Paragraph(f"- {item.get('word', '')}: ____________________", normal))
+        story.append(Paragraph(f"- {paragraph_text(item.get('word', ''))}: ____________________", normal))
 
     story.append(Paragraph("Fill in the Blank", section))
     for item in practice.get("fill_blank", []):
-        story.append(Paragraph(f"- {item.get('sentence', '')}", normal))
+        story.append(Paragraph(f"- {paragraph_text(item.get('sentence', ''))}", normal))
 
     story.append(Paragraph("Reading Bridge", section))
     for idx, item in enumerate(practice.get("keyword_reading", []), 1):
-        story.append(Paragraph(f"{idx}. {item.get('question', '')}", normal))
+        story.append(Paragraph(f"{idx}. {paragraph_text(item.get('question', ''))}", normal))
         story.append(Paragraph("Keyword: ____________________", normal))
 
     _build_doc(filename, story)
@@ -52,24 +52,27 @@ def build_answers(task: dict) -> Path:
 
     story.append(Paragraph("Quick Checks", section))
     for idx, item in enumerate(task.get("words", []), 1):
-        story.append(Paragraph(f"{idx}. {item.get('quick_check', '')}", normal))
-        story.append(Paragraph(f"Answer: {item.get('answer', '')}", answer))
+        story.append(Paragraph(f"{idx}. {paragraph_text(item.get('quick_check', ''))}", normal))
+        story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
 
     practice = task.get("practice", {})
     story.append(Paragraph("Matching", section))
     for item in practice.get("matching", []):
-        story.append(Paragraph(f"{item.get('word', '')}: {item.get('definition', '')}", answer))
+        story.append(Paragraph(
+            f"{paragraph_text(item.get('word', ''))}: {paragraph_text(item.get('definition', ''))}",
+            answer,
+        ))
 
     story.append(Paragraph("Fill in the Blank", section))
     for item in practice.get("fill_blank", []):
-        story.append(Paragraph(f"{item.get('sentence', '')}", normal))
-        story.append(Paragraph(f"Answer: {item.get('answer', '')}", answer))
+        story.append(Paragraph(f"{paragraph_text(item.get('sentence', ''))}", normal))
+        story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
 
     story.append(Paragraph("Reading Bridge", section))
     for item in practice.get("keyword_reading", []):
-        story.append(Paragraph(f"{item.get('question', '')}", normal))
+        story.append(Paragraph(f"{paragraph_text(item.get('question', ''))}", normal))
         story.append(Paragraph(
-            f"Keyword: {item.get('keyword', '')} - {item.get('meaning', '')}",
+            f"Keyword: {paragraph_text(item.get('keyword', ''))} - {paragraph_text(item.get('meaning', ''))}",
             answer,
         ))
 
@@ -85,18 +88,15 @@ def _path(task: dict, name: str) -> Path:
 
 def _base_story(task: dict, title: str):
     styles = getSampleStyleSheet()
-    font_name = register_cjk_font()
-    title_style = ParagraphStyle("title", parent=styles["Heading1"], fontName=font_name,
-                                 fontSize=16, spaceAfter=4)
+    title_style = ParagraphStyle("title", parent=styles["Heading1"], fontSize=16, spaceAfter=4)
     subtitle_style = ParagraphStyle("subtitle", parent=styles["Normal"], fontSize=10,
-                                    fontName=font_name, textColor=colors.grey, spaceAfter=12)
+                                    textColor=colors.grey, spaceAfter=12)
     section_style = ParagraphStyle("section", parent=styles["Heading2"], fontSize=12,
-                                   fontName=font_name, spaceBefore=14, spaceAfter=6)
+                                   spaceBefore=14, spaceAfter=6)
     normal_style = ParagraphStyle("vocab_normal", parent=styles["Normal"], fontSize=10,
-                                  fontName=font_name, spaceAfter=8, leading=14)
+                                  spaceAfter=8, leading=14)
     answer_style = ParagraphStyle("answer", parent=styles["Normal"], fontSize=10,
-                                  fontName=font_name, textColor=colors.HexColor("#1a6b1a"),
-                                  spaceAfter=5, leading=13)
+                                  textColor=colors.HexColor("#1a6b1a"), spaceAfter=5, leading=13)
     custom = {
         "section": section_style,
         "normal": normal_style,
@@ -104,7 +104,7 @@ def _base_story(task: dict, title: str):
     }
     story = [
         Paragraph(title, title_style),
-        Paragraph(f"{task['date']} | Grade {task.get('grade_level', '-')}", subtitle_style),
+        Paragraph(paragraph_text(f"{task['date']} | Grade {task.get('grade_level', '-')}"), subtitle_style),
         HRFlowable(width="100%", thickness=0.5, color=colors.black),
         Spacer(1, 8),
     ]

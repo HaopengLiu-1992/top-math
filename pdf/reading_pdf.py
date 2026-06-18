@@ -7,7 +7,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 
 from domain.daily_task import TaskScope
-from pdf.fonts import register_cjk_font
+from pdf.fonts import paragraph_text
 from storage import reading_store
 
 
@@ -18,19 +18,19 @@ def build_reading(scope: TaskScope, task: dict) -> Path:
     normal = styles["normal"]
 
     passage = task.get("passage", {})
-    story.append(Paragraph(passage.get("title", "Passage"), section))
-    story.append(Paragraph(passage.get("text", ""), normal))
+    story.append(Paragraph(paragraph_text(passage.get("title", "Passage")), section))
+    story.append(Paragraph(paragraph_text(passage.get("text", "")), normal))
 
     story.append(Paragraph("Vocabulary", section))
     for item in task.get("vocabulary", []):
         story.append(Paragraph(
-            f"<b>{item.get('word', '')}</b> - {item.get('definition', '')}",
+            f"<b>{paragraph_text(item.get('word', ''))}</b> - {paragraph_text(item.get('definition', ''))}",
             normal,
         ))
 
     story.append(Paragraph("Questions", section))
     for idx, item in enumerate(task.get("questions", []), 1):
-        story.append(Paragraph(f"{idx}. {item.get('question', '')}", normal))
+        story.append(Paragraph(f"{idx}. {paragraph_text(item.get('question', ''))}", normal))
         story.append(Spacer(1, 8))
 
     _build_doc(filename, story)
@@ -47,15 +47,16 @@ def build_answers(scope: TaskScope, task: dict) -> Path:
     story.append(Paragraph("Vocabulary", section))
     for item in task.get("vocabulary", []):
         story.append(Paragraph(
-            f"<b>{item.get('word', '')}</b> ({item.get('chinese', '')}) - {item.get('definition', '')}<br/>"
-            f"<i>{item.get('sentence', '')}</i>",
+            f"<b>{paragraph_text(item.get('word', ''))}</b> ({paragraph_text(item.get('chinese', ''))}) - "
+            f"{paragraph_text(item.get('definition', ''))}<br/>"
+            f"<i>{paragraph_text(item.get('sentence', ''))}</i>",
             normal,
         ))
 
     story.append(Paragraph("Answers", section))
     for idx, item in enumerate(task.get("questions", []), 1):
-        story.append(Paragraph(f"{idx}. {item.get('question', '')}", normal))
-        story.append(Paragraph(f"Answer: {item.get('answer', '')}", answer))
+        story.append(Paragraph(f"{idx}. {paragraph_text(item.get('question', ''))}", normal))
+        story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
 
     _build_doc(filename, story)
     return filename
@@ -69,21 +70,18 @@ def _path(scope: TaskScope, task: dict, name: str) -> Path:
 
 def _base_story(task: dict, title: str):
     styles = getSampleStyleSheet()
-    font_name = register_cjk_font()
-    title_style = ParagraphStyle("title", parent=styles["Heading1"], fontName=font_name,
-                                 fontSize=16, spaceAfter=4)
+    title_style = ParagraphStyle("title", parent=styles["Heading1"], fontSize=16, spaceAfter=4)
     subtitle_style = ParagraphStyle("subtitle", parent=styles["Normal"], fontSize=10,
-                                    fontName=font_name, textColor=colors.grey, spaceAfter=12)
+                                    textColor=colors.grey, spaceAfter=12)
     section_style = ParagraphStyle("section", parent=styles["Heading2"], fontSize=12,
-                                   fontName=font_name, spaceBefore=14, spaceAfter=6)
+                                   spaceBefore=14, spaceAfter=6)
     normal_style = ParagraphStyle("reading_normal", parent=styles["Normal"], fontSize=10,
-                                  fontName=font_name, spaceAfter=8, leading=14)
+                                  spaceAfter=8, leading=14)
     answer_style = ParagraphStyle("answer", parent=styles["Normal"], fontSize=10,
-                                  fontName=font_name, textColor=colors.HexColor("#1a6b1a"),
-                                  spaceAfter=5, leading=13)
+                                  textColor=colors.HexColor("#1a6b1a"), spaceAfter=5, leading=13)
     story = [
         Paragraph(title, title_style),
-        Paragraph(f"{task['date']} | Grade {task.get('grade_level', '-')}", subtitle_style),
+        Paragraph(paragraph_text(f"{task['date']} | Grade {task.get('grade_level', '-')}"), subtitle_style),
         HRFlowable(width="100%", thickness=0.5, color=colors.black),
         Spacer(1, 8),
     ]
