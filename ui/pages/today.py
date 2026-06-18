@@ -16,10 +16,25 @@ from storage import homework_store, mark_buffer, history_store
 from ui.components import question_card
 
 
-def render(provider_choice: str):
+def render(provider_choice: str, embedded: bool = False):
     today = date.today().isoformat()
 
-    st.title(f"📚 Today — {today}")
+    if embedded:
+        st.markdown(
+            f"""
+            <div class="tm-module-heading">
+                <div>
+                    <div class="tm-section-label">Math homework</div>
+                    <h2>Math Practice</h2>
+                    <p>Topic-based practice with lesson mode, difficulty control, PDFs, and answer marking.</p>
+                </div>
+                <span class="tm-chip">{today}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.title(f"📚 Today — {today}")
 
     # ── background generation status ──────────────────────────────────────────
     gen = generation_tracker.get()
@@ -102,16 +117,19 @@ def _render_course_controls(homework):
             "Grade",
             grades,
             index=grades.index(current_grade) if current_grade in grades else 1,
+            key="math_grade",
         )
         mode_label = c2.selectbox(
             "Mode",
             mode_options,
             index=mode_options.index(current_mode_label),
+            key="math_mode",
         )
         include_lesson = c3.checkbox(
             "Include lesson",
             value=bool((homework or {}).get("lesson")) or mode_label == "Lesson + Practice",
             disabled=mode_label == "Practice Only",
+            key="math_include_lesson",
         )
         difficulties = list_difficulty_profiles()
         difficulty_ids = [d.id for d in difficulties]
@@ -122,6 +140,7 @@ def _render_course_controls(homework):
             index=difficulty_ids.index(current_difficulty)
             if current_difficulty in difficulty_ids else difficulty_ids.index(DEFAULT_DIFFICULTY),
             format_func=lambda value: difficulty_labels[value],
+            key="math_difficulty",
         )
 
         topics = curriculum_service.list_topics("math", grade_level)
@@ -134,8 +153,9 @@ def _render_course_controls(homework):
             topic_options,
             index=topic_options.index(existing_topic_id) if existing_topic_id in topic_options else 0,
             format_func=lambda value: topic_labels[value],
+            key="math_topic",
         )
-        include_hints = st.checkbox("Include hints", value=True)
+        include_hints = st.checkbox("Include hints", value=True, key="math_include_hints")
 
     mode_map = {
         "Lesson + Practice": "lesson_practice",
@@ -153,7 +173,7 @@ def _render_course_controls(homework):
 
 
 def _render_generate_button(today, provider, course_options):
-    if st.button("Generate Task", type="primary", width="stretch"):
+    if st.button("Generate Task", type="primary", width="stretch", key="math_generate"):
         _run_generate(today, provider, course_options)
 
 
@@ -165,15 +185,15 @@ def _run_generate(today, provider, course_options):
 
 
 def _render_regenerate_button(today, provider, course_options):
-    if st.button("Regenerate Task", type="secondary"):
+    if st.button("Regenerate Task", type="secondary", key="math_regenerate"):
         st.session_state["confirm_regen"] = True
 
     if st.session_state.get("confirm_regen"):
         st.warning("This will delete today's task and all marks. Continue?")
         c1, c2 = st.columns(2)
-        if c1.button("Yes, regenerate", type="primary", width="stretch"):
+        if c1.button("Yes, regenerate", type="primary", width="stretch", key="math_confirm_regenerate"):
             _do_regenerate(today, provider, course_options)
-        if c2.button("Cancel", width="stretch"):
+        if c2.button("Cancel", width="stretch", key="math_cancel_regenerate"):
             st.session_state.pop("confirm_regen", None)
             st.rerun()
 
@@ -216,7 +236,7 @@ def _render_homework(homework, today):
 
 
 def _render_pdf_downloads(date_str):
-    pdf_d = homework_store.pdf_dir(date_str)
+    pdf_d = _existing_pdf_dir(date_str)
     q_pdf = pdf_d / "questions.pdf"
     a_pdf = pdf_d / "answers.pdf"
 
@@ -231,6 +251,15 @@ def _render_pdf_downloads(date_str):
             c2.download_button("Download Answers PDF", f,
                                file_name=f"answers_{date_str}.pdf",
                                mime="application/pdf", width="stretch")
+
+
+def _existing_pdf_dir(date_str):
+    pdf_d = homework_store.pdf_dir(date_str)
+    legacy = homework_store.legacy_pdf_dir(date_str)
+    if not (pdf_d / "questions.pdf").exists() and (legacy / "questions.pdf").exists():
+        return legacy
+    return pdf_d
+
 
 def _check_api_key(provider) -> bool:
     if isinstance(provider, DeepSeekProvider) and not secrets.deepseek_api_key():

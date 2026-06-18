@@ -1,9 +1,9 @@
 import streamlit as st
 
 PAGES = [
-    ("📚  Today", "Today"),
-    ("📅  History", "History"),
-    ("📊  Analysis", "Analysis"),
+    ("Daily", "Daily"),
+    ("History", "History"),
+    ("Analysis", "Analysis"),
 ]
 
 
@@ -15,7 +15,7 @@ def render() -> str:
     selected = st.pills(
         "Navigation",
         [key for _, key in PAGES],
-        default=st.session_state.page,
+        default=st.session_state.page if st.session_state.page in labels else "Daily",
         format_func=lambda value: labels[value],
         label_visibility="collapsed",
         width="stretch",

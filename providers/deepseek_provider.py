@@ -11,11 +11,13 @@ class DeepSeekProvider(ModelProvider):
         self,
         model: str = "deepseek-v4-flash",
         base_url: str = DEEPSEEK_BASE_URL,
-        thinking_enabled: bool = False,
+        thinking_enabled: bool = True,
+        reasoning_effort: str = "high",
     ):
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.thinking_enabled = thinking_enabled
+        self.reasoning_effort = reasoning_effort
 
     @property
     def name(self) -> str:
@@ -30,9 +32,12 @@ class DeepSeekProvider(ModelProvider):
                 {"role": "user", "content": user},
             ],
             "max_tokens": max_tokens,
-            "temperature": 0.3,
             "thinking": {"type": "enabled" if self.thinking_enabled else "disabled"},
         }
+        if self.thinking_enabled:
+            payload["reasoning_effort"] = self.reasoning_effort
+        else:
+            payload["temperature"] = 0.3
         if wants_json:
             payload["response_format"] = {"type": "json_object"}
 

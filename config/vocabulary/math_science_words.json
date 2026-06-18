@@ -1,0 +1,1652 @@
+[
+  {
+    "word": "sum",
+    "category": "math_operations",
+    "chinese": "和",
+    "definition": "the result of addition"
+  },
+  {
+    "word": "difference",
+    "category": "math_operations",
+    "chinese": "差",
+    "definition": "the result of subtraction"
+  },
+  {
+    "word": "product",
+    "category": "math_operations",
+    "chinese": "积",
+    "definition": "the result of multiplication"
+  },
+  {
+    "word": "quotient",
+    "category": "math_operations",
+    "chinese": "商",
+    "definition": "the result of division"
+  },
+  {
+    "word": "factor",
+    "category": "math_operations",
+    "chinese": "因数",
+    "definition": "a number multiplied by another number"
+  },
+  {
+    "word": "multiple",
+    "category": "math_operations",
+    "chinese": "倍数",
+    "definition": "a product of a number and a whole number"
+  },
+  {
+    "word": "estimate",
+    "category": "word_problem_signals",
+    "chinese": "估算",
+    "definition": "to find an answer close to the exact answer"
+  },
+  {
+    "word": "approximately",
+    "category": "word_problem_signals",
+    "chinese": "大约",
+    "definition": "close to, but not exactly"
+  },
+  {
+    "word": "altogether",
+    "category": "word_problem_signals",
+    "chinese": "总共",
+    "definition": "all together; in total"
+  },
+  {
+    "word": "remaining",
+    "category": "word_problem_signals",
+    "chinese": "剩下的",
+    "definition": "left after some amount is used or removed"
+  },
+  {
+    "word": "fewer",
+    "category": "word_problem_signals",
+    "chinese": "更少的",
+    "definition": "a smaller number of things"
+  },
+  {
+    "word": "increase",
+    "category": "word_problem_signals",
+    "chinese": "增加",
+    "definition": "to become larger"
+  },
+  {
+    "word": "decrease",
+    "category": "word_problem_signals",
+    "chinese": "减少",
+    "definition": "to become smaller"
+  },
+  {
+    "word": "compare",
+    "category": "academic_verbs",
+    "chinese": "比较",
+    "definition": "to tell how things are alike or different"
+  },
+  {
+    "word": "explain",
+    "category": "academic_verbs",
+    "chinese": "解释",
+    "definition": "to make an idea clear"
+  },
+  {
+    "word": "justify",
+    "category": "academic_verbs",
+    "chinese": "证明理由",
+    "definition": "to give a reason why an answer is correct"
+  },
+  {
+    "word": "evidence",
+    "category": "science_process",
+    "chinese": "证据",
+    "definition": "information that supports an idea"
+  },
+  {
+    "word": "observe",
+    "category": "science_process",
+    "chinese": "观察",
+    "definition": "to notice using your senses or tools"
+  },
+  {
+    "word": "predict",
+    "category": "science_process",
+    "chinese": "预测",
+    "definition": "to say what may happen next based on evidence"
+  },
+  {
+    "word": "measure",
+    "category": "science_process",
+    "chinese": "测量",
+    "definition": "to find the size, amount, or degree of something"
+  },
+  {
+    "word": "perimeter",
+    "category": "geometry_measurement",
+    "chinese": "周长",
+    "definition": "the distance around a shape"
+  },
+  {
+    "word": "area",
+    "category": "geometry_measurement",
+    "chinese": "面积",
+    "definition": "the amount of space inside a flat shape"
+  },
+  {
+    "word": "volume",
+    "category": "geometry_measurement",
+    "chinese": "体积",
+    "definition": "the amount of space inside a solid shape"
+  },
+  {
+    "word": "length",
+    "category": "geometry_measurement",
+    "chinese": "长度",
+    "definition": "how long something is"
+  },
+  {
+    "word": "width",
+    "category": "geometry_measurement",
+    "chinese": "宽度",
+    "definition": "how wide something is"
+  },
+  {
+    "word": "height",
+    "category": "geometry_measurement",
+    "chinese": "高度",
+    "definition": "how tall something is"
+  },
+  {
+    "word": "ratio",
+    "category": "fractions_decimals",
+    "chinese": "比率",
+    "definition": "a comparison of two quantities"
+  },
+  {
+    "word": "equivalent",
+    "category": "fractions_decimals",
+    "chinese": "等价的",
+    "definition": "having the same value"
+  },
+  {
+    "word": "simplify",
+    "category": "fractions_decimals",
+    "chinese": "化简",
+    "definition": "to write in a simpler but equal form"
+  },
+  {
+    "word": "fraction",
+    "category": "fractions_decimals",
+    "chinese": "分数",
+    "definition": "a number that shows part of a whole"
+  },
+  {
+    "word": "decimal",
+    "category": "fractions_decimals",
+    "chinese": "小数",
+    "definition": "a number written with a decimal point"
+  },
+  {
+    "word": "numerator",
+    "category": "fractions_decimals",
+    "chinese": "分子",
+    "definition": "the top number in a fraction"
+  },
+  {
+    "word": "denominator",
+    "category": "fractions_decimals",
+    "chinese": "分母",
+    "definition": "the bottom number in a fraction"
+  },
+  {
+    "word": "data",
+    "category": "data_statistics",
+    "chinese": "数据",
+    "definition": "information collected for study"
+  },
+  {
+    "word": "average",
+    "category": "data_statistics",
+    "chinese": "平均数",
+    "definition": "a typical value found by dividing the total by the number of values"
+  },
+  {
+    "word": "range",
+    "category": "data_statistics",
+    "chinese": "范围",
+    "definition": "the difference between the greatest and least values"
+  },
+  {
+    "word": "ecosystem",
+    "category": "life_science",
+    "chinese": "生态系统",
+    "definition": "living and nonliving things interacting in an area"
+  },
+  {
+    "word": "habitat",
+    "category": "life_science",
+    "chinese": "栖息地",
+    "definition": "the place where an organism lives"
+  },
+  {
+    "word": "adaptation",
+    "category": "life_science",
+    "chinese": "适应特征",
+    "definition": "a trait that helps an organism survive"
+  },
+  {
+    "word": "force",
+    "category": "physical_science",
+    "chinese": "力",
+    "definition": "a push or a pull"
+  },
+  {
+    "word": "motion",
+    "category": "physical_science",
+    "chinese": "运动",
+    "definition": "a change in position"
+  },
+  {
+    "word": "energy",
+    "category": "physical_science",
+    "chinese": "能量",
+    "definition": "the ability to do work or cause change"
+  },
+  {
+    "word": "weathering",
+    "category": "earth_science",
+    "chinese": "风化",
+    "definition": "the breaking down of rocks at Earth's surface"
+  },
+  {
+    "word": "erosion",
+    "category": "earth_science",
+    "chinese": "侵蚀",
+    "definition": "the movement of weathered rock or soil"
+  },
+  {
+    "word": "climate",
+    "category": "earth_science",
+    "chinese": "气候",
+    "definition": "the usual weather pattern of a place over time"
+  },
+  {
+    "word": "add",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "subtract",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "multiply",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "divide",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "operation",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "calculate",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "compute",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "total",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "equal",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "unequal",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "double",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "triple",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "halve",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "value",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "expression",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "equation",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "solution",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "variable",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "constant",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "coefficient",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "term",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "more",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "less",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "greater",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "least",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "greatest",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "combined",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "together",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "separate",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "each",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "per",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "rate",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "unit",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "discount",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "tax",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "profit",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "loss",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "change",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "initial",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "final",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "missing",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "percent",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "percentage",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "proportion",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "proportional",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "improper",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "mixed",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "reciprocal",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "convert",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "round",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "place value",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "tenths",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "hundredths",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "thousandths",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "integer",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "negative",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "positive",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "absolute value",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "angle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "degree",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "line",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "ray",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "segment",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "parallel",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "perpendicular",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "vertex",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "vertices",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "polygon",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "triangle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "quadrilateral",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "rectangle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "square",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "circle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "radius",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "diameter",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "circumference",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "surface area",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "coordinate",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "axis",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "plane",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "base",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "face",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "edge",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "mean",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "median",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "mode",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "table",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "graph",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "chart",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "plot",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "bar graph",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "line plot",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "scatter plot",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "frequency",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "survey",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "sample",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "population",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "probability",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "outcome",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "random",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "trend",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "maximum",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "minimum",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "analyze",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "describe",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "identify",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "classify",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "summarize",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "infer",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "evaluate",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "support",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "contrast",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "represent",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "model",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "solve",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "prove",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "reason",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "organize",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "interpret",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "apply",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "determine",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "conclude",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "revise",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "hypothesis",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "experiment",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "investigate",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "control",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "independent variable",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "dependent variable",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "procedure",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "result",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "claim",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "reasoning",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "accurate",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "precise",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "record",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "trial",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "observation",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "conclusion",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "system",
+    "category": "science_process",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "organism",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "species",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "community",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "cell",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "tissue",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "organ",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "function",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "structure",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "trait",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "inherit",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "genetic",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "reproduce",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "survive",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "consumer",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "producer",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "decomposer",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "food chain",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "food web",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "photosynthesis",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "respiration",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "competition",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "predator",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "prey",
+    "category": "life_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "matter",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "mass",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "weight",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "density",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "particle",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "atom",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "molecule",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "element",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "compound",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "mixture",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "solid",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "liquid",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "gas",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "temperature",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "thermal",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "conductor",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "insulator",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "magnet",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "electricity",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "circuit",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "friction",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "gravity",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "speed",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "velocity",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "acceleration",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "rock",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "mineral",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "sediment",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "fossil",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "soil",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "landform",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "plate",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "earthquake",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "volcano",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "atmosphere",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "ocean",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "current",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "tide",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "water cycle",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "evaporation",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "condensation",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "precipitation",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "runoff",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "groundwater",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "renewable",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "nonrenewable",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "resource",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "concept",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "process",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "pattern",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "relationship",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "cause",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "effect",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "similar",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "different",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "specific",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "general",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "complex",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "simple",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "method",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "strategy",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "section",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "context",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "source",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "valid",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "reliable",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  },
+  {
+    "word": "significant",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": ""
+  }
+]

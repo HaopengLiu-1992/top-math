@@ -1,11 +1,16 @@
-# Daily Math Homework Generator
+# Daily Learning Generator
 
-A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks daily progress, and runs Sunday review sessions targeting past mistakes.
+A Streamlit app that generates daily math, vocabulary, English reading, and
+science reading practice for Jessie. It uses scoped daily tasks so multiple
+subjects can share providers, storage, PDFs, history, and analysis.
 
 ## Features
 
-- Daily Grade 5 math homework following CCSS standards — one generation per day (idempotent/cached)
-- Questions and answers in separate PDFs stored under `output/pdf/YYYY/MM/DD/`
+- Daily Grade 5-8 math homework following CCSS standards — one generation per day (idempotent/cached)
+- Daily math/science academic vocabulary practice — 20 words from a 10,000-word academic candidate bank
+- Daily English reading practice — passage, vocabulary, comprehension, inference, and short response
+- Daily science reading practice — science passage, academic vocabulary, evidence/cause-effect questions
+- Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
 - Sunday review: collects incorrectly marked questions from the past 7 days; skipped if no mistakes
 - Weekly feedback report and skills analysis generated on Sundays; browseable by past week via date selector
@@ -18,92 +23,116 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
 ```
 ┌───────────────────────────────────────────────────────────┐
 │                        Streamlit UI                       │
-│   ┌──────────┐    ┌──────────┐    ┌─────────────────────┐ │
-│   │  Today   │    │ History  │    │      Analysis       │ │
-│   └────┬─────┘    └────┬─────┘    └──────────┬──────────┘ │
+│  Daily · History · Analysis                               │
 └────────┼───────────────┼─────────────────────┼────────────┘
          │               │                     │
 ┌────────▼───────────────▼─────────────────────▼────────────┐
 │                        Services                           │
-│  generator · review_service · analysis_service            │
+│  generator · vocabulary_service · reading_service         │
+│  analysis_service · summary_service                       │
 │  feedback_service · feedback_report_service · dedup       │
 └──────────────┬────────────────────────────────────────────┘
                │
     ┌──────────▼──────────────────────────────────────────┐
     │                     Storage                         │
     │                                                     │
-    │  mark_buffer  ◄── single source of truth            │
+    │  daily_task_store(subject, task_type, date)          │
+    │      │                                              │
+    │  homework_store / vocabulary_store / reading_store  │
+    │      │                                              │
+    │  scoped mark_buffer ◄── single source of mark truth │
     │      │                                              │
     │  mark_flusher (daemon, 5s timestamp-based flush)    │
-    │      │                                              │
-    │  homework_store  ·  history_store                   │
     └──────────────────────────┬──────────────────────────┘
                                │
               ┌────────────────┼───────────────┐
               ▼                ▼               ▼
-         Providers           PDF           output/raw/
-       AnthropicAPI      questions         YYYY/MM/DD/
-       DeepSeek/Gemini/Claude/MLX      answers
+         Providers           PDF           output/tasks/
+       DeepSeek/Gemini   questions         subject/task_type/
+       Claude/MLX        answers           raw + pdf
 ```
+
+---
+
+## Scoped Daily Tasks
+
+The app is now organized around a scoped daily task:
+
+```
+TaskScope(subject="math", task_type="homework")
+TaskScope(subject="english", task_type="vocabulary")
+TaskScope(subject="english", task_type="reading")
+TaskScope(subject="science", task_type="reading")
+```
+
+That scope is part of storage, marks, PDFs, and history lookup. This prevents
+same-day work from different subjects from colliding.
+
+```
+output/tasks/<subject>/<task_type>/
+├── raw/YYYY/MM/DD/task.json
+├── raw/YYYY/MM/DD/meta.json
+├── raw/YYYY/MM/DD/fingerprints.json
+└── pdf/YYYY/MM/DD/
+    ├── questions.pdf      # math
+    ├── vocabulary.pdf     # vocabulary
+    ├── reading.pdf        # reading
+    └── answers.pdf
+```
+
+Current task scopes:
+
+| Scope | UI | Generator | Store facade | PDF |
+|-------|----|-----------|--------------|-----|
+| `math/homework` | Today | `services.generator` | `homework_store` | `questions_pdf`, `answers_pdf` |
+| `english/vocabulary` | Vocabulary | `vocabulary_service` | `vocabulary_store` | `vocabulary_pdf` |
+| `english/reading` | Daily / English Reading | `reading_service` | `reading_store` | `reading_pdf` |
+| `science/reading` | Daily / Science Reading | `reading_service` | `reading_store` | `reading_pdf` |
+
+The top-level UI intentionally stays small:
+
+- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, and Science Reading
+- **History**: all generated tasks across all scopes
+- **Analysis**: cross-subject activity overview plus math-specific score/topic analysis
 
 ---
 
 ## Mark Buffer — Single Source of Truth
 
-All question state lives in one in-memory hashmap. The UI **never reads from disk at runtime** — only from the buffer.
+All mark state lives in one in-memory hashmap keyed by scope and date. The UI
+reads marks from the buffer; the background flusher persists changed entries to
+the matching scoped `meta.json`.
 
 ```
 mark_buffer._store = {
-  "2026-04-06": {
-    "marks": {
-      "p1_001": True,    ← correct
-      "p1_002": False,   ← wrong
-      "p1_003": None,    ← not yet marked
-      ...
-    },
-    "last_update": "2026-04-06T18:30:00.123"   ← "" if loaded from disk (not dirty)
+  "math/homework/2026-04-06": {
+    "scope": TaskScope("math", "homework"),
+    "date_str": "2026-04-06",
+    "marks": {"p1_001": True, "p1_002": False, "p1_003": None},
+    "last_update": "2026-04-06T18:30:00.123"
   },
-  "2026-04-07": { ... },
-  ...
+  "english/vocabulary/2026-04-06": {
+    "scope": TaskScope("english", "vocabulary"),
+    "date_str": "2026-04-06",
+    "marks": {"quotient": True, "estimate": None},
+    "last_update": ""
+  }
 }
 ```
 
-**Lifecycle:**
+Compatibility wrappers keep existing math calls working:
 
 ```
-App startup
-  → migrate_from_old_history()       one-time: converts old data/history.json
-  → hydrate_all_marks()              scan all output/raw/*/*/*/homework.json
-  → init_date(date, marks)           buffer populated with True/False/None per question
-  → last_update = ""                 not dirty — no flush triggered
-
-User marks a question
-  → set_mark(date, qid, True/False)
-  → buffer updated instantly
-  → last_update = now
-
-Background flusher (every 5s)
-  → get_recently_updated(5s)         scan buffer: dates with last_update within 5s
-  → _write_marks()                   full overwrite of homework.json correct fields
-  → homework["last_update"] = ts     timestamp written to disk
-
-UI reads (score bar, badges, analysis page)
-  → get_marks(date) from buffer
-  → calc_auto_score() = correct / total_questions (includes unchecked in denominator)
-  → no disk reads, no fallbacks
+mark_buffer.get_marks(date)      # defaults to math/homework
+mark_buffer.get_marks_for(scope, date)
 ```
-
-**Design rationale:**
-- Single source of truth — no split brain between memory and disk
-- Timestamp-based flush: no separate dirty set to lose on exception
-- Full overwrite per date keeps disk state simple and consistent
-- `None` in buffer = unchecked → score denominator is always all questions
 
 ---
 
-## Per-Day Storage
+## Legacy Math Compatibility
 
-No central history file. All data lives in `output/raw/YYYY/MM/DD/`:
+New math homework writes to the scoped task tree. Existing historical homework
+is still readable from the old layout:
 
 ```
 output/raw/
@@ -119,14 +148,47 @@ output/raw/
             └── fingerprints.json
 ```
 
-`history_store` scans this directory tree at runtime:
-- `get_all_dates()` → glob `*/*/*/homework.json`
+`homework_store` is now a compatibility facade:
+
+- `load_questions(date)` reads `output/tasks/math/homework/...` first, then the legacy `output/raw/...`
+- `save_questions(date)` writes the scoped task and legacy questions file during the transition
+- `load_meta(date)` / `save_meta(date)` do the same for marks
+- `pdf_dir(date)` points to the new scoped PDF directory
+- History PDF downloads fall back to the old `output/pdf/...` directory when needed
+
+`history_store` scans both the new math task tree and legacy tree:
+
+- `get_all_dates()` → scoped math tasks plus legacy `questions.json`
 - `get_total_days()` → max `day` field across non-review sessions
 - `get_all_fingerprints()` → union of all per-day `fingerprints.json`
-- `get_recent_topics(14)` → topics from past 14 days' homework.json
-- `get_weekly_logs(date, 7)` → log entries built from homework.json + mark_buffer scores
+- `get_recent_topics(14)` → topics from scoped or legacy meta
+- `get_weekly_logs(date, 7)` → log entries built from homework + scoped mark buffer scores
 
 **Scores are never stored** — always computed live from mark_buffer.
+
+---
+
+## Vocabulary Bank
+
+Vocabulary practice uses `config/vocabulary/academic_word_bank_10000.json`.
+The bank contains:
+
+- 275 curated math/science/academic core words ordered from middle-school basics
+- 10,000 ranked academic candidates drawn from the local English word list
+- `cn_stage` mapping such as `cn_middle_school`, `cn_high_school`, and extension levels
+- `us_band` mapping such as `us_grade_5_8`, `us_grade_8_10`, and `us_grade_10_12`
+- categories for math operations, word-problem signals, geometry, science process, and general academic vocabulary
+
+The model fills any missing Chinese/definition fields at generation time and
+keeps examples tied to math/science reading where possible.
+
+Runtime selection does **not** send the 10,000-word bank to the model. The app
+uses `config/vocabulary/vocabulary_index.json` to pick the next 15 new words and
+5 review words locally, starting from curated middle-school math/science basics.
+Only those selected daily words are included in the LLM prompt. The selector also
+filters fallback candidates so unvetted dictionary words are not used for daily
+practice. Regenerating a date ignores that date's previous vocabulary meta so
+bad output can be replaced cleanly.
 
 ---
 
@@ -136,7 +198,7 @@ output/raw/
 |-------|------|----------------|
 | **UI** | `ui/pages/`, `ui/components/` | Streamlit pages and marking widgets |
 | **Services** | `services/` | Business logic — generation, dedup, scoring, review |
-| **Providers** | `providers/` | AI model abstraction (Claude API / Gemini API / local MLX) |
+| **Providers** | `providers/` | AI model abstraction (DeepSeek API / Claude API / Gemini API / local MLX) |
 | **Storage** | `storage/` | Mark buffer (source of truth), JSON I/O, flush thread |
 | **PDF** | `pdf/` | ReportLab PDF generation (questions and answers separate) |
 | **Prompts** | `prompts/` | Prompt builders for each generation task |
@@ -309,7 +371,7 @@ The app auto-detects it and offers it in the sidebar.
 
 | Provider | Details |
 |----------|---------|
-| **DeepSeek (cloud)** | DeepSeek API — requires `DEEPSEEK_API_KEY`; default model is `deepseek-v4-flash` |
+| **DeepSeek (cloud)** | DeepSeek API — requires `DEEPSEEK_API_KEY`; default model is `deepseek-v4-flash` with thinking `high` |
 | **Gemini (cloud)** | Google Gemini API — requires `GEMINI_API_KEY` |
 | **Claude (cloud)** | Anthropic API — requires `ANTHROPIC_API_KEY` |
 | **Local MLX (Qwen)** | OpenAI-compatible local server at `http://localhost:8080` — no API key needed |
