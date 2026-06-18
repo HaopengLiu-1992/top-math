@@ -52,27 +52,40 @@ You must output EXACTLY this JSON structure and nothing else:
   "parts": {
     "part1": [
       {
-        "id": "<unique string e.g. p1_001>",
-        "question": "<question text in English>",
-        "answer": "<answer only>",
-        "hint": "<brief hint if hints are enabled, otherwise omit or set to null>",
-        "teaching_point": "<what this question practices>",
-        "fingerprint": "<topic|operation|normalized_operands e.g. NBT|multiply|124x36>",
-        "topic": "<CCSS topic tag e.g. 5.NBT.B.5>"
-      }
+        "id": "p1_001",
+        "question": "456 x 23",
+        "answer": "10488",
+        "hint": null,
+        "teaching_point": "Multi-digit multiplication",
+        "fingerprint": "NBT|multiply|456x23",
+        "topic": "5.NBT.B.5"
+      },
+      "... (total 20 questions in Part 1) ..."
     ],
-    "part2": [ ... ],
+    "part2": [
+      {
+        "id": "p2_001",
+        "question": "Standard practice question...",
+        "answer": "...",
+        "hint": "...",
+        "teaching_point": "...",
+        "fingerprint": "...",
+        "topic": "..."
+      },
+      "... (total 12 questions in Part 2) ..."
+    ],
     "part3": [
       {
-        "id": "<unique string>",
-        "question": "<English word problem>",
-        "answer": "<final answer>",
-        "hint": "<brief hint if hints are enabled, otherwise omit or set to null>",
-        "teaching_point": "<what this question practices>",
-        "solution_steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."],
-        "fingerprint": "<topic|operation|normalized_operands>",
-        "topic": "<CCSS topic tag>"
-      }
+        "id": "p3_001",
+        "question": "Concise word problem...",
+        "answer": "...",
+        "hint": "...",
+        "teaching_point": "...",
+        "solution_steps": ["Step 1", "Step 2"],
+        "fingerprint": "...",
+        "topic": "..."
+      },
+      "... (total 3 questions in Part 3) ..."
     ]
   },
   "weekly_challenge": {
@@ -96,9 +109,9 @@ Difficulty standard:
 - Weekly challenge must require creative thinking and cannot be solved in one step.
 
 Rules:
-- Part 1 (Warm-up): 8 questions, challenging fluency — multi-digit arithmetic, fractions, or decimals. NO single-digit facts.
-- Part 2 (Core Focus): 12 questions on the week's main topic. At least 3 must be multi-step. Include 1-2 "Spot the Mistake" questions where the mistake is subtle, not obvious.
-- Part 3 (Word Problems): 3-5 multi-step real-world word problems. Each must require at least 2 operations or logical steps.
+- Part 1 (Fluency Booster): 20 questions. STRICTLY pure numerical calculations only (e.g., "456 x 23"). NO words, NO sentences, NO instructions other than the numbers and operators. Focus on speed and precision.
+- Part 2 (Application & Skills): 12 questions. This part SHOULD include word-based descriptions, short application scenarios, and logic checks (e.g., "Find the area of a rectangle with length 4.5 and width 2.3", "Which is greater: 0.5 x 10 or 0.2 x 50?"). Use full sentences to build context.
+- Part 3 (Complex Word Problems): 3 multi-step real-world word problems. Deep reasoning with multiple operations. Keep descriptions concise but complete.
 - weekly_challenge: only include when day number is a multiple of 5, otherwise set to null. Must be a rich open-ended problem.
 - lesson: include a complete lesson object only when include_lesson is true. If include_lesson is false, set lesson to null.
 - lesson.plain_text is required when lesson is not null. It should be a student-facing handout in plain text, suitable to print before the questions.
