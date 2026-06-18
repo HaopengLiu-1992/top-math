@@ -11,23 +11,26 @@ from providers.gemini_provider import GeminiProvider
 from storage import vocabulary_store
 
 
-def render(provider_choice: str):
+def render(provider_choice: str, embedded: bool = False):
     today = date.today().isoformat()
-    st.title(f"🔤 Vocabulary — {today}")
+    if embedded:
+        st.subheader(f"Academic Vocabulary — {today}")
+    else:
+        st.title(f"🔤 Vocabulary — {today}")
 
     provider = resolve_provider(provider_choice)
     task = vocabulary_store.load_task(today)
 
     with st.container(border=True):
         st.markdown('<div class="tm-section-label">Vocabulary setup</div>', unsafe_allow_html=True)
-        grade_level = st.selectbox("Grade", [5, 6, 7, 8], index=1)
+        grade_level = st.selectbox("Grade", [5, 6, 7, 8], index=1, key="vocabulary_grade")
 
     if not task:
-        if st.button("Generate Vocabulary", type="primary", width="stretch"):
+        if st.button("Generate Vocabulary", type="primary", width="stretch", key="vocabulary_generate"):
             _generate(today, provider, grade_level, force=False)
     else:
         st.info("Vocabulary already generated for today.")
-        if st.button("Regenerate Vocabulary", type="secondary"):
+        if st.button("Regenerate Vocabulary", type="secondary", key="vocabulary_regenerate"):
             _generate(today, provider, grade_level, force=True)
 
     if task:

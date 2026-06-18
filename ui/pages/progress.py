@@ -4,9 +4,10 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from domain.daily_task import ALL_TASK_SCOPES, MATH_HOMEWORK, TASK_LABELS
 from providers.provider_resolver import resolve_provider
 from services import feedback_service, summary_service
-from storage import history_store, homework_store
+from storage import daily_task_store, history_store, homework_store
 
 TOPIC_NAMES = {
     "5.NBT.A.1": "Place Value",
@@ -63,16 +64,57 @@ def _build_df() -> pd.DataFrame:
     return df
 
 
-def render(provider_choice: str):
-    st.title("📊 Analysis")
+def _build_activity_df() -> pd.DataFrame:
+    rows = []
+    for record in daily_task_store.list_task_records(ALL_TASK_SCOPES):
+        task = record["task"]
+        rows.append({
+            "date": record["date"],
+            "subject": record["subject"],
+            "task_type": record["task_type"],
+            "label": TASK_LABELS.get(record["scope"], record["scope"].key),
+            "estimated_minutes": task.get("estimated_minutes"),
+            "model": task.get("model", "—"),
+        })
 
-    dates = history_store.get_all_dates()
-    if not dates:
-        st.info("No homework generated yet. Go to Today to get started.")
+    existing = {(r["date"], r["subject"], r["task_type"]) for r in rows}
+    for d in history_store.get_all_dates():
+        if (d, "math", "homework") in existing:
+            continue
+        hw = homework_store.load_questions(d)
+        if hw:
+            rows.append({
+                "date": d,
+                "subject": "math",
+                "task_type": "homework",
+                "label": TASK_LABELS[MATH_HOMEWORK],
+                "estimated_minutes": hw.get("estimated_minutes"),
+                "model": hw.get("model", "—"),
+            })
+
+    df = pd.DataFrame(rows)
+    if not df.empty:
+        df["date"] = pd.to_datetime(df["date"])
+        df = df.sort_values("date")
+    return df
+
+
+def render(provider_choice: str):
+    st.title("Analysis")
+
+    activity_df = _build_activity_df()
+    if activity_df.empty:
+        st.info("No tasks generated yet. Go to Daily to get started.")
         return
 
-    df = _build_df()
+    _render_activity(activity_df)
+    st.divider()
 
+    df = _build_df()
+    if df.empty:
+        return
+
+    st.subheader("Math Analysis")
     _render_metrics(df)
     st.divider()
     _render_streak(df)
@@ -88,6 +130,28 @@ def render(provider_choice: str):
     display_df["score_pct"] = display_df["score_pct"].apply(
         lambda x: f"{x:.1f}%" if pd.notna(x) else "—"
     )
+    st.dataframe(display_df, width="stretch")
+
+
+def _render_activity(df: pd.DataFrame):
+    st.subheader("Daily Activity")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Tasks", len(df))
+    c2.metric("Subjects", df["subject"].nunique())
+    c3.metric("Task types", df["task_type"].nunique())
+    total_minutes = pd.to_numeric(df["estimated_minutes"], errors="coerce").fillna(0).sum()
+    c4.metric("Est. minutes", int(total_minutes) if total_minutes else "—")
+
+    counts = df.groupby(["subject", "task_type"]).size().reset_index(name="count")
+    if not counts.empty:
+        fig = px.bar(counts, x="task_type", y="count", color="subject",
+                     labels={"task_type": "Task type", "count": "Count"})
+        fig.update_layout(height=280, margin=dict(l=0, r=0, t=20, b=0))
+        st.plotly_chart(fig, width="stretch")
+
+    display_df = df[["date", "label", "subject", "task_type", "estimated_minutes", "model"]].sort_values(
+        "date", ascending=False
+    ).copy()
     st.dataframe(display_df, width="stretch")
 
 

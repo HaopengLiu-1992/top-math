@@ -82,13 +82,29 @@ def list_dates(scope: TaskScope) -> list[str]:
     return sorted(dates)
 
 
+def list_task_records(scopes: list[TaskScope]) -> list[dict]:
+    records = []
+    for scope in scopes:
+        for date_str in list_dates(scope):
+            task = load_task(scope, date_str)
+            if task:
+                records.append({
+                    "scope": scope,
+                    "date": date_str,
+                    "subject": scope.subject,
+                    "task_type": scope.task_type,
+                    "task": task,
+                })
+    return sorted(records, key=lambda item: (item["date"], item["subject"], item["task_type"]))
+
+
 def delete_for_date(scope: TaskScope, date_str: str):
     for p in [task_path(scope, date_str), meta_path(scope, date_str), fingerprints_path(scope, date_str)]:
         if p.exists():
             p.unlink()
 
     pdf_dir = pdf_day_dir(scope, date_str)
-    for name in ["questions.pdf", "answers.pdf", "vocabulary.pdf"]:
+    for name in ["questions.pdf", "answers.pdf", "vocabulary.pdf", "reading.pdf"]:
         p = pdf_dir / name
         if p.exists():
             p.unlink()

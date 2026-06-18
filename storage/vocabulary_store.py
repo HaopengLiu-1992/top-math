@@ -4,7 +4,7 @@ from pathlib import Path
 from domain.daily_task import ENGLISH_VOCABULARY
 from storage import daily_task_store
 
-WORD_BANK = Path("config/vocabulary/math_science_words.json")
+WORD_BANK = Path("config/vocabulary/academic_word_bank_10000.json")
 
 
 def load_word_bank() -> list[dict]:

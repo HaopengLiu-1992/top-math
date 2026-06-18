@@ -1,11 +1,15 @@
-# Daily Math Homework Generator
+# Daily Learning Generator
 
-A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks daily progress, and runs Sunday review sessions targeting past mistakes.
+A Streamlit app that generates daily math, vocabulary, English reading, and
+science reading practice for Jessie. It uses scoped daily tasks so multiple
+subjects can share providers, storage, PDFs, history, and analysis.
 
 ## Features
 
-- Daily Grade 5 math homework following CCSS standards — one generation per day (idempotent/cached)
-- Daily math/science academic vocabulary practice — 20 words with matching, fill-in-the-blank, and reading-bridge questions
+- Daily Grade 5-8 math homework following CCSS standards — one generation per day (idempotent/cached)
+- Daily math/science academic vocabulary practice — 20 words from a 10,000-word academic candidate bank
+- Daily English reading practice — passage, vocabulary, comprehension, inference, and short response
+- Daily science reading practice — science passage, academic vocabulary, evidence/cause-effect questions
 - Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
 - Sunday review: collects incorrectly marked questions from the past 7 days; skipped if no mistakes
@@ -19,12 +23,13 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
 ```
 ┌───────────────────────────────────────────────────────────┐
 │                        Streamlit UI                       │
-│  Today · Vocabulary · History · Analysis                  │
+│  Daily · History · Analysis                               │
 └────────┼───────────────┼─────────────────────┼────────────┘
          │               │                     │
 ┌────────▼───────────────▼─────────────────────▼────────────┐
 │                        Services                           │
-│  generator · vocabulary_service · analysis_service         │
+│  generator · vocabulary_service · reading_service         │
+│  analysis_service · summary_service                       │
 │  feedback_service · feedback_report_service · dedup       │
 └──────────────┬────────────────────────────────────────────┘
                │
@@ -33,7 +38,7 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
     │                                                     │
     │  daily_task_store(subject, task_type, date)          │
     │      │                                              │
-    │  homework_store / vocabulary_store facades          │
+    │  homework_store / vocabulary_store / reading_store  │
     │      │                                              │
     │  scoped mark_buffer ◄── single source of mark truth │
     │      │                                              │
@@ -56,6 +61,8 @@ The app is now organized around a scoped daily task:
 ```
 TaskScope(subject="math", task_type="homework")
 TaskScope(subject="english", task_type="vocabulary")
+TaskScope(subject="english", task_type="reading")
+TaskScope(subject="science", task_type="reading")
 ```
 
 That scope is part of storage, marks, PDFs, and history lookup. This prevents
@@ -69,6 +76,7 @@ output/tasks/<subject>/<task_type>/
 └── pdf/YYYY/MM/DD/
     ├── questions.pdf      # math
     ├── vocabulary.pdf     # vocabulary
+    ├── reading.pdf        # reading
     └── answers.pdf
 ```
 
@@ -78,6 +86,14 @@ Current task scopes:
 |-------|----|-----------|--------------|-----|
 | `math/homework` | Today | `services.generator` | `homework_store` | `questions_pdf`, `answers_pdf` |
 | `english/vocabulary` | Vocabulary | `vocabulary_service` | `vocabulary_store` | `vocabulary_pdf` |
+| `english/reading` | Daily / English Reading | `reading_service` | `reading_store` | `reading_pdf` |
+| `science/reading` | Daily / Science Reading | `reading_service` | `reading_store` | `reading_pdf` |
+
+The top-level UI intentionally stays small:
+
+- **Daily**: Math, Vocabulary, English Reading, Science Reading tabs
+- **History**: all generated tasks across all scopes
+- **Analysis**: cross-subject activity overview plus math-specific score/topic analysis
 
 ---
 
@@ -149,6 +165,22 @@ output/raw/
 - `get_weekly_logs(date, 7)` → log entries built from homework + scoped mark buffer scores
 
 **Scores are never stored** — always computed live from mark_buffer.
+
+---
+
+## Vocabulary Bank
+
+Vocabulary practice uses `config/vocabulary/academic_word_bank_10000.json`.
+The bank contains:
+
+- curated math/science core words with Chinese meanings and student-friendly definitions
+- 10,000 ranked academic candidates drawn from the local English word list
+- `cn_stage` mapping such as `cn_middle_school`, `cn_high_school`, and extension levels
+- `us_band` mapping such as `us_grade_5_8`, `us_grade_8_10`, and `us_grade_10_12`
+- categories for math operations, word-problem signals, geometry, science process, and general academic vocabulary
+
+The model fills any missing Chinese/definition fields at generation time and
+keeps examples tied to math/science reading where possible.
 
 ---
 

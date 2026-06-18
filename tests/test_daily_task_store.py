@@ -2,8 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from domain.daily_task import ENGLISH_VOCABULARY, MATH_HOMEWORK
-from storage import daily_task_store, mark_buffer, vocabulary_store
+from domain.daily_task import ENGLISH_READING, ENGLISH_VOCABULARY, MATH_HOMEWORK
+from storage import daily_task_store, mark_buffer, reading_store, vocabulary_store
 
 
 class DailyTaskStoreTests(unittest.TestCase):
@@ -62,6 +62,41 @@ class DailyTaskStoreTests(unittest.TestCase):
                 }
             },
         )
+
+    def test_vocabulary_word_bank_has_large_candidate_pool(self):
+        self.assertGreaterEqual(len(vocabulary_store.load_word_bank()), 10000)
+
+    def test_reading_meta_uses_question_ids(self):
+        task = {
+            "questions": [
+                {"id": "q_001", "type": "main_idea", "skill": "main idea"}
+            ]
+        }
+
+        self.assertEqual(
+            reading_store.build_meta(task),
+            {
+                "q_001": {
+                    "correct": None,
+                    "skill": "main idea",
+                    "question_type": "main_idea",
+                }
+            },
+        )
+
+    def test_store_lists_multiple_scopes(self):
+        original_root = daily_task_store.TASK_ROOT
+        with tempfile.TemporaryDirectory() as tmp:
+            try:
+                daily_task_store.TASK_ROOT = Path(tmp)
+                daily_task_store.save_task(MATH_HOMEWORK, "2099-01-01", {"date": "2099-01-01"})
+                daily_task_store.save_task(ENGLISH_READING, "2099-01-01", {"date": "2099-01-01"})
+
+                records = daily_task_store.list_task_records([MATH_HOMEWORK, ENGLISH_READING])
+                self.assertEqual(len(records), 2)
+                self.assertEqual({r["scope"] for r in records}, {MATH_HOMEWORK, ENGLISH_READING})
+            finally:
+                daily_task_store.TASK_ROOT = original_root
 
 
 if __name__ == "__main__":

@@ -65,4 +65,5 @@ Rules:
 - fill_blank must contain 10 items.
 - keyword_reading must contain 3 short math/science reading questions.
 - Keep examples concise.
-- Do not invent Chinese meanings; use the provided Chinese field."""
+- If a provided Chinese or definition field is blank, fill it with a concise accurate value.
+- Prefer math/science/academic meaning when a word has multiple meanings."""
