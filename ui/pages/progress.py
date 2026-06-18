@@ -68,6 +68,8 @@ def _build_activity_df() -> pd.DataFrame:
     rows = []
     for record in daily_task_store.list_task_records(ALL_TASK_SCOPES):
         task = record["task"]
+        feedback_service.hydrate_marks_for(record["scope"], record["date"])
+        correct, total = feedback_service.calc_score_for(record["scope"], record["date"])
         rows.append({
             "date": record["date"],
             "subject": record["subject"],
@@ -75,6 +77,8 @@ def _build_activity_df() -> pd.DataFrame:
             "label": TASK_LABELS.get(record["scope"], record["scope"].key),
             "estimated_minutes": task.get("estimated_minutes"),
             "model": task.get("model", "—"),
+            "score": f"{correct}/{total}" if total else "—",
+            "score_pct": round(correct / total * 100, 1) if total else None,
         })
 
     existing = {(r["date"], r["subject"], r["task_type"]) for r in rows}
@@ -83,6 +87,8 @@ def _build_activity_df() -> pd.DataFrame:
             continue
         hw = homework_store.load_questions(d)
         if hw:
+            feedback_service.hydrate_marks(d)
+            correct, total = feedback_service.calc_auto_score(d)
             rows.append({
                 "date": d,
                 "subject": "math",
@@ -90,6 +96,8 @@ def _build_activity_df() -> pd.DataFrame:
                 "label": TASK_LABELS[MATH_HOMEWORK],
                 "estimated_minutes": hw.get("estimated_minutes"),
                 "model": hw.get("model", "—"),
+                "score": f"{correct}/{total}" if total else "—",
+                "score_pct": round(correct / total * 100, 1) if total else None,
             })
 
     df = pd.DataFrame(rows)
@@ -149,7 +157,7 @@ def _render_activity(df: pd.DataFrame):
         fig.update_layout(height=280, margin=dict(l=0, r=0, t=20, b=0))
         st.plotly_chart(fig, width="stretch")
 
-    display_df = df[["date", "label", "subject", "task_type", "estimated_minutes", "model"]].sort_values(
+    display_df = df[["date", "label", "subject", "task_type", "estimated_minutes", "score", "model"]].sort_values(
         "date", ascending=False
     ).copy()
     st.dataframe(display_df, width="stretch")

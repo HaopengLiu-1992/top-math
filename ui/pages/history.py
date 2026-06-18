@@ -3,7 +3,7 @@ import streamlit as st
 from domain.daily_task import ALL_TASK_SCOPES, MATH_HOMEWORK, TASK_LABELS
 from services import feedback_service
 from storage import daily_task_store, homework_store, history_store, reading_store, vocabulary_store
-from ui.components import question_card
+from ui.components import marking, question_card
 
 
 def render():
@@ -56,11 +56,9 @@ def _render_header(record: dict):
     c1.metric("Subject", record["subject"].title())
     c2.metric("Type", record["task_type"].replace("_", " ").title())
     c3.metric("Est. minutes", task.get("estimated_minutes", "—"))
-    if scope == MATH_HOMEWORK:
-        correct, total = feedback_service.calc_auto_score(record["date"])
-        c4.metric("Score", f"{correct}/{total}" if total else "—")
-    else:
-        c4.metric("Model", task.get("model", "—"))
+    feedback_service.hydrate_marks_for(scope, record["date"])
+    correct, total = feedback_service.calc_score_for(scope, record["date"])
+    c4.metric("Score", f"{correct}/{total}" if total else "—")
 
 
 def _render_task(record: dict):
@@ -70,7 +68,7 @@ def _render_task(record: dict):
     if scope == MATH_HOMEWORK:
         _render_math(task, date_str)
     elif scope.subject == "english" and scope.task_type == "vocabulary":
-        _render_vocabulary(task, date_str)
+        _render_vocabulary(scope, task, date_str)
     else:
         _render_reading(scope, task, date_str)
 
@@ -84,20 +82,30 @@ def _render_math(task: dict, date_str: str):
     _render_math_pdf_downloads(date_str)
 
 
-def _render_vocabulary(task: dict, date_str: str):
+def _render_vocabulary(scope, task: dict, date_str: str):
+    feedback_service.hydrate_marks_for(scope, date_str)
+    marking.render_score(scope, date_str, "Mark each vocabulary quick check.")
     for item in task.get("words", []):
-        st.markdown(f"- **{item.get('word', '')}** ({item.get('chinese', '')}) — {item.get('definition', '')}")
+        with st.container(border=True):
+            st.markdown(f"**{item.get('word', '')}** ({item.get('chinese', '')}) — {item.get('definition', '')}")
+            st.markdown(item.get("quick_check", ""))
+            st.caption(f"Answer: {item.get('answer', '')}")
+            marking.render_mark(scope, date_str, item.get("word", ""))
     _render_vocab_pdf_downloads(date_str)
 
 
 def _render_reading(scope, task: dict, date_str: str):
+    feedback_service.hydrate_marks_for(scope, date_str)
     passage = task.get("passage", {})
     st.markdown(f"### {passage.get('title', 'Passage')}")
     st.write(passage.get("text", ""))
     with st.expander("Questions and answers", expanded=True):
+        marking.render_score(scope, date_str, "Mark each reading question.")
         for idx, item in enumerate(task.get("questions", []), 1):
-            st.markdown(f"{idx}. {item.get('question', '')}")
-            st.caption(f"Answer: {item.get('answer', '')}")
+            with st.container(border=True):
+                st.markdown(f"**{idx}. {item.get('question', '')}**")
+                st.caption(f"Answer: {item.get('answer', '')}")
+                marking.render_mark(scope, date_str, item.get("id", f"q_{idx:03d}"))
     _render_reading_pdf_downloads(scope, date_str)
 
 

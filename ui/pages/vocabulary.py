@@ -9,7 +9,10 @@ from settings import secrets
 from providers.anthropic_provider import AnthropicProvider
 from providers.deepseek_provider import DeepSeekProvider
 from providers.gemini_provider import GeminiProvider
+from domain.daily_task import ENGLISH_VOCABULARY
+from services import feedback_service
 from storage import vocabulary_store
+from ui.components import marking
 
 
 def render(provider_choice: str, embedded: bool = False):
@@ -47,9 +50,10 @@ def render(provider_choice: str, embedded: bool = False):
             _generate(today, provider, grade_level, force=True)
 
     if task:
+        feedback_service.hydrate_marks_for(ENGLISH_VOCABULARY, today)
         _render_task(task)
         st.divider()
-        _render_pdf_downloads(today)
+        _render_pdf_downloads(task)
 
 
 def _generate(today: str, provider, grade_level: int, force: bool):
@@ -69,7 +73,8 @@ def _render_task(task: dict):
     c1.metric("Words", len(words))
     c2.metric("New", new_count)
     c3.metric("Review", review_count)
-    c4.metric("Model", task.get("model", "—"))
+    correct, total = feedback_service.calc_score_for(ENGLISH_VOCABULARY, task["date"])
+    c4.metric("Marked", f"{correct}/{total}" if total else "—")
 
     st.subheader("Words")
     st.markdown('<div class="tm-word-grid">', unsafe_allow_html=True)
@@ -89,7 +94,26 @@ def _render_task(task: dict):
     st.markdown("</div>", unsafe_allow_html=True)
 
     practice = task.get("practice", {})
-    tab_m, tab_f, tab_k = st.tabs(["Matching", "Fill Blank", "Reading Bridge"])
+    tab_check, tab_m, tab_f, tab_k = st.tabs(["Quick Check", "Matching", "Fill Blank", "Reading Bridge"])
+    with tab_check:
+        marking.render_score(
+            ENGLISH_VOCABULARY,
+            task["date"],
+            "Mark each vocabulary quick check after reviewing the answer.",
+        )
+        for idx, item in enumerate(words, 1):
+            item_id = item.get("word", f"word_{idx}")
+            with st.container(border=True):
+                st.markdown(f"**{idx}. {item.get('word', '')}**")
+                st.markdown(item.get("quick_check", ""))
+                st.caption(f"Answer: {item.get('answer', '')}")
+                marking.render_mark(
+                    ENGLISH_VOCABULARY,
+                    task["date"],
+                    item_id,
+                    correct_label="Known",
+                    wrong_label="Needs review",
+                )
     with tab_m:
         for item in practice.get("matching", []):
             st.markdown(f"- **{item.get('word', '')}** → {item.get('definition', '')}")
@@ -103,7 +127,12 @@ def _render_task(task: dict):
             st.caption(f"Keyword: {item.get('keyword', '')} — {item.get('meaning', '')}")
 
 
-def _render_pdf_downloads(date_str: str):
+def _render_pdf_downloads(task: dict):
+    from pdf.vocabulary_pdf import build_answers, build_vocabulary
+
+    date_str = task["date"]
+    build_vocabulary(task)
+    build_answers(task)
     pdf_d = vocabulary_store.pdf_dir(date_str)
     vocab_pdf = pdf_d / "vocabulary.pdf"
     answers_pdf = pdf_d / "answers.pdf"

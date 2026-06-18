@@ -49,6 +49,7 @@ def build_meta(task: dict) -> dict:
     for item in task.get("words", []):
         word = item["word"]
         meta[word] = {
+            "correct": None,
             "known": None,
             "last_seen": task["date"],
             "times_seen": 1,

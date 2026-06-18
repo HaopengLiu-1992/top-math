@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from domain.daily_task import ENGLISH_READING, ENGLISH_VOCABULARY, MATH_HOMEWORK
 from storage import daily_task_store, mark_buffer, reading_store, vocabulary_store
-from services import vocabulary_service
+from services import feedback_service, vocabulary_service
 from prompts import vocabulary_prompt
 
 
@@ -44,6 +44,18 @@ class DailyTaskStoreTests(unittest.TestCase):
             {"word1": False},
         )
 
+    def test_feedback_service_scores_scoped_marks(self):
+        mark_buffer.clear_for(ENGLISH_READING, "2099-01-01")
+        mark_buffer.init_for(ENGLISH_READING, "2099-01-01", {"q1": None, "q2": None})
+
+        feedback_service.mark_item_for(ENGLISH_READING, "2099-01-01", "q1", True)
+        feedback_service.mark_item_for(ENGLISH_READING, "2099-01-01", "q2", False)
+
+        self.assertEqual(
+            feedback_service.calc_score_for(ENGLISH_READING, "2099-01-01"),
+            (1, 2),
+        )
+
     def test_vocabulary_meta_uses_words(self):
         task = {
             "date": "2099-01-01",
@@ -56,6 +68,7 @@ class DailyTaskStoreTests(unittest.TestCase):
             vocabulary_store.build_meta(task),
             {
                 "quotient": {
+                    "correct": None,
                     "known": None,
                     "last_seen": "2099-01-01",
                     "times_seen": 1,

@@ -52,6 +52,8 @@ def _write_meta(scope: TaskScope, date_str: str, marks: dict):
     for qid, data in meta.items():
         if qid in marks:
             data["correct"] = marks[qid]
+            if "known" in data:
+                data["known"] = marks[qid]
 
     if scope == MATH_HOMEWORK:
         homework_store.save_meta(meta, date_str)

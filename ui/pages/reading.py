@@ -8,9 +8,10 @@ from providers.anthropic_provider import AnthropicProvider
 from providers.deepseek_provider import DeepSeekProvider
 from providers.gemini_provider import GeminiProvider
 from providers.provider_resolver import resolve_provider
-from services import reading_service
+from services import feedback_service, reading_service
 from settings import secrets
 from storage import reading_store
+from ui.components import marking
 
 
 def render(scope: TaskScope, provider_choice: str):
@@ -55,9 +56,10 @@ def render(scope: TaskScope, provider_choice: str):
             _generate(scope, today, provider, grade_level, focus, force=True)
 
     if task:
-        _render_task(task)
+        feedback_service.hydrate_marks_for(scope, today)
+        _render_task(scope, task)
         st.divider()
-        _render_pdf_downloads(scope, today)
+        _render_pdf_downloads(scope, task)
 
 
 def _generate(scope: TaskScope, today: str, provider, grade_level: int, focus: str, force: bool):
@@ -68,7 +70,7 @@ def _generate(scope: TaskScope, today: str, provider, grade_level: int, focus: s
     st.rerun()
 
 
-def _render_task(task: dict):
+def _render_task(scope: TaskScope, task: dict):
     passage = task.get("passage", {})
     questions = task.get("questions", [])
     vocab = task.get("vocabulary", [])
@@ -77,7 +79,8 @@ def _render_task(task: dict):
     c1.metric("Words", passage.get("word_count", "—"))
     c2.metric("Vocabulary", len(vocab))
     c3.metric("Questions", len(questions))
-    c4.metric("Model", task.get("model", "—"))
+    correct, total = feedback_service.calc_score_for(scope, task["date"])
+    c4.metric("Marked", f"{correct}/{total}" if total else "—")
 
     st.markdown(
         f"""
@@ -101,11 +104,24 @@ def _render_task(task: dict):
         for idx, item in enumerate(questions, 1):
             st.markdown(f"{idx}. {item.get('question', '')}")
     with tab_a:
+        marking.render_score(
+            scope,
+            task["date"],
+            "Mark each reading question after checking the answer.",
+        )
         for idx, item in enumerate(questions, 1):
-            st.markdown(f"{idx}. **{item.get('answer', '')}**")
+            with st.container(border=True):
+                st.markdown(f"**{idx}. {item.get('question', '')}**")
+                st.markdown(f"**Answer:** {item.get('answer', '')}")
+                marking.render_mark(scope, task["date"], item.get("id", f"q_{idx:03d}"))
 
 
-def _render_pdf_downloads(scope: TaskScope, date_str: str):
+def _render_pdf_downloads(scope: TaskScope, task: dict):
+    from pdf.reading_pdf import build_answers, build_reading
+
+    date_str = task["date"]
+    build_reading(scope, task)
+    build_answers(scope, task)
     pdf_d = reading_store.pdf_dir(scope, date_str)
     reading_pdf = pdf_d / "reading.pdf"
     answers_pdf = pdf_d / "answers.pdf"

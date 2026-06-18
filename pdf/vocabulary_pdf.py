@@ -6,6 +6,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 
+from pdf.fonts import register_cjk_font
 from storage import vocabulary_store
 
 
@@ -84,15 +85,18 @@ def _path(task: dict, name: str) -> Path:
 
 def _base_story(task: dict, title: str):
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle("title", parent=styles["Heading1"], fontSize=16, spaceAfter=4)
+    font_name = register_cjk_font()
+    title_style = ParagraphStyle("title", parent=styles["Heading1"], fontName=font_name,
+                                 fontSize=16, spaceAfter=4)
     subtitle_style = ParagraphStyle("subtitle", parent=styles["Normal"], fontSize=10,
-                                    textColor=colors.grey, spaceAfter=12)
+                                    fontName=font_name, textColor=colors.grey, spaceAfter=12)
     section_style = ParagraphStyle("section", parent=styles["Heading2"], fontSize=12,
-                                   spaceBefore=14, spaceAfter=6)
+                                   fontName=font_name, spaceBefore=14, spaceAfter=6)
     normal_style = ParagraphStyle("vocab_normal", parent=styles["Normal"], fontSize=10,
-                                  spaceAfter=8, leading=14)
+                                  fontName=font_name, spaceAfter=8, leading=14)
     answer_style = ParagraphStyle("answer", parent=styles["Normal"], fontSize=10,
-                                  textColor=colors.HexColor("#1a6b1a"), spaceAfter=5, leading=13)
+                                  fontName=font_name, textColor=colors.HexColor("#1a6b1a"),
+                                  spaceAfter=5, leading=13)
     custom = {
         "section": section_style,
         "normal": normal_style,
