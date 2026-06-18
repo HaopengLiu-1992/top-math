@@ -9,7 +9,7 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
 - Per-question ✓/✗ marking with real-time score tracking
 - Sunday review: collects incorrectly marked questions from the past 7 days; skipped if no mistakes
 - Weekly feedback report and skills analysis generated on Sundays; browseable by past week via date selector
-- Three AI providers: Claude API, Gemini API, or local MLX server (Qwen)
+- Four AI providers: DeepSeek API, Gemini API, Claude API, or local MLX server (Qwen)
 
 ---
 
@@ -43,7 +43,7 @@ A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks dai
               ▼                ▼               ▼
          Providers           PDF           output/raw/
        AnthropicAPI      questions         YYYY/MM/DD/
-       MLX/Qwen HTTP      answers
+       DeepSeek/Gemini/Claude/MLX      answers
 ```
 
 ---
@@ -158,6 +158,7 @@ top-math/
 ├── providers/
 │   ├── base.py                        # Abstract ModelProvider
 │   ├── anthropic_provider.py          # Claude API
+│   ├── deepseek_provider.py           # DeepSeek API
 │   ├── gemini_provider.py             # Gemini API
 │   └── mlx_provider.py               # Local Qwen via mlx_lm server
 ├── prompts/
@@ -274,7 +275,10 @@ source .venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Set API key. Gemini is the default cloud provider.
+# Set API key. DeepSeek is the default cloud provider.
+export DEEPSEEK_API_KEY=...
+
+# Optional, only needed if you choose Gemini in the sidebar
 export GEMINI_API_KEY=...
 
 # Optional, only needed if you choose Claude in the sidebar
@@ -293,10 +297,9 @@ you want to test the cloud password gate locally.
 
 **Optional — local MLX model:**
 
-Start your MLX FastAPI inference server at `http://localhost:8000`. Expected endpoint:
+Start your MLX OpenAI-compatible inference server at `http://localhost:8080`. Expected endpoint:
 ```
-POST /stream
-{ "prompt": str, "max_tokens": int, "temp": float, "top_p": float }
+POST /v1/chat/completions
 ```
 The app auto-detects it and offers it in the sidebar.
 
@@ -306,9 +309,10 @@ The app auto-detects it and offers it in the sidebar.
 
 | Provider | Details |
 |----------|---------|
+| **DeepSeek (cloud)** | DeepSeek API — requires `DEEPSEEK_API_KEY`; default model is `deepseek-v4-flash` |
 | **Gemini (cloud)** | Google Gemini API — requires `GEMINI_API_KEY` |
 | **Claude (cloud)** | Anthropic API — requires `ANTHROPIC_API_KEY` |
-| **Local MLX (Qwen)** | Streams from `http://localhost:8000/stream` — no API key needed |
+| **Local MLX (Qwen)** | OpenAI-compatible local server at `http://localhost:8080` — no API key needed |
 
 Both implement the same `ModelProvider` abstract interface (`providers/base.py`).
 
@@ -348,6 +352,9 @@ Paste this into Streamlit's **Secrets** box:
 AUTH_REQUIRED=true
 APP_PASSWORD="choose-a-private-password"
 
+DEEPSEEK_API_KEY="your-deepseek-api-key"
+
+# Optional, only needed if you want Gemini available.
 GEMINI_API_KEY="your-gemini-api-key"
 
 # Optional, only needed if you want Claude available.
@@ -363,6 +370,7 @@ For local development, environment variables are enough. If you prefer a local
 Streamlit secrets file, create `.streamlit/secrets.toml`:
 
 ```toml
+DEEPSEEK_API_KEY="your-deepseek-api-key"
 GEMINI_API_KEY="your-gemini-api-key"
 ANTHROPIC_API_KEY="your-anthropic-api-key"
 ```
