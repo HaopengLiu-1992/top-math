@@ -9,6 +9,22 @@ from storage import vocabulary_store
 NEW_WORD_COUNT = 15
 REVIEW_WORD_COUNT = 5
 STAGE_ORDER = ["cn_middle_school", "cn_high_school", "cn_high_school_extension"]
+TRUSTED_SOURCES = {"curated_math_science_core"}
+TEACHABLE_CATEGORIES = {
+    "math_operations",
+    "word_problem_signals",
+    "fractions_decimals",
+    "geometry_measurement",
+    "data_statistics",
+    "academic_verbs",
+    "science_process",
+    "life_science",
+    "physical_science",
+    "earth_science",
+    "general_academic",
+    "math",
+    "science",
+}
 
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None,
@@ -47,7 +63,7 @@ def _select_words(date_str: str) -> tuple[list[dict], list[dict]]:
     bank = vocabulary_store.load_word_bank()
     index = vocabulary_store.load_word_index()
     by_word = {item["word"]: item for item in bank}
-    seen = _seen_words()
+    seen = _seen_words(exclude_date=date_str)
 
     review_words = _select_review_words(bank, seen)
     new_needed = NEW_WORD_COUNT + max(0, REVIEW_WORD_COUNT - len(review_words))
@@ -57,6 +73,7 @@ def _select_words(date_str: str) -> tuple[list[dict], list[dict]]:
         new_words.extend(
             w for w in bank
             if w["word"] not in selected and w["word"] not in seen
+            and _is_teachable_word(w)
         )
         new_words = new_words[:new_needed]
     return new_words, review_words
@@ -72,7 +89,12 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
     selected: list[dict] = []
     selected_words: set[str] = set()
     for word in index.get("learning_sequence", []):
-        if word not in by_word or word in seen or word in selected_words:
+        if (
+            word not in by_word
+            or word in seen
+            or word in selected_words
+            or not _is_teachable_word(by_word[word])
+        ):
             continue
         selected.append(by_word[word])
         selected_words.add(word)
@@ -100,7 +122,12 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
         # Second pass: fill from the same stage before moving harder.
         for words in by_stage_category.get(stage, {}).values():
             for word in words:
-                if word not in by_word or word in seen or word in selected_words:
+                if (
+                    word not in by_word
+                    or word in seen
+                    or word in selected_words
+                    or not _is_teachable_word(by_word[word])
+                ):
                     continue
                 selected.append(by_word[word])
                 selected_words.add(word)
@@ -113,14 +140,36 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
 def _first_available_word(words: list[str], by_word: dict[str, dict],
                           seen: set[str], selected: set[str]) -> str | None:
     for word in words:
-        if word in by_word and word not in seen and word not in selected:
+        if (
+            word in by_word
+            and word not in seen
+            and word not in selected
+            and _is_teachable_word(by_word[word])
+        ):
             return word
     return None
 
 
-def _seen_words() -> set[str]:
+def _is_teachable_word(item: dict) -> bool:
+    word = item.get("word", "")
+    if item.get("source") in TRUSTED_SOURCES:
+        return True
+    if item.get("category") not in TEACHABLE_CATEGORIES:
+        return False
+    if not item.get("definition"):
+        return False
+    if len(word) < 3 or len(word) > 18:
+        return False
+    if any(ch.isdigit() for ch in word):
+        return False
+    return True
+
+
+def _seen_words(exclude_date: str | None = None) -> set[str]:
     seen = set()
     for date_str in vocabulary_store.list_dates():
+        if date_str == exclude_date:
+            continue
         meta = vocabulary_store.load_meta(date_str)
         seen.update(meta.keys())
     return seen

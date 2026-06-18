@@ -405,6 +405,2076 @@
     "source": "curated_math_science_core"
   },
   {
+    "word": "add",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "subtract",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "multiply",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "divide",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "operation",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "calculate",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "compute",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "total",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "equal",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "unequal",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "double",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "triple",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "halve",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "value",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "expression",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "equation",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "solution",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "variable",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "constant",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "coefficient",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "term",
+    "category": "math_operations",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "more",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "less",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "greater",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "least",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "greatest",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "combined",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "together",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "separate",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "each",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "per",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "rate",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "unit",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "discount",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "tax",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "profit",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "loss",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "change",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "initial",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "final",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "missing",
+    "category": "word_problem_signals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "percent",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "percentage",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "proportion",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "proportional",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "improper",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "mixed",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "reciprocal",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "convert",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "round",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "place value",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "tenths",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "hundredths",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "thousandths",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "integer",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "negative",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "positive",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "absolute value",
+    "category": "fractions_decimals",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "angle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "degree",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "line",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "ray",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "segment",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "parallel",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "perpendicular",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "vertex",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "vertices",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "polygon",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "triangle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "quadrilateral",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "rectangle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "square",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "circle",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "radius",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "diameter",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "circumference",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "surface area",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "coordinate",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "axis",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "plane",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "base",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "face",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "edge",
+    "category": "geometry_measurement",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "mean",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "median",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "mode",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "table",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "graph",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "chart",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "plot",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "bar graph",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "line plot",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "scatter plot",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "frequency",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "survey",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "sample",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "population",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "probability",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "outcome",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "random",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "trend",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "maximum",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "minimum",
+    "category": "data_statistics",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "analyze",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "describe",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "identify",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "classify",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "summarize",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "infer",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "evaluate",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "support",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "contrast",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "represent",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "model",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "solve",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "prove",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "reason",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "organize",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "interpret",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "apply",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "determine",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "conclude",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "revise",
+    "category": "academic_verbs",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "hypothesis",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "experiment",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "investigate",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "control",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "independent variable",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "dependent variable",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "procedure",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "result",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "claim",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "reasoning",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "accurate",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "precise",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "record",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "trial",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "observation",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "conclusion",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "system",
+    "category": "science_process",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "organism",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "species",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "community",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "cell",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "tissue",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "organ",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "function",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "structure",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "trait",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "inherit",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "genetic",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "reproduce",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "survive",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "consumer",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "producer",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "decomposer",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "food chain",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "food web",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "photosynthesis",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "respiration",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "competition",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "predator",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "prey",
+    "category": "life_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "matter",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "mass",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "weight",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "density",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "particle",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "atom",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "molecule",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "element",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "compound",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "mixture",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "solid",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "liquid",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "gas",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "temperature",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "thermal",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "conductor",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "insulator",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "magnet",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "electricity",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "circuit",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "friction",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "gravity",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "speed",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "velocity",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "acceleration",
+    "category": "physical_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "rock",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "mineral",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "sediment",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "fossil",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "soil",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "landform",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "plate",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "earthquake",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "volcano",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "atmosphere",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "ocean",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "current",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "tide",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "water cycle",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "evaporation",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "condensation",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "precipitation",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "runoff",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "groundwater",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "renewable",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "nonrenewable",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "resource",
+    "category": "earth_science",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "concept",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "process",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "pattern",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "relationship",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "cause",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "effect",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "similar",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "different",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "specific",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "general",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "complex",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "simple",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "method",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "strategy",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "section",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "context",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "source",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "valid",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "reliable",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
+    "word": "significant",
+    "category": "general_academic",
+    "chinese": "",
+    "definition": "",
+    "cn_stage": "cn_middle_school",
+    "us_band": "us_grade_5_8",
+    "source": "curated_math_science_core"
+  },
+  {
     "word": "aaronic",
     "category": "academic",
     "chinese": "",
@@ -3789,15 +5859,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "analyze",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "analyzer",
     "category": "academic",
     "chinese": "",
@@ -4016,15 +6077,6 @@
   {
     "word": "anginous",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "angle",
-    "category": "math",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_middle_school",
@@ -6158,15 +8210,6 @@
   {
     "word": "atokous",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "atom",
-    "category": "science",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_middle_school",
@@ -11097,15 +13140,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "cell",
-    "category": "science",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "cella",
     "category": "science",
     "chinese": "",
@@ -13384,15 +15418,6 @@
   },
   {
     "word": "conormal",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "contrast",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -15840,15 +17865,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "density",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "dental",
     "category": "academic",
     "chinese": "",
@@ -15995,15 +18011,6 @@
   {
     "word": "descale",
     "category": "math",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "describe",
-    "category": "academic",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_middle_school",
@@ -17210,15 +19217,6 @@
   {
     "word": "dive",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "divide",
-    "category": "math",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_middle_school",
@@ -18720,15 +20718,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "element",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "elenchic",
     "category": "academic",
     "chinese": "",
@@ -20196,26 +22185,8 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "equal",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "equality",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "equation",
-    "category": "math",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_middle_school",
@@ -21007,15 +22978,6 @@
   },
   {
     "word": "eutropic",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "evaluate",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -22419,15 +24381,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "final",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_middle_school",
-    "us_band": "us_grade_5_8",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "finality",
     "category": "academic",
     "chinese": "",
@@ -23094,15 +25047,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "friction",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "friesic",
     "category": "academic",
     "chinese": "",
@@ -23293,15 +25237,6 @@
   },
   {
     "word": "fumous",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "function",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -23994,15 +25929,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "general",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "generic",
     "category": "academic",
     "chinese": "",
@@ -24031,15 +25957,6 @@
   },
   {
     "word": "genesic",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "genetic",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -25650,15 +27567,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "graph",
-    "category": "math",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "graphic",
     "category": "math",
     "chinese": "",
@@ -25732,15 +27640,6 @@
   },
   {
     "word": "gravic",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "gravity",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -27936,15 +29835,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "identify",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "identity",
     "category": "academic",
     "chinese": "",
@@ -28683,15 +30573,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "infer",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "inferent",
     "category": "academic",
     "chinese": "",
@@ -28837,15 +30718,6 @@
   },
   {
     "word": "iniquity",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "initial",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -33030,15 +34902,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "matter",
-    "category": "science",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "mattery",
     "category": "science",
     "chinese": "",
@@ -33104,15 +34967,6 @@
   {
     "word": "meal",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "mean",
-    "category": "math",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_high_school",
@@ -33284,15 +35138,6 @@
   {
     "word": "medial",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "median",
-    "category": "math",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_high_school",
@@ -33994,15 +35839,6 @@
   },
   {
     "word": "minacity",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "mineral",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -35019,15 +36855,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "multiply",
-    "category": "math",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "mundic",
     "category": "academic",
     "chinese": "",
@@ -35866,15 +37693,6 @@
   },
   {
     "word": "negation",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "negative",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -38709,15 +40527,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "organ",
-    "category": "science",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "organal",
     "category": "science",
     "chinese": "",
@@ -38763,15 +40572,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "organism",
-    "category": "science",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "organist",
     "category": "science",
     "chinese": "",
@@ -38782,15 +40582,6 @@
   },
   {
     "word": "organity",
-    "category": "science",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "organize",
     "category": "science",
     "chinese": "",
     "definition": "",
@@ -41076,15 +42867,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "percent",
-    "category": "math",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "perceval",
     "category": "academic",
     "chinese": "",
@@ -43255,15 +45037,6 @@
   },
   {
     "word": "position",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "positive",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -46063,15 +47836,6 @@
   },
   {
     "word": "rearrive",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "reason",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -49293,15 +51057,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "section",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "sective",
     "category": "academic",
     "chinese": "",
@@ -49347,15 +51102,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "sediment",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "sedition",
     "category": "academic",
     "chinese": "",
@@ -49393,15 +51139,6 @@
   },
   {
     "word": "sedulous",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "segment",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -50895,15 +52632,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "solution",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "somal",
     "category": "academic",
     "chinese": "",
@@ -51400,15 +53128,6 @@
   },
   {
     "word": "special",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "specific",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -52605,15 +54324,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "subtract",
-    "category": "math",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "subtunic",
     "category": "academic",
     "chinese": "",
@@ -53020,15 +54730,6 @@
   },
   {
     "word": "survival",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "survive",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -54693,15 +56394,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "thermal",
-    "category": "science",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "thermic",
     "category": "science",
     "chinese": "",
@@ -55449,15 +57141,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "total",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "totality",
     "category": "academic",
     "chinese": "",
@@ -55674,26 +57357,8 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "trial",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "triality",
     "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "triangle",
-    "category": "math",
     "chinese": "",
     "definition": "",
     "cn_stage": "cn_high_school",
@@ -57097,15 +58762,6 @@
   },
   {
     "word": "unepic",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "unequal",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -59437,15 +61093,6 @@
   },
   {
     "word": "velleity",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school",
-    "us_band": "us_grade_8_10",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "velocity",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -70237,15 +71884,6 @@
   },
   {
     "word": "commotive",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school_extension",
-    "us_band": "us_grade_10_12",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "community",
     "category": "academic",
     "chinese": "",
     "definition": "",
@@ -82044,15 +83682,6 @@
     "source": "system_word_bank_ranked_candidate"
   },
   {
-    "word": "interpret",
-    "category": "academic",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school_extension",
-    "us_band": "us_grade_10_12",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
     "word": "intorsion",
     "category": "academic",
     "chinese": "",
@@ -88120,15 +89749,6 @@
   },
   {
     "word": "opegrapha",
-    "category": "math",
-    "chinese": "",
-    "definition": "",
-    "cn_stage": "cn_high_school_extension",
-    "us_band": "us_grade_10_12",
-    "source": "system_word_bank_ranked_candidate"
-  },
-  {
-    "word": "operation",
     "category": "math",
     "chinese": "",
     "definition": "",

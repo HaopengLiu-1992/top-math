@@ -1,4 +1,5 @@
 from datetime import date
+from html import escape
 
 import streamlit as st
 
@@ -18,7 +19,19 @@ def render(scope: TaskScope, provider_choice: str):
     provider = resolve_provider(provider_choice)
     task = reading_store.load_task(scope, today)
 
-    st.subheader(label)
+    st.markdown(
+        f"""
+        <div class="tm-module-heading">
+            <div>
+                <div class="tm-section-label">{scope.subject} · {scope.task_type}</div>
+                <h2>{escape(label)}</h2>
+                <p>Generate a focused passage with vocabulary, questions, and answer keys.</p>
+            </div>
+            <span class="tm-chip">{escape(today)}</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     with st.container(border=True):
         c1, c2 = st.columns([1, 3])
         grade_level = c1.selectbox(
@@ -66,7 +79,17 @@ def _render_task(task: dict):
     c3.metric("Questions", len(questions))
     c4.metric("Model", task.get("model", "—"))
 
-    st.markdown(f"### {passage.get('title', 'Passage')}")
+    st.markdown(
+        f"""
+        <div class="tm-module-heading">
+            <div>
+                <div class="tm-section-label">Passage</div>
+                <h2>{escape(passage.get('title', 'Passage'))}</h2>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.write(passage.get("text", ""))
 
     tab_v, tab_q, tab_a = st.tabs(["Vocabulary", "Questions", "Answers"])

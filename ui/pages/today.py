@@ -20,7 +20,19 @@ def render(provider_choice: str, embedded: bool = False):
     today = date.today().isoformat()
 
     if embedded:
-        st.subheader(f"Math Homework — {today}")
+        st.markdown(
+            f"""
+            <div class="tm-module-heading">
+                <div>
+                    <div class="tm-section-label">Math homework</div>
+                    <h2>Math Practice</h2>
+                    <p>Topic-based practice with lesson mode, difficulty control, PDFs, and answer marking.</p>
+                </div>
+                <span class="tm-chip">{today}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     else:
         st.title(f"📚 Today — {today}")
 

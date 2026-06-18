@@ -91,7 +91,7 @@ Current task scopes:
 
 The top-level UI intentionally stays small:
 
-- **Daily**: Math, Vocabulary, English Reading, Science Reading tabs
+- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, and Science Reading
 - **History**: all generated tasks across all scopes
 - **Analysis**: cross-subject activity overview plus math-specific score/topic analysis
 
@@ -173,7 +173,7 @@ output/raw/
 Vocabulary practice uses `config/vocabulary/academic_word_bank_10000.json`.
 The bank contains:
 
-- curated math/science core words with Chinese meanings and student-friendly definitions
+- 275 curated math/science/academic core words ordered from middle-school basics
 - 10,000 ranked academic candidates drawn from the local English word list
 - `cn_stage` mapping such as `cn_middle_school`, `cn_high_school`, and extension levels
 - `us_band` mapping such as `us_grade_5_8`, `us_grade_8_10`, and `us_grade_10_12`
@@ -185,7 +185,10 @@ keeps examples tied to math/science reading where possible.
 Runtime selection does **not** send the 10,000-word bank to the model. The app
 uses `config/vocabulary/vocabulary_index.json` to pick the next 15 new words and
 5 review words locally, starting from curated middle-school math/science basics.
-Only those selected daily words are included in the LLM prompt.
+Only those selected daily words are included in the LLM prompt. The selector also
+filters fallback candidates so unvetted dictionary words are not used for daily
+practice. Regenerating a date ignores that date's previous vocabulary meta so
+bad output can be replaced cleanly.
 
 ---
 
@@ -195,7 +198,7 @@ Only those selected daily words are included in the LLM prompt.
 |-------|------|----------------|
 | **UI** | `ui/pages/`, `ui/components/` | Streamlit pages and marking widgets |
 | **Services** | `services/` | Business logic — generation, dedup, scoring, review |
-| **Providers** | `providers/` | AI model abstraction (Claude API / Gemini API / local MLX) |
+| **Providers** | `providers/` | AI model abstraction (DeepSeek API / Claude API / Gemini API / local MLX) |
 | **Storage** | `storage/` | Mark buffer (source of truth), JSON I/O, flush thread |
 | **PDF** | `pdf/` | ReportLab PDF generation (questions and answers separate) |
 | **Prompts** | `prompts/` | Prompt builders for each generation task |

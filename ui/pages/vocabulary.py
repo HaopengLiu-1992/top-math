@@ -1,4 +1,5 @@
 from datetime import date
+from html import escape
 
 import streamlit as st
 
@@ -14,7 +15,19 @@ from storage import vocabulary_store
 def render(provider_choice: str, embedded: bool = False):
     today = date.today().isoformat()
     if embedded:
-        st.subheader(f"Academic Vocabulary — {today}")
+        st.markdown(
+            f"""
+            <div class="tm-module-heading">
+                <div>
+                    <div class="tm-section-label">English vocabulary</div>
+                    <h2>Academic Vocabulary</h2>
+                    <p>20 math and science words selected locally, then shaped into practice.</p>
+                </div>
+                <span class="tm-chip">{today}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     else:
         st.title(f"🔤 Vocabulary — {today}")
 
@@ -59,13 +72,21 @@ def _render_task(task: dict):
     c4.metric("Model", task.get("model", "—"))
 
     st.subheader("Words")
+    st.markdown('<div class="tm-word-grid">', unsafe_allow_html=True)
     for item in words:
         label = "Review" if item.get("is_review") else "New"
-        with st.container(border=True):
-            st.markdown(f"**{item.get('word', '')}** · {label} · {item.get('category', '')}")
-            st.markdown(f"{item.get('chinese', '')} — {item.get('definition', '')}")
-            st.caption(item.get("example", ""))
-            st.markdown(f"Quick check: {item.get('quick_check', '')}")
+        st.markdown(
+            f"""
+            <article class="tm-word-card">
+                <em>{escape(label)} · {escape(item.get('category', ''))}</em>
+                <strong>{escape(item.get('word', ''))}</strong>
+                <p>{escape(item.get('chinese', ''))} — {escape(item.get('definition', ''))}</p>
+                <small>{escape(item.get('example', ''))}</small>
+            </article>
+            """,
+            unsafe_allow_html=True,
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
 
     practice = task.get("practice", {})
     tab_m, tab_f, tab_k = st.tabs(["Matching", "Fill Blank", "Reading Bridge"])
