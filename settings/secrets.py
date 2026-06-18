@@ -43,10 +43,6 @@ def anthropic_api_key() -> str | None:
     return get_secret("ANTHROPIC_API_KEY")
 
 
-def deepseek_api_key() -> str | None:
-    return get_secret("DEEPSEEK_API_KEY")
-
-
 def _get_streamlit_secret(name: str) -> str | None:
     if st is None:
         return None
