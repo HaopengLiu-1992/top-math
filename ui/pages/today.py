@@ -4,6 +4,7 @@ from datetime import date
 import streamlit as st
 
 from providers.anthropic_provider import AnthropicProvider
+from providers.deepseek_provider import DeepSeekProvider
 from providers.gemini_provider import GeminiProvider
 from providers.provider_resolver import resolve_provider
 from domain.difficulty import DEFAULT_DIFFICULTY, get_difficulty_profile, list_difficulty_profiles
@@ -232,6 +233,9 @@ def _render_pdf_downloads(date_str):
                                mime="application/pdf", width="stretch")
 
 def _check_api_key(provider) -> bool:
+    if isinstance(provider, DeepSeekProvider) and not secrets.deepseek_api_key():
+        st.error("DEEPSEEK_API_KEY is not set.")
+        return False
     if isinstance(provider, AnthropicProvider) and not secrets.anthropic_api_key():
         st.error("ANTHROPIC_API_KEY is not set.")
         return False
