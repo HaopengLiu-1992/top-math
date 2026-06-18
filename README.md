@@ -182,6 +182,11 @@ The bank contains:
 The model fills any missing Chinese/definition fields at generation time and
 keeps examples tied to math/science reading where possible.
 
+Runtime selection does **not** send the 10,000-word bank to the model. The app
+uses `config/vocabulary/vocabulary_index.json` to pick the next 15 new words and
+5 review words locally, starting from curated middle-school math/science basics.
+Only those selected daily words are included in the LLM prompt.
+
 ---
 
 ## Layer Responsibilities

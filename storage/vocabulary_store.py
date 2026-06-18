@@ -5,10 +5,15 @@ from domain.daily_task import ENGLISH_VOCABULARY
 from storage import daily_task_store
 
 WORD_BANK = Path("config/vocabulary/academic_word_bank_10000.json")
+WORD_INDEX = Path("config/vocabulary/vocabulary_index.json")
 
 
 def load_word_bank() -> list[dict]:
     return json.loads(WORD_BANK.read_text())
+
+
+def load_word_index() -> dict:
+    return json.loads(WORD_INDEX.read_text())
 
 
 def load_task(date_str: str) -> dict | None:
