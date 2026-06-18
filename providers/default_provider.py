@@ -2,6 +2,6 @@ from providers.base import ModelProvider
 
 
 def get_default_provider() -> ModelProvider:
-    from providers.gemini_provider import GeminiProvider
+    from providers.deepseek_provider import DeepSeekProvider
 
-    return GeminiProvider()
+    return DeepSeekProvider()
