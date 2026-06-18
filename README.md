@@ -1,4 +1,4 @@
-# Jessie Daily Math Homework Generator
+#Daily Math Homework Generator
 
 A Streamlit app that generates Grade 5 math homework PDFs for Jessie, tracks daily progress, and runs Sunday review sessions targeting past mistakes.
 
