@@ -381,6 +381,7 @@ def apply_theme():
     .tm-accent-blue { --tm-card-accent: linear-gradient(90deg, #2563eb, #06b6d4); }
     .tm-accent-green { --tm-card-accent: linear-gradient(90deg, #188f5f, #84cc16); }
     .tm-accent-amber { --tm-card-accent: linear-gradient(90deg, #b7791f, #ef4444); }
+    .tm-accent-violet { --tm-card-accent: linear-gradient(90deg, #7c3aed, #2563eb); }
     .tm-task-card.is-ready { --tm-status-color: var(--tm-green); }
     .tm-task-card.is-pending { --tm-status-color: var(--tm-amber); }
 

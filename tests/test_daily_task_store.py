@@ -3,9 +3,9 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from domain.daily_task import ENGLISH_READING, ENGLISH_VOCABULARY, MATH_HOMEWORK
-from storage import daily_task_store, mark_buffer, reading_store, vocabulary_store
-from services import feedback_service, vocabulary_service
+from domain.daily_task import ENGLISH_READING, ENGLISH_VOCABULARY, ENGLISH_WRITING, MATH_HOMEWORK
+from storage import daily_task_store, mark_buffer, reading_store, vocabulary_store, writing_store
+from services import feedback_service, vocabulary_service, writing_service
 from prompts import vocabulary_prompt
 
 
@@ -172,6 +172,41 @@ class DailyTaskStoreTests(unittest.TestCase):
             },
         )
 
+    def test_writing_meta_tracks_opinion_and_examples(self):
+        task = {
+            "opinion": {"claim": "Practice helps students improve."},
+            "examples": [
+                {"id": "example_001", "memorize_line": "For example, daily reading builds vocabulary."},
+                {"id": "example_002", "memorize_line": "Also, science notes help students explain evidence."},
+                {"id": "example_003", "memorize_line": "Finally, math practice makes problem solving faster."},
+            ],
+        }
+
+        meta = writing_store.build_meta(task)
+
+        self.assertEqual(set(meta), {"opinion", "example_001", "example_002", "example_003"})
+        self.assertTrue(all(item["correct"] is None for item in meta.values()))
+        self.assertTrue(all(item["skill"] == "writing_memorization" for item in meta.values()))
+
+    def test_writing_task_normalization_builds_recitation_checks(self):
+        task = {
+            "opinion": {"claim": "Practice helps.", "memorize_line": "I believe practice helps."},
+            "examples": [
+                {"memorize_line": "For example, reading builds vocabulary."},
+                {"memorize_line": "Also, science notes explain evidence."},
+                {"memorize_line": "Finally, math practice improves speed."},
+            ],
+        }
+
+        writing_service._normalize_task(task)
+
+        self.assertEqual([item["id"] for item in task["examples"]],
+                         ["example_001", "example_002", "example_003"])
+        self.assertEqual(
+            [item["id"] for item in task["practice"]["recitation_check"]],
+            ["opinion", "example_001", "example_002", "example_003"],
+        )
+
     def test_store_lists_multiple_scopes(self):
         original_root = daily_task_store.TASK_ROOT
         with tempfile.TemporaryDirectory() as tmp:
@@ -179,10 +214,11 @@ class DailyTaskStoreTests(unittest.TestCase):
                 daily_task_store.TASK_ROOT = Path(tmp)
                 daily_task_store.save_task(MATH_HOMEWORK, "2099-01-01", {"date": "2099-01-01"})
                 daily_task_store.save_task(ENGLISH_READING, "2099-01-01", {"date": "2099-01-01"})
+                daily_task_store.save_task(ENGLISH_WRITING, "2099-01-01", {"date": "2099-01-01"})
 
-                records = daily_task_store.list_task_records([MATH_HOMEWORK, ENGLISH_READING])
-                self.assertEqual(len(records), 2)
-                self.assertEqual({r["scope"] for r in records}, {MATH_HOMEWORK, ENGLISH_READING})
+                records = daily_task_store.list_task_records([MATH_HOMEWORK, ENGLISH_READING, ENGLISH_WRITING])
+                self.assertEqual(len(records), 3)
+                self.assertEqual({r["scope"] for r in records}, {MATH_HOMEWORK, ENGLISH_READING, ENGLISH_WRITING})
             finally:
                 daily_task_store.TASK_ROOT = original_root
 
