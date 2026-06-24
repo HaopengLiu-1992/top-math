@@ -1,7 +1,7 @@
 # Daily Learning Generator
 
-A Streamlit app that generates daily math, vocabulary, English reading, and
-science reading practice for Jessie. It uses scoped daily tasks so multiple
+A Streamlit app that generates daily math, vocabulary, English reading, English
+writing, and science reading practice for Jessie. It uses scoped daily tasks so multiple
 subjects can share providers, storage, PDFs, history, and analysis.
 
 ## Features
@@ -9,6 +9,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
 - Daily Grade 5-8 math homework following CCSS standards — one generation per day (idempotent/cached)
 - Daily math/science academic vocabulary practice — 20 words from a 10,000-word academic candidate bank
 - Daily English reading practice — passage, vocabulary, comprehension, inference, and short response
+- Daily English writing practice — one reusable opinion and three memorized examples
 - Daily science reading practice — science passage, academic vocabulary, evidence/cause-effect questions
 - Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
@@ -29,7 +30,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
 ┌────────▼───────────────▼─────────────────────▼────────────┐
 │                        Services                           │
 │  generator · vocabulary_service · reading_service         │
-│  analysis_service · summary_service                       │
+│  writing_service · analysis_service · summary_service     │
 │  feedback_service · feedback_report_service · dedup       │
 └──────────────┬────────────────────────────────────────────┘
                │
@@ -39,6 +40,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
     │  daily_task_store(subject, task_type, date)          │
     │      │                                              │
     │  homework_store / vocabulary_store / reading_store  │
+    │  writing_store                                      │
     │      │                                              │
     │  scoped mark_buffer ◄── single source of mark truth │
     │      │                                              │
@@ -62,6 +64,7 @@ The app is now organized around a scoped daily task:
 TaskScope(subject="math", task_type="homework")
 TaskScope(subject="english", task_type="vocabulary")
 TaskScope(subject="english", task_type="reading")
+TaskScope(subject="english", task_type="writing")
 TaskScope(subject="science", task_type="reading")
 ```
 
@@ -77,6 +80,7 @@ output/tasks/<subject>/<task_type>/
     ├── questions.pdf      # math
     ├── vocabulary.pdf     # vocabulary
     ├── reading.pdf        # reading
+    ├── writing.pdf        # writing
     └── answers.pdf
 ```
 
@@ -87,11 +91,12 @@ Current task scopes:
 | `math/homework` | Today | `services.generator` | `homework_store` | `questions_pdf`, `answers_pdf` |
 | `english/vocabulary` | Vocabulary | `vocabulary_service` | `vocabulary_store` | `vocabulary_pdf` |
 | `english/reading` | Daily / English Reading | `reading_service` | `reading_store` | `reading_pdf` |
+| `english/writing` | Daily / English Writing | `writing_service` | `writing_store` | `writing_pdf` |
 | `science/reading` | Daily / Science Reading | `reading_service` | `reading_store` | `reading_pdf` |
 
 The top-level UI intentionally stays small:
 
-- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, and Science Reading
+- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, English Writing, and Science Reading
 - **History**: all generated tasks across all scopes
 - **Analysis**: cross-subject activity overview plus math-specific score/topic analysis
 
