@@ -197,6 +197,40 @@ bad output can be replaced cleanly.
 
 ---
 
+## Reading Guardrail Sidecar
+
+Reading generation uses a low-intrusion sidecar to reduce repeated Grade 5-8
+passages without growing the prompt over time.
+
+`services.reading_guardrail` adds three steps around the existing
+`reading_service.generate()` flow:
+
+1. `prepare(scope, date, grade, focus)` selects a slot:
+   grade, domain, topic, subtopic, text type, and target skill.
+2. `validate(scope, task, plan)` checks structure, rough grade-level length,
+   required vocabulary/question counts, evidence/detail coverage, and concept
+   similarity.
+3. `commit(scope, date, task, plan)` stores long-term concept memory.
+
+The prompt receives only:
+
+- the current slot
+- the selected core concept
+- a small top-k list of similar concepts to avoid
+
+It does **not** receive the full reading history. Concept memory is stored in:
+
+```
+output/reading_guardrail/concepts.json
+```
+
+Each committed record includes concept, deterministic embedding, metadata, and
+an `external_passage_id`. The embedding implementation is local and deterministic
+today, so the sidecar has no extra API cost; it can be swapped for a hosted
+embedding provider later without changing the reading UI.
+
+---
+
 ## Layer Responsibilities
 
 | Layer | Path | Responsibility |

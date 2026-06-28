@@ -7,6 +7,9 @@ from domain.daily_task import ENGLISH_READING, ENGLISH_VOCABULARY, ENGLISH_WRITI
 from storage import daily_task_store, mark_buffer, reading_store, vocabulary_store, writing_store
 from services import feedback_service, vocabulary_service, writing_service
 from prompts import vocabulary_prompt
+from prompts import reading_prompt
+from services import reading_guardrail
+from storage import reading_guardrail_store
 
 
 class DailyTaskStoreTests(unittest.TestCase):
@@ -171,6 +174,68 @@ class DailyTaskStoreTests(unittest.TestCase):
                 }
             },
         )
+
+    def test_reading_guardrail_prompt_keeps_history_small(self):
+        guardrail = {
+            "slot": {
+                "grade": 6,
+                "domain": "informational",
+                "topic": "technology",
+                "subtopic": "how an invention changes daily life",
+                "text_type": "expository",
+                "skill": "main idea",
+            },
+            "core_concept": "how an invention changes daily life in a school setting",
+            "avoid_concepts": ["old concept 1", "old concept 2"],
+            "external_passage_id": "english-reading-2099-01-01-test",
+        }
+
+        prompt = reading_prompt.user_prompt(
+            "2099-01-01",
+            6,
+            "english",
+            "main idea",
+            guardrail=guardrail,
+        )
+
+        self.assertIn("core_concept", prompt)
+        self.assertIn("old concept 1", prompt)
+        self.assertLess(len(prompt), 7000)
+
+    def test_reading_guardrail_commit_stores_concept_memory(self):
+        original_path = reading_guardrail_store.MEMORY_PATH
+        with tempfile.TemporaryDirectory() as tmp:
+            try:
+                reading_guardrail_store.MEMORY_PATH = Path(tmp) / "concepts.json"
+                plan = reading_guardrail.prepare(
+                    ENGLISH_READING,
+                    "2099-01-01",
+                    6,
+                    "main idea",
+                )
+                task = {
+                    "passage": {"title": "A New Tool", "text": "word " * 500},
+                    "vocabulary": [{"word": f"w{i}"} for i in range(8)],
+                    "questions": [
+                        {"id": f"q_{i:03d}", "type": "detail" if i == 1 else "main_idea", "skill": "text evidence"}
+                        for i in range(1, 9)
+                    ],
+                    "metadata": {},
+                }
+
+                self.assertEqual(reading_guardrail.validate(ENGLISH_READING, task, plan), [])
+                reading_guardrail.commit(ENGLISH_READING, "2099-01-01", task, plan)
+
+                records = reading_guardrail_store.load_records()
+                self.assertEqual(len(records), 1)
+                self.assertEqual(records[0]["concept"], plan.core_concept)
+                self.assertEqual(len(records[0]["embedding"]), reading_guardrail.EMBED_DIM)
+                self.assertEqual(
+                    task["metadata"]["reading_guardrail"]["external_passage_id"],
+                    plan.external_passage_id,
+                )
+            finally:
+                reading_guardrail_store.MEMORY_PATH = original_path
 
     def test_writing_meta_tracks_opinion_and_examples(self):
         task = {
