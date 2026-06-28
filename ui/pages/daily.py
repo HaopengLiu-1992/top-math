@@ -3,7 +3,7 @@ from datetime import date
 import streamlit as st
 
 from domain.daily_task import ENGLISH_READING, ENGLISH_WRITING, SCIENCE_READING
-from pdf.combined_daily_pdf import build_today_all_pdf
+from pdf.combined_daily_pdf import build_today_answers_pdf, build_today_questions_pdf
 from storage import homework_store, reading_store, vocabulary_store, writing_store
 from ui.pages import reading, today, vocabulary, writing
 
@@ -129,23 +129,46 @@ def _render_daily_overview(tasks: list[dict]):
 
 
 def _render_combined_pdf_download(date_str: str):
-    pdf_path, included, missing = build_today_all_pdf(date_str)
+    questions_pdf, question_included, question_missing = build_today_questions_pdf(date_str)
+    answers_pdf, answer_included, answer_missing = build_today_answers_pdf(date_str)
     with st.container(border=True):
         st.markdown('<div class="tm-section-label">One-click download</div>', unsafe_allow_html=True)
-        if not pdf_path:
+        if not questions_pdf and not answers_pdf:
             st.info("No PDFs found for today yet.")
             return
 
-        with open(pdf_path, "rb") as f:
-            st.download_button(
-                "Download All Today PDFs",
-                f,
-                file_name=f"topmath_{date_str}_all.pdf",
-                mime="application/pdf",
-                width="stretch",
-                key="download_today_all_pdf",
-            )
-        st.caption(f"Combined {len(included)} PDF file(s).")
+        c1, c2 = st.columns(2)
+        if questions_pdf:
+            with open(questions_pdf, "rb") as f:
+                c1.download_button(
+                    "Download Questions",
+                    f,
+                    file_name=f"topmath_{date_str}_questions.pdf",
+                    mime="application/pdf",
+                    width="stretch",
+                    key="download_today_questions_pdf",
+                )
+        else:
+            c1.info("No question PDFs found.")
+
+        if answers_pdf:
+            with open(answers_pdf, "rb") as f:
+                c2.download_button(
+                    "Download Answers",
+                    f,
+                    file_name=f"topmath_{date_str}_answers.pdf",
+                    mime="application/pdf",
+                    width="stretch",
+                    key="download_today_answers_pdf",
+                )
+        else:
+            c2.info("No answer PDFs found.")
+
+        st.caption(
+            f"Questions: {len(question_included)} PDF(s). "
+            f"Answers: {len(answer_included)} PDF(s)."
+        )
+        missing = question_missing + answer_missing
         if missing:
             with st.expander("Missing PDFs"):
                 for part in missing:

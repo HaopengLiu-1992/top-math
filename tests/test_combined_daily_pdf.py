@@ -7,25 +7,34 @@ from pypdf import PdfReader
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-from pdf.combined_daily_pdf import build_today_all_pdf
+from pdf.combined_daily_pdf import build_today_answers_pdf, build_today_questions_pdf
 
 
 class CombinedDailyPdfTests(unittest.TestCase):
-    def test_build_today_all_pdf_combines_existing_parts(self):
+    def test_build_today_questions_and_answers_pdf_combines_existing_parts(self):
         cwd = Path.cwd()
         with tempfile.TemporaryDirectory() as tmp:
             try:
                 os.chdir(tmp)
                 _write_pdf(Path("output/tasks/math/homework/pdf/2099/01/01/questions.pdf"), "math")
+                _write_pdf(Path("output/tasks/math/homework/pdf/2099/01/01/answers.pdf"), "math answers")
                 _write_pdf(Path("output/tasks/english/vocabulary/pdf/2099/01/01/vocabulary.pdf"), "vocab")
+                _write_pdf(Path("output/tasks/english/vocabulary/pdf/2099/01/01/answers.pdf"), "vocab answers")
 
-                out_path, included, missing = build_today_all_pdf("2099-01-01")
+                questions_path, question_included, question_missing = build_today_questions_pdf("2099-01-01")
+                answers_path, answer_included, answer_missing = build_today_answers_pdf("2099-01-01")
 
-                self.assertIsNotNone(out_path)
-                self.assertTrue(out_path.exists())
-                self.assertEqual([part.label for part in included], ["Math practice", "Vocabulary practice"])
-                self.assertGreaterEqual(len(missing), 1)
-                self.assertEqual(len(PdfReader(str(out_path)).pages), 2)
+                self.assertIsNotNone(questions_path)
+                self.assertTrue(questions_path.exists())
+                self.assertEqual([part.label for part in question_included], ["Math questions", "Vocabulary questions"])
+                self.assertGreaterEqual(len(question_missing), 1)
+                self.assertEqual(len(PdfReader(str(questions_path)).pages), 2)
+
+                self.assertIsNotNone(answers_path)
+                self.assertTrue(answers_path.exists())
+                self.assertEqual([part.label for part in answer_included], ["Math answers", "Vocabulary answers"])
+                self.assertGreaterEqual(len(answer_missing), 1)
+                self.assertEqual(len(PdfReader(str(answers_path)).pages), 2)
             finally:
                 os.chdir(cwd)
 

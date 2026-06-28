@@ -17,6 +17,19 @@ def combined_pdf_dir(date_str: str) -> Path:
 
 def build_today_all_pdf(date_str: str) -> tuple[Path | None, list[PdfPart], list[PdfPart]]:
     parts = _pdf_parts(date_str)
+    return _build_combined_pdf(date_str, "today_all.pdf", parts)
+
+
+def build_today_questions_pdf(date_str: str) -> tuple[Path | None, list[PdfPart], list[PdfPart]]:
+    return _build_combined_pdf(date_str, "questions.pdf", _question_parts(date_str))
+
+
+def build_today_answers_pdf(date_str: str) -> tuple[Path | None, list[PdfPart], list[PdfPart]]:
+    return _build_combined_pdf(date_str, "answers.pdf", _answer_parts(date_str))
+
+
+def _build_combined_pdf(date_str: str, filename: str,
+                        parts: list[PdfPart]) -> tuple[Path | None, list[PdfPart], list[PdfPart]]:
     existing = [part for part in parts if part.path.exists()]
     missing = [part for part in parts if not part.path.exists()]
     if not existing:
@@ -24,7 +37,7 @@ def build_today_all_pdf(date_str: str) -> tuple[Path | None, list[PdfPart], list
 
     out_dir = combined_pdf_dir(date_str)
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "today_all.pdf"
+    out_path = out_dir / filename
 
     writer = PdfWriter()
     for part in existing:
@@ -36,16 +49,26 @@ def build_today_all_pdf(date_str: str) -> tuple[Path | None, list[PdfPart], list
 
 
 def _pdf_parts(date_str: str) -> list[PdfPart]:
+    return _question_parts(date_str) + _answer_parts(date_str)
+
+
+def _question_parts(date_str: str) -> list[PdfPart]:
     y, m, d = date_str.split("-")
     return [
-        PdfPart("Math practice", Path("output/tasks/math/homework/pdf") / y / m / d / "questions.pdf"),
+        PdfPart("Math questions", Path("output/tasks/math/homework/pdf") / y / m / d / "questions.pdf"),
+        PdfPart("Vocabulary questions", Path("output/tasks/english/vocabulary/pdf") / y / m / d / "vocabulary.pdf"),
+        PdfPart("English reading questions", Path("output/tasks/english/reading/pdf") / y / m / d / "reading.pdf"),
+        PdfPart("English writing questions", Path("output/tasks/english/writing/pdf") / y / m / d / "writing.pdf"),
+        PdfPart("Science reading questions", Path("output/tasks/science/reading/pdf") / y / m / d / "reading.pdf"),
+    ]
+
+
+def _answer_parts(date_str: str) -> list[PdfPart]:
+    y, m, d = date_str.split("-")
+    return [
         PdfPart("Math answers", Path("output/tasks/math/homework/pdf") / y / m / d / "answers.pdf"),
-        PdfPart("Vocabulary practice", Path("output/tasks/english/vocabulary/pdf") / y / m / d / "vocabulary.pdf"),
         PdfPart("Vocabulary answers", Path("output/tasks/english/vocabulary/pdf") / y / m / d / "answers.pdf"),
-        PdfPart("English reading practice", Path("output/tasks/english/reading/pdf") / y / m / d / "reading.pdf"),
         PdfPart("English reading answers", Path("output/tasks/english/reading/pdf") / y / m / d / "answers.pdf"),
-        PdfPart("English writing practice", Path("output/tasks/english/writing/pdf") / y / m / d / "writing.pdf"),
         PdfPart("English writing answers", Path("output/tasks/english/writing/pdf") / y / m / d / "answers.pdf"),
-        PdfPart("Science reading practice", Path("output/tasks/science/reading/pdf") / y / m / d / "reading.pdf"),
         PdfPart("Science reading answers", Path("output/tasks/science/reading/pdf") / y / m / d / "answers.pdf"),
     ]
