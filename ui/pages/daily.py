@@ -3,6 +3,7 @@ from datetime import date
 import streamlit as st
 
 from domain.daily_task import ENGLISH_READING, ENGLISH_WRITING, SCIENCE_READING
+from pdf.combined_daily_pdf import build_today_all_pdf
 from storage import homework_store, reading_store, vocabulary_store, writing_store
 from ui.pages import reading, today, vocabulary, writing
 
@@ -29,6 +30,7 @@ def render(provider_choice: str):
     )
 
     _render_daily_overview(tasks)
+    _render_combined_pdf_download(today_str)
 
     selected = st.pills(
         "Daily task",
@@ -124,6 +126,30 @@ def _render_daily_overview(tasks: list[dict]):
             """,
             unsafe_allow_html=True,
         )
+
+
+def _render_combined_pdf_download(date_str: str):
+    pdf_path, included, missing = build_today_all_pdf(date_str)
+    with st.container(border=True):
+        st.markdown('<div class="tm-section-label">One-click download</div>', unsafe_allow_html=True)
+        if not pdf_path:
+            st.info("No PDFs found for today yet.")
+            return
+
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                "Download All Today PDFs",
+                f,
+                file_name=f"topmath_{date_str}_all.pdf",
+                mime="application/pdf",
+                width="stretch",
+                key="download_today_all_pdf",
+            )
+        st.caption(f"Combined {len(included)} PDF file(s).")
+        if missing:
+            with st.expander("Missing PDFs"):
+                for part in missing:
+                    st.markdown(f"- {part.label}")
 
 
 def _math_detail(task: dict | None) -> str:
