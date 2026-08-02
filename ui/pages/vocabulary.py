@@ -40,14 +40,22 @@ def render(provider_choice: str, embedded: bool = False):
     with st.container(border=True):
         st.markdown('<div class="tm-section-label">Vocabulary setup</div>', unsafe_allow_html=True)
         grade_level = st.selectbox("Grade", [5, 6, 7, 8], index=1, key="vocabulary_grade")
+        personal_prompt = st.text_area(
+            "Personal prompt",
+            value=task.get("personal_prompt", "") if task else "",
+            placeholder="Example: focus on words useful for explaining math solutions",
+            help="Optional extra instruction injected into the vocabulary generation prompt.",
+            key="vocabulary_personal_prompt",
+            height=100,
+        )
 
     if not task:
         if st.button("Generate Vocabulary", type="primary", width="stretch", key="vocabulary_generate"):
-            _generate(today, provider, grade_level, force=False)
+            _generate(today, provider, grade_level, personal_prompt, force=False)
     else:
         st.info("Vocabulary already generated for today.")
         if st.button("Regenerate Vocabulary", type="secondary", key="vocabulary_regenerate"):
-            _generate(today, provider, grade_level, force=True)
+            _generate(today, provider, grade_level, personal_prompt, force=True)
 
     if task:
         feedback_service.hydrate_marks_for(ENGLISH_VOCABULARY, today)
@@ -56,11 +64,17 @@ def render(provider_choice: str, embedded: bool = False):
         _render_pdf_downloads(task)
 
 
-def _generate(today: str, provider, grade_level: int, force: bool):
+def _generate(today: str, provider, grade_level: int, personal_prompt: str, force: bool):
     if not _check_api_key(provider):
         return
     with st.spinner("Generating vocabulary..."):
-        vocabulary_service.generate(today, provider, grade_level=grade_level, force=force)
+        vocabulary_service.generate(
+            today,
+            provider,
+            grade_level=grade_level,
+            personal_prompt=personal_prompt,
+            force=force,
+        )
     st.rerun()
 
 

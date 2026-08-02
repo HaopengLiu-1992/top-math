@@ -28,7 +28,8 @@ TEACHABLE_CATEGORIES = {
 
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None,
-             grade_level: int = 6, force: bool = False) -> dict:
+             grade_level: int = 6, personal_prompt: str = "",
+             force: bool = False) -> dict:
     today = date_str or date.today().isoformat()
     provider = provider or get_default_provider()
 
@@ -40,8 +41,10 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
     new_words, review_words = _select_words(today)
     raw = provider.complete(
         system=vocabulary_prompt.system_prompt(),
-        user=vocabulary_prompt.user_prompt(today, grade_level, new_words, review_words),
-        max_tokens=8000,
+        user=vocabulary_prompt.user_prompt(
+            today, grade_level, new_words, review_words, personal_prompt=personal_prompt
+        ),
+        max_tokens=16000,
     )
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
@@ -52,6 +55,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
     task["task_type"] = "vocabulary"
     task["grade_level"] = grade_level
     task["model"] = provider.name
+    task["personal_prompt"] = personal_prompt.strip()
 
     vocabulary_store.save_task(today, task)
     vocabulary_store.save_meta(today, vocabulary_store.build_meta(task))

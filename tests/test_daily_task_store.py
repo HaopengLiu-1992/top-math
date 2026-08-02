@@ -135,6 +135,14 @@ class DailyTaskStoreTests(unittest.TestCase):
         self.assertLess(len(prompt), 20000)
         self.assertNotIn("academic_word_bank_10000", prompt)
 
+    def test_vocabulary_prompt_includes_personal_prompt(self):
+        prompt = vocabulary_prompt.user_prompt(
+            "2099-01-01", 6, [], [], personal_prompt="Use examples from science class"
+        )
+
+        self.assertIn("Personal prompt from the learner or parent", prompt)
+        self.assertIn("Use examples from science class", prompt)
+
     def test_vocabulary_regeneration_ignores_current_date_seen_words(self):
         original_root = daily_task_store.TASK_ROOT
         with tempfile.TemporaryDirectory() as tmp:

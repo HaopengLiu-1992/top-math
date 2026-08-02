@@ -143,6 +143,15 @@ def _render_course_controls(homework):
             key="math_difficulty",
         )
 
+        personal_prompt = st.text_area(
+            "Personal prompt",
+            value=(homework or {}).get("personal_prompt", ""),
+            placeholder="Example: use money examples and explain each answer step by step",
+            help="Optional extra instruction injected into the homework generation prompt.",
+            key="math_personal_prompt",
+            height=100,
+        )
+
         topics = curriculum_service.list_topics("math", grade_level)
         topic_options = [None] + [t.id for t in topics]
         topic_labels = {None: "Auto"}
@@ -169,6 +178,7 @@ def _render_course_controls(homework):
         "include_hints": include_hints,
         "target_topic_id": selected_topic,
         "difficulty_policy": difficulty_policy,
+        "personal_prompt": personal_prompt,
     }
 
 

@@ -14,6 +14,7 @@ class LearningContext:
     target_topic_id: str | None = None
     difficulty_policy: str = DEFAULT_DIFFICULTY
     recent_topics: list[str] = field(default_factory=list)
+    personal_prompt: str = ""
 
     def normalized_subject(self) -> str:
         return self.subject.strip().lower()

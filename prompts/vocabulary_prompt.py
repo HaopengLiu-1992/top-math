@@ -8,7 +8,18 @@ Use simple English suitable for an English learner.
 Make every example sentence useful for understanding math or science word problems."""
 
 
-def user_prompt(date_str: str, grade_level: int, new_words: list[dict], review_words: list[dict]) -> str:
+def user_prompt(date_str: str, grade_level: int, new_words: list[dict], review_words: list[dict],
+                personal_prompt: str = "") -> str:
+    personal_section = ""
+    if personal_prompt.strip():
+        personal_section = f"""
+
+Personal prompt from the learner or parent:
+{personal_prompt.strip()}
+Treat this as a learner preference and follow it when compatible with the
+grade level, vocabulary task structure, and required output format.
+"""
+
     return f"""Generate today's academic vocabulary task.
 
 Date: {date_str}
@@ -66,4 +77,4 @@ Rules:
 - keyword_reading must contain 3 short math/science reading questions.
 - Keep examples concise.
 - If a provided Chinese or definition field is blank, fill it with a concise accurate value.
-- Prefer math/science/academic meaning when a word has multiple meanings."""
+- Prefer math/science/academic meaning when a word has multiple meanings.{personal_section}"""

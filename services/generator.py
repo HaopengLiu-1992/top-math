@@ -17,7 +17,8 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
              grade_level: int = 6, include_lesson: bool = True,
              include_hints: bool = True, target_topic_id: str | None = None,
              mode: str = "lesson_practice",
-             difficulty_policy: str = "standard") -> dict:
+             difficulty_policy: str = "standard",
+             personal_prompt: str = "") -> dict:
     today = date_str or date.today().isoformat()
     provider = provider or get_default_provider()
 
@@ -37,6 +38,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
         target_topic_id=target_topic_id,
         difficulty_policy=difficulty_policy,
         recent_topics=recent_topics,
+        personal_prompt=personal_prompt,
     )
     topic = curriculum_service.resolve_topic(context)
     cached_lesson = lesson_service.load_cached_lesson(context, topic) if include_lesson else None
@@ -50,6 +52,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
     homework["grade_level"] = context.grade_level
     homework["mode"] = context.mode
     homework["difficulty_policy"] = context.difficulty_policy
+    homework["personal_prompt"] = context.personal_prompt
     homework["target_topic"] = {
         "id": topic.id,
         "title": topic.title,
@@ -78,6 +81,7 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
                          topic=None,
                          cached_lesson: dict | None = None) -> dict:
     system = homework_prompt.system_prompt()
+    last_error = "unknown generation error"
 
     for attempt in range(1, MAX_RETRIES + 1):
         # On retries, always include forbidden fingerprints so model can avoid them
@@ -88,7 +92,7 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
                                            topic=topic,
                                            cached_lesson=cached_lesson)
         print(f"  [{provider.name}] attempt {attempt}/{MAX_RETRIES}")
-        raw = provider.complete(system=system, user=user, max_tokens=12000)
+        raw = provider.complete(system=system, user=user, max_tokens=24000)
 
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
@@ -98,18 +102,22 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
             if not isinstance(homework, dict):
                 raise ValueError(f"expected JSON object, got {type(homework).__name__}")
         except (json.JSONDecodeError, ValueError) as e:
+            last_error = f"invalid model JSON: {e}"
             print(f"  JSON error: {e}")
             continue
 
         dupes = check_duplicates(homework, forbidden)
         if dupes:
+            last_error = f"duplicate fingerprints: {len(dupes)}"
             print(f"  {len(dupes)} duplicate(s) found, retrying...")
             forbidden.update(dupes)
             continue
 
         return homework
 
-    raise RuntimeError(f"Failed to generate homework after {MAX_RETRIES} attempts.")
+    raise RuntimeError(
+        f"Failed to generate homework after {MAX_RETRIES} attempts ({last_error})."
+    )
 
 
 def _ensure_pdfs(homework: dict, date_str: str):
