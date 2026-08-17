@@ -184,16 +184,21 @@ The bank contains:
 - `us_band` mapping such as `us_grade_5_8`, `us_grade_8_10`, and `us_grade_10_12`
 - categories for math operations, word-problem signals, geometry, science process, and general academic vocabulary
 
-The model fills any missing Chinese/definition fields at generation time and
-keeps examples tied to math/science reading where possible.
+Curated entries carry their Chinese/definition fields locally. Ranked candidates
+without approved teaching metadata remain excluded until they are enriched by an
+offline catalog step; they are never silently promoted by the model.
 
 Runtime selection does **not** send the 10,000-word bank to the model. The app
 uses `config/vocabulary/vocabulary_index.json` to pick the next 15 new words and
 5 review words locally, starting from curated middle-school math/science basics.
-Only those selected daily words are included in the LLM prompt. The selector also
-filters fallback candidates so unvetted dictionary words are not used for daily
-practice. Regenerating a date ignores that date's previous vocabulary meta so
-bad output can be replaced cleanly.
+Review words are selected from per-day metadata using correctness, last-seen
+date, and a small spaced-repetition interval, so the same bank prefix is not
+repeated forever. Only those selected daily words are included in the LLM
+prompt. The provider response is then checked against the local word list;
+missing, extra, or duplicate words are rejected, and `is_review` is assigned by
+the application rather than trusted from model output. If the approved new-word
+pool is exhausted, the app generates a review-only task or shows a catalog
+warning; it never asks the model to invent replacement "new" words.
 
 ---
 

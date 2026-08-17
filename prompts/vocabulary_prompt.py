@@ -30,6 +30,11 @@ New words:
 Review words:
 {json.dumps(review_words, indent=2, ensure_ascii=False)}
 
+The local selector is authoritative. There are {len(new_words)} new words and
+{len(review_words)} review words in this task. Use exactly those words and no
+others. If the new-word list is empty, create a review-only task; never invent
+additional new words from memory.
+
 Return EXACTLY this JSON shape:
 {{
   "date": "{date_str}",
@@ -71,7 +76,8 @@ Return EXACTLY this JSON shape:
 
 Rules:
 - Include every provided new word and review word exactly once in words.
-- Use 15 new words and 5 review words when available; if fewer review words are provided, use more new words.
+- Use exactly the provided word counts; do not add, remove, or substitute words.
+- Set is_review to true only for words from the provided Review words list.
 - matching must contain 10 items.
 - fill_blank must contain 10 items.
 - keyword_reading must contain 3 short math/science reading questions.

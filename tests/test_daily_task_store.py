@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -125,6 +126,114 @@ class DailyTaskStoreTests(unittest.TestCase):
         self.assertEqual(len(review_words), 5)
         self.assertNotIn("aaronic", selected)
         self.assertTrue(all(item["source"] == "curated_math_science_core" for item in new_words))
+
+    def test_vocabulary_review_selection_rotates_away_from_bank_prefix(self):
+        words = ["sum", "difference", "old_one", "old_two", "old_three", "old_four", "old_five"]
+        bank = [{"word": word} for word in words]
+        history = {
+            "sum": {"last_seen": "2099-01-10", "times_seen": 5, "times_wrong": 0, "known": None},
+            "difference": {"last_seen": "2099-01-10", "times_seen": 5, "times_wrong": 0, "known": None},
+        }
+        for index, word in enumerate(words[2:], 1):
+            history[word] = {
+                "last_seen": f"2099-01-0{index}",
+                "times_seen": 1,
+                "times_wrong": 0,
+                "known": None,
+            }
+
+        selected = vocabulary_service._select_review_words(
+            bank,
+            set(history),
+            history,
+            "2099-01-11",
+        )
+
+        self.assertEqual(
+            [item["word"] for item in selected],
+            ["old_one", "old_two", "old_three", "old_four", "old_five"],
+        )
+
+    def test_vocabulary_selection_never_falls_back_to_seen_words(self):
+        bank = vocabulary_store.load_word_bank()
+        seen = {item["word"] for item in bank if item.get("source") == "curated_math_science_core"}
+        history = {
+            word: {
+                "last_seen": "2099-01-01",
+                "times_seen": 1,
+                "times_wrong": 0,
+                "known": None,
+            }
+            for word in seen
+        }
+
+        with patch("services.vocabulary_service._seen_words", return_value=seen), \
+             patch("services.vocabulary_service._word_history", return_value=history):
+            new_words, review_words = vocabulary_service._select_words("2099-01-02")
+
+        self.assertEqual(new_words, [])
+        self.assertEqual(len(review_words), 5)
+        self.assertTrue(set(item["word"] for item in review_words).issubset(seen))
+
+    def test_vocabulary_normalization_owns_word_membership_and_review_flags(self):
+        new_words = [{"word": "alpha", "category": "math"}]
+        review_words = [{"word": "beta", "category": "science"}]
+        task = {
+            "words": [
+                {"word": "alpha", "is_review": True},
+                {"word": "beta", "is_review": False},
+            ]
+        }
+
+        normalized = vocabulary_service._normalize_generated_task(task, new_words, review_words)
+
+        self.assertEqual([item["word"] for item in normalized["words"]], ["alpha", "beta"])
+        self.assertFalse(normalized["words"][0]["is_review"])
+        self.assertTrue(normalized["words"][1]["is_review"])
+        with self.assertRaises(ValueError):
+            vocabulary_service._normalize_generated_task(
+                {"words": [{"word": "alpha"}, {"word": "beta"}, {"word": "extra"}]},
+                new_words,
+                review_words,
+            )
+
+    def test_vocabulary_generation_retries_invalid_word_membership(self):
+        original_root = daily_task_store.TASK_ROOT
+
+        class FakeVocabularyProvider:
+            name = "Fake Vocabulary"
+
+            def __init__(self):
+                self.calls = 0
+
+            def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
+                self.calls += 1
+                words = [{"word": "alpha", "is_review": True}]
+                if self.calls == 1:
+                    words.append({"word": "invented", "is_review": False})
+                else:
+                    words.append({"word": "beta", "is_review": False})
+                return json.dumps({"words": words})
+
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                daily_task_store.TASK_ROOT = Path(tmp)
+                provider = FakeVocabularyProvider()
+                with patch(
+                    "services.vocabulary_service._select_words",
+                    return_value=(
+                        [{"word": "beta", "category": "math"}],
+                        [{"word": "alpha", "category": "science"}],
+                    ),
+                ), patch("services.vocabulary_service._ensure_pdfs"):
+                    task = vocabulary_service.generate("2099-01-01", provider)
+
+                self.assertEqual(provider.calls, 2)
+                self.assertEqual([item["word"] for item in task["words"]], ["beta", "alpha"])
+                self.assertFalse(task["words"][0]["is_review"])
+                self.assertTrue(task["words"][1]["is_review"])
+        finally:
+            daily_task_store.TASK_ROOT = original_root
 
     def test_vocabulary_prompt_only_contains_selected_words(self):
         with patch("services.vocabulary_service._seen_words", return_value=set()):

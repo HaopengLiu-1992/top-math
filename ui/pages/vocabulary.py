@@ -24,7 +24,7 @@ def render(provider_choice: str, embedded: bool = False):
                 <div>
                     <div class="tm-section-label">English vocabulary</div>
                     <h2>Academic Vocabulary</h2>
-                    <p>20 math and science words selected locally, then shaped into practice.</p>
+                    <p>Locally selected math and science words, then shaped into practice.</p>
                 </div>
                 <span class="tm-chip">{today}</span>
             </div>
@@ -68,13 +68,20 @@ def _generate(today: str, provider, grade_level: int, personal_prompt: str, forc
     if not _check_api_key(provider):
         return
     with st.spinner("Generating vocabulary..."):
-        vocabulary_service.generate(
-            today,
-            provider,
-            grade_level=grade_level,
-            personal_prompt=personal_prompt,
-            force=force,
-        )
+        try:
+            vocabulary_service.generate(
+                today,
+                provider,
+                grade_level=grade_level,
+                personal_prompt=personal_prompt,
+                force=force,
+            )
+        except vocabulary_service.VocabularySelectionError as exc:
+            st.warning(str(exc))
+            return
+        except vocabulary_service.VocabularyGenerationError as exc:
+            st.error(str(exc))
+            return
     st.rerun()
 
 
@@ -89,6 +96,12 @@ def _render_task(task: dict):
     c3.metric("Review", review_count)
     correct, total = feedback_service.calc_score_for(ENGLISH_VOCABULARY, task["date"])
     c4.metric("Marked", f"{correct}/{total}" if total else "—")
+
+    if words and new_count == 0:
+        st.warning(
+            "The approved new-word pool is exhausted. This task contains review words only; "
+            "enrich the local catalog before expecting new words."
+        )
 
     st.subheader("Words")
     st.markdown('<div class="tm-word-grid">', unsafe_allow_html=True)
