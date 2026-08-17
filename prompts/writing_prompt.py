@@ -1,15 +1,49 @@
+import json
+
+
 def system_prompt() -> str:
     return """You generate short grade-level English writing practice for an English learner.
 Output ONLY valid JSON. No markdown.
 Use clear sentences that a student can memorize and reuse in school writing."""
 
 
-def user_prompt(date_str: str, grade_level: int, focus: str) -> str:
+def user_prompt(date_str: str, grade_level: int, focus: str,
+                plan: list[dict] | None = None, history: dict | None = None,
+                feedback: str = "") -> str:
+    plan = plan or [
+        {"position": 1, "type": "personal_experience"},
+        {"position": 2, "type": "math_science_application"},
+        {"position": 3, "type": "reading_evidence"},
+    ]
+    history = history or {}
+    guardrail_feedback = ""
+    if feedback:
+        guardrail_feedback = f"""
+
+The previous draft failed this quality check:
+{feedback}
+Generate a genuinely different draft and follow every rule below.
+"""
+
     return f"""Generate today's English writing memorization task.
 
 Date: {date_str}
 Grade level: {grade_level}
 Focus: {focus}
+
+Anti-repetition guardrail:
+Use these exact example types in this exact order:
+{json.dumps(plan, indent=2, ensure_ascii=False)}
+
+Do not reuse or closely paraphrase these recent opinion sentences:
+{json.dumps(history.get("avoid_opinions", []), indent=2, ensure_ascii=False)}
+
+Do not reuse or closely paraphrase these recent example sentences:
+{json.dumps(history.get("avoid_examples", []), indent=2, ensure_ascii=False)}
+
+Do not reuse these recent example-starter signatures:
+{json.dumps(history.get("avoid_starters", []), indent=2, ensure_ascii=False)}
+{guardrail_feedback}
 
 Return EXACTLY this JSON shape:
 {{
@@ -28,7 +62,7 @@ Return EXACTLY this JSON shape:
   "examples": [
     {{
       "id": "example_001",
-      "type": "personal",
+      "type": "personal_experience",
       "example": "For example, when I read a science article, I learn new words and facts.",
       "chinese": "例如，当我读一篇科学文章时，我会学到新单词和新事实。",
       "why_it_works": "This example connects reading to vocabulary and knowledge.",
@@ -55,8 +89,10 @@ Return EXACTLY this JSON shape:
 
 Rules:
 - Generate exactly 1 opinion/claim and exactly 3 examples.
+- Set the three example `type` fields to the exact planned types, in order.
 - Each memorize_line must be one sentence and easy to recite.
 - Examples should be school-friendly and useful for opinion or short-response writing.
-- At least one example should connect to math, science, or academic learning.
+- The `math_science_application` example must connect to math or science.
+- Use three different sentence starters. Do not begin every example with "For example".
 - Chinese translations must directly translate the exact English opinion/example sentence; do not add extra details.
 - Keep the full task suitable for 15-20 minutes."""

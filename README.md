@@ -208,6 +208,17 @@ warning; it never asks the model to invent replacement "new" words.
 
 ---
 
+## Writing Repetition Guardrail
+
+English writing generation reads only a compact summary of the recent 30-day
+writing history. Before generation it chooses three distinct example types,
+always including one math/science application. After generation it validates
+the opinion sentence, example count, type order, duplicate wording, and
+sentence starters. A failed draft is regenerated with the rejection reason;
+the full writing history is never placed in the prompt.
+
+---
+
 ## Reading Guardrail Sidecar
 
 Reading generation uses a low-intrusion sidecar to reduce repeated Grade 5-8

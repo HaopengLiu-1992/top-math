@@ -414,6 +414,105 @@ class DailyTaskStoreTests(unittest.TestCase):
             ["opinion", "example_001", "example_002", "example_003"],
         )
 
+    def test_writing_guardrail_rotates_example_types_from_recent_history(self):
+        records = [
+            {
+                "date": "2099-01-01",
+                "opinion": "I believe practice helps students.",
+                "examples": [
+                    {"type": "personal_experience", "line": "In my experience, practice helps."},
+                    {"type": "math_science_application", "line": "In math class, practice helps."},
+                ],
+            }
+        ]
+
+        plan = writing_service._choose_example_plan("2099-01-02", records)
+
+        self.assertEqual(len(plan), 3)
+        self.assertEqual(len({item["type"] for item in plan}), 3)
+        self.assertIn("math_science_application", [item["type"] for item in plan])
+
+    def test_writing_guardrail_rejects_repeated_opinion_and_starter(self):
+        plan = [
+            {"position": 1, "type": "personal_experience"},
+            {"position": 2, "type": "math_science_application"},
+            {"position": 3, "type": "reading_evidence"},
+        ]
+        history = {
+            "avoid_opinions": ["I believe reading every day helps students become stronger learners."],
+            "avoid_examples": [],
+            "avoid_starters": ["for example reading"],
+        }
+        task = {
+            "opinion": {"memorize_line": "I believe reading every day helps students become stronger learners."},
+            "examples": [
+                {"type": "personal_experience", "memorize_line": "For example, reading books helps me learn."},
+                {"type": "math_science_application", "memorize_line": "For example, reading graphs helps me compare data."},
+                {"type": "reading_evidence", "memorize_line": "In science class, evidence supports a claim."},
+            ],
+        }
+
+        errors = writing_service._validate_task(task, history, plan)
+
+        self.assertIn("opinion sentence is too similar to recent writing", errors)
+        self.assertIn("examples reuse the same sentence starter", errors)
+        self.assertIn("example sentence starter repeats recent writing", errors)
+
+    def test_writing_generation_retries_repeated_history(self):
+        original_root = daily_task_store.TASK_ROOT
+
+        class FakeWritingProvider:
+            name = "Fake Writing"
+
+            def __init__(self, invalid_task, valid_task):
+                self.calls = 0
+                self.invalid_task = invalid_task
+                self.valid_task = valid_task
+
+            def complete(self, system: str, user: str, max_tokens: int = 7000) -> str:
+                self.calls += 1
+                return json.dumps(self.invalid_task if self.calls == 1 else self.valid_task)
+
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                daily_task_store.TASK_ROOT = Path(tmp)
+                writing_store.save_task("2099-01-01", {
+                    "date": "2099-01-01",
+                    "opinion": {"memorize_line": "I believe reading every day helps students become stronger learners."},
+                    "examples": [
+                        {"type": "personal", "memorize_line": "For example, reading books helps me learn."},
+                    ],
+                })
+                plan = writing_service._choose_example_plan(
+                    "2099-01-02",
+                    writing_service._recent_history("2099-01-02"),
+                )
+                invalid = {
+                    "opinion": {"memorize_line": "I believe reading every day helps students become stronger learners."},
+                    "examples": [
+                        {"type": item["type"], "memorize_line": f"In slot {item['position']}, students can practice a useful skill."}
+                        for item in plan
+                    ],
+                }
+                valid = {
+                    "opinion": {"memorize_line": "I believe asking questions helps students understand difficult ideas."},
+                    "examples": [
+                        {"type": plan[0]["type"], "memorize_line": "In my experience, asking questions helps me understand new ideas."},
+                        {"type": plan[1]["type"], "memorize_line": "In math class, I can explain why a formula works."},
+                        {"type": plan[2]["type"], "memorize_line": "A text can show the value of questions through strong evidence."},
+                    ],
+                }
+                provider = FakeWritingProvider(invalid, valid)
+
+                with patch("services.writing_service._ensure_pdfs"):
+                    task = writing_service.generate("2099-01-02", provider)
+
+                self.assertEqual(provider.calls, 2)
+                self.assertEqual(task["opinion"]["memorize_line"], valid["opinion"]["memorize_line"])
+                self.assertEqual(task["writing_guardrail"]["history_days"], 30)
+        finally:
+            daily_task_store.TASK_ROOT = original_root
+
     def test_store_lists_multiple_scopes(self):
         original_root = daily_task_store.TASK_ROOT
         with tempfile.TemporaryDirectory() as tmp:
