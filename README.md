@@ -175,22 +175,28 @@ output/raw/
 
 ## Vocabulary Bank
 
-Vocabulary practice uses `config/vocabulary/academic_word_bank_10000.json`.
-The bank contains:
+Vocabulary practice uses the checked-in, grade-aware catalog at
+`config/vocabulary/academic_word_bank_10000.json` (`g5-g8-2026.08`). The catalog
+contains exactly 10,000 unique entries:
 
 - 275 curated math/science/academic core words ordered from middle-school basics
-- 10,000 ranked academic candidates drawn from the local English word list
-- `cn_stage` mapping such as `cn_middle_school`, `cn_high_school`, and extension levels
-- `us_band` mapping such as `us_grade_5_8`, `us_grade_8_10`, and `us_grade_10_12`
-- categories for math operations, word-problem signals, geometry, science process, and general academic vocabulary
+- 9,725 locally ranked English words with a WordNet definition and provenance
+- `grade_min` / `grade_max` for US Grades 5-8 selection, with an explicit
+  frequency-band and domain-overlay basis
+- separate labels for math, science process, life science, physical science,
+  earth science, academic verbs, and general academic reading
 
-Curated entries carry their Chinese/definition fields locally. Ranked candidates
-without approved teaching metadata remain excluded until they are enriched by an
-offline catalog step; they are never silently promoted by the model.
+There is no single official US G5-G8 vocabulary list. The catalog follows the
+Common Core requirement for general academic plus domain-specific vocabulary,
+and uses middle-school textbook vocabulary research as a subject-layering
+reference. Source and license notes are in `config/vocabulary/SOURCES.md`.
+The build recipe is in `scripts/build_vocabulary_catalog.py` with its build-only
+dependencies in `requirements-vocabulary-build.txt`.
 
 Runtime selection does **not** send the 10,000-word bank to the model. The app
 uses `config/vocabulary/vocabulary_index.json` to pick the next 15 new words and
-5 review words locally, starting from curated middle-school math/science basics.
+5 review words locally, starting from curated middle-school math/science basics
+and then moving through grade-appropriate academic reading words.
 Review words are selected from per-day metadata using correctness, last-seen
 date, and a small spaced-repetition interval, so the same bank prefix is not
 repeated forever. Only those selected daily words are included in the LLM

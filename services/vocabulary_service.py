@@ -47,7 +47,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
         _ensure_pdfs(existing)
         return existing
 
-    new_words, review_words = _select_words(today)
+    new_words, review_words = _select_words(today, grade_level=grade_level)
     if not new_words and not review_words:
         raise VocabularySelectionError(
             "No unused approved vocabulary words are available. "
@@ -92,7 +92,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
     return task
 
 
-def _select_words(date_str: str) -> tuple[list[dict], list[dict]]:
+def _select_words(date_str: str, grade_level: int = 6) -> tuple[list[dict], list[dict]]:
     bank = vocabulary_store.load_word_bank()
     index = vocabulary_store.load_word_index()
     by_word = {item["word"]: item for item in bank}
@@ -101,7 +101,7 @@ def _select_words(date_str: str) -> tuple[list[dict], list[dict]]:
 
     review_words = _select_review_words(bank, seen, history, date_str)
     new_needed = NEW_WORD_COUNT + max(0, REVIEW_WORD_COUNT - len(review_words))
-    new_words = _select_new_words(index, by_word, seen, new_needed)
+    new_words = _select_new_words(index, by_word, seen, new_needed, grade_level=grade_level)
     return new_words, review_words
 
 
@@ -133,7 +133,8 @@ def _review_sort_key(word: str, history: dict, today: date | None) -> tuple:
     return (status_rank, due_rank, -times_wrong, last_seen, times_seen, word)
 
 
-def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], count: int) -> list[dict]:
+def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], count: int,
+                      grade_level: int = 6) -> list[dict]:
     selected: list[dict] = []
     selected_words: set[str] = set()
     for word in index.get("learning_sequence", []):
@@ -142,6 +143,7 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
             or word in seen
             or word in selected_words
             or not _is_teachable_word(by_word[word])
+            or not _is_grade_appropriate(by_word[word], grade_level)
         ):
             continue
         selected.append(by_word[word])
@@ -160,6 +162,7 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
                 by_word,
                 seen,
                 selected_words,
+                grade_level,
             )
             if word:
                 selected.append(by_word[word])
@@ -175,6 +178,7 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
                     or word in seen
                     or word in selected_words
                     or not _is_teachable_word(by_word[word])
+                    or not _is_grade_appropriate(by_word[word], grade_level)
                 ):
                     continue
                 selected.append(by_word[word])
@@ -186,13 +190,14 @@ def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], cou
 
 
 def _first_available_word(words: list[str], by_word: dict[str, dict],
-                          seen: set[str], selected: set[str]) -> str | None:
+                          seen: set[str], selected: set[str], grade_level: int = 6) -> str | None:
     for word in words:
         if (
             word in by_word
             and word not in seen
             and word not in selected
             and _is_teachable_word(by_word[word])
+            and _is_grade_appropriate(by_word[word], grade_level)
         ):
             return word
     return None
@@ -211,6 +216,18 @@ def _is_teachable_word(item: dict) -> bool:
     if any(ch.isdigit() for ch in word):
         return False
     return True
+
+
+def _is_grade_appropriate(item: dict, grade_level: int) -> bool:
+    """Apply the catalog's grade band without rejecting legacy entries."""
+    minimum = item.get("grade_min")
+    maximum = item.get("grade_max")
+    if minimum is None or maximum is None:
+        return True
+    try:
+        return int(minimum) <= int(grade_level) <= int(maximum)
+    except (TypeError, ValueError):
+        return False
 
 
 def _seen_words(exclude_date: str | None = None) -> set[str]:

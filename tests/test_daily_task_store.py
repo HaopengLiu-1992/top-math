@@ -84,7 +84,11 @@ class DailyTaskStoreTests(unittest.TestCase):
         )
 
     def test_vocabulary_word_bank_has_large_candidate_pool(self):
-        self.assertGreaterEqual(len(vocabulary_store.load_word_bank()), 10000)
+        bank = vocabulary_store.load_word_bank()
+        self.assertEqual(len(bank), 10000)
+        self.assertEqual(len({item["word"] for item in bank}), 10000)
+        self.assertTrue(all(item.get("definition") for item in bank))
+        self.assertTrue(all(item.get("grade_min") <= item.get("grade_max") for item in bank))
 
     def test_vocabulary_index_groups_large_bank_before_prompting(self):
         index = vocabulary_store.load_word_index()
@@ -171,9 +175,30 @@ class DailyTaskStoreTests(unittest.TestCase):
              patch("services.vocabulary_service._word_history", return_value=history):
             new_words, review_words = vocabulary_service._select_words("2099-01-02")
 
-        self.assertEqual(new_words, [])
+        self.assertEqual(len(new_words), 15)
         self.assertEqual(len(review_words), 5)
         self.assertTrue(set(item["word"] for item in review_words).issubset(seen))
+        self.assertTrue(set(item["word"] for item in new_words).isdisjoint(seen))
+
+    def test_vocabulary_selection_respects_grade_band(self):
+        bank = vocabulary_store.load_word_bank()
+        index = vocabulary_store.load_word_index()
+        by_word = {item["word"]: item for item in bank}
+        curated_words = {
+            item["word"]
+            for item in bank
+            if item.get("source") == "curated_math_science_core"
+        }
+
+        grade_five = vocabulary_service._select_new_words(
+            index, by_word, curated_words, 50, grade_level=5
+        )
+        grade_eight = vocabulary_service._select_new_words(
+            index, by_word, curated_words, 50, grade_level=8
+        )
+
+        self.assertTrue(all(item["grade_min"] <= 5 <= item["grade_max"] for item in grade_five))
+        self.assertTrue(any(item["grade_min"] > 5 for item in grade_eight))
 
     def test_vocabulary_normalization_owns_word_membership_and_review_flags(self):
         new_words = [{"word": "alpha", "category": "math"}]
