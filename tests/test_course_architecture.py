@@ -76,6 +76,17 @@ class CourseArchitectureTests(unittest.TestCase):
         self.assertIn("6.RP.A.1", prompt)
         self.assertIn("Cached ratio lesson", prompt)
 
+    def test_homework_prompt_includes_personal_prompt(self):
+        context = LearningContext(
+            grade_level=6,
+            personal_prompt="Use quick mental-math strategies",
+        )
+
+        prompt = homework_prompt.user_prompt(10, "2099-01-01", [], set(), context=context)
+
+        self.assertIn("Personal prompt from the learner or parent", prompt)
+        self.assertIn("Use quick mental-math strategies", prompt)
+
     def test_instruction_requires_plain_text_lesson(self):
         instruction = homework_prompt.system_prompt()
 
@@ -109,7 +120,7 @@ class CourseArchitectureTests(unittest.TestCase):
         )
 
         self.assertEqual(homework["grade_level"], 6)
-        self.assertEqual(provider.max_tokens_seen, 12000)
+        self.assertEqual(provider.max_tokens_seen, 24000)
         self.assertIn("6.RP.A.1", provider.user_prompt_seen)
         self.assertIn("Difficulty policy: standard", provider.user_prompt_seen)
 

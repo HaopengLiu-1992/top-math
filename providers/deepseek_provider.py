@@ -25,6 +25,9 @@ class DeepSeekProvider(ModelProvider):
 
     def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
         wants_json = "json" in f"{system}\n{user}".lower()
+        # Structured tasks still benefit from reasoning; callers should provide
+        # enough output budget for both reasoning and the final JSON response.
+        use_thinking = self.thinking_enabled
         payload = {
             "model": self.model,
             "messages": [
@@ -32,9 +35,9 @@ class DeepSeekProvider(ModelProvider):
                 {"role": "user", "content": user},
             ],
             "max_tokens": max_tokens,
-            "thinking": {"type": "enabled" if self.thinking_enabled else "disabled"},
+            "thinking": {"type": "enabled" if use_thinking else "disabled"},
         }
-        if self.thinking_enabled:
+        if use_thinking:
             payload["reasoning_effort"] = self.reasoning_effort
         else:
             payload["temperature"] = 0.3
@@ -51,4 +54,7 @@ class DeepSeekProvider(ModelProvider):
             timeout=300,
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"].strip()
+        content = response.json()["choices"][0]["message"].get("content")
+        if not isinstance(content, str) or not content.strip():
+            raise RuntimeError("DeepSeek returned an empty response content.")
+        return content.strip()

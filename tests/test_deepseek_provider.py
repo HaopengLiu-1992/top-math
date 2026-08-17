@@ -59,6 +59,16 @@ class DeepSeekProviderTests(unittest.TestCase):
         self.assertEqual(kwargs["json"]["temperature"], 0.3)
         self.assertNotIn("reasoning_effort", kwargs["json"])
 
+    def test_empty_content_raises_clear_error(self):
+        response = Mock()
+        response.json.return_value = {"choices": [{"message": {"content": ""}}]}
+
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-key"}, clear=False):
+            with patch("settings.secrets._get_streamlit_secret", return_value=None):
+                with patch("providers.deepseek_provider.requests.post", return_value=response):
+                    with self.assertRaisesRegex(RuntimeError, "empty response content"):
+                        DeepSeekProvider().complete("Return JSON only.", "Return JSON.")
+
 
 if __name__ == "__main__":
     unittest.main()

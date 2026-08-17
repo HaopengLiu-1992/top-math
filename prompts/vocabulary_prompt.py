@@ -8,7 +8,18 @@ Use simple English suitable for an English learner.
 Make every example sentence useful for understanding math or science word problems."""
 
 
-def user_prompt(date_str: str, grade_level: int, new_words: list[dict], review_words: list[dict]) -> str:
+def user_prompt(date_str: str, grade_level: int, new_words: list[dict], review_words: list[dict],
+                personal_prompt: str = "") -> str:
+    personal_section = ""
+    if personal_prompt.strip():
+        personal_section = f"""
+
+Personal prompt from the learner or parent:
+{personal_prompt.strip()}
+Treat this as a learner preference and follow it when compatible with the
+grade level, vocabulary task structure, and required output format.
+"""
+
     return f"""Generate today's academic vocabulary task.
 
 Date: {date_str}
@@ -18,6 +29,11 @@ New words:
 
 Review words:
 {json.dumps(review_words, indent=2, ensure_ascii=False)}
+
+The local selector is authoritative. There are {len(new_words)} new words and
+{len(review_words)} review words in this task. Use exactly those words and no
+others. If the new-word list is empty, create a review-only task; never invent
+additional new words from memory.
 
 Return EXACTLY this JSON shape:
 {{
@@ -60,10 +76,11 @@ Return EXACTLY this JSON shape:
 
 Rules:
 - Include every provided new word and review word exactly once in words.
-- Use 15 new words and 5 review words when available; if fewer review words are provided, use more new words.
+- Use exactly the provided word counts; do not add, remove, or substitute words.
+- Set is_review to true only for words from the provided Review words list.
 - matching must contain 10 items.
 - fill_blank must contain 10 items.
 - keyword_reading must contain 3 short math/science reading questions.
 - Keep examples concise.
 - If a provided Chinese or definition field is blank, fill it with a concise accurate value.
-- Prefer math/science/academic meaning when a word has multiple meanings."""
+- Prefer math/science/academic meaning when a word has multiple meanings.{personal_section}"""

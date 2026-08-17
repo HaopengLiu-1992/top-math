@@ -5,7 +5,10 @@ from domain.daily_task import ENGLISH_READING, SCIENCE_READING, TaskScope
 from providers.base import ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import reading_prompt
+from services import reading_guardrail
 from storage import reading_store
+
+MAX_GUARDRAIL_ATTEMPTS = 2
 
 
 def generate(scope: TaskScope, date_str: str | None = None,
@@ -19,25 +22,49 @@ def generate(scope: TaskScope, date_str: str | None = None,
         _ensure_pdfs(scope, existing)
         return existing
 
-    raw = provider.complete(
-        system=reading_prompt.system_prompt(),
-        user=reading_prompt.user_prompt(today, grade_level, scope.subject, focus),
-        max_tokens=9000,
-    )
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
-
-    task = json.loads(raw)
+    plan = reading_guardrail.prepare(scope, today, grade_level, focus)
+    task = _generate_with_guardrail(scope, today, provider, grade_level, focus, plan)
     task["date"] = today
     task["subject"] = scope.subject
     task["task_type"] = scope.task_type
     task["grade_level"] = grade_level
     task["model"] = provider.name
+    reading_guardrail.commit(scope, today, task, plan)
 
     reading_store.save_task(scope, today, task)
     reading_store.save_meta(scope, today, reading_store.build_meta(task))
     _ensure_pdfs(scope, task)
     return task
+
+
+def _generate_with_guardrail(scope: TaskScope, today: str, provider: ModelProvider,
+                             grade_level: int, focus: str,
+                             plan: reading_guardrail.ReadingPlan) -> dict:
+    last_errors: list[str] = []
+    for attempt in range(MAX_GUARDRAIL_ATTEMPTS):
+        user_prompt = reading_prompt.user_prompt(
+            today,
+            grade_level,
+            scope.subject,
+            focus,
+            guardrail={
+                **plan.as_prompt_context(),
+                "validation_retry": attempt,
+                "previous_errors": last_errors,
+            },
+        )
+        raw = provider.complete(
+            system=reading_prompt.system_prompt(),
+            user=user_prompt,
+            max_tokens=9000,
+        )
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
+        task = json.loads(raw)
+        last_errors = reading_guardrail.validate(scope, task, plan)
+        if not last_errors:
+            return task
+    raise ValueError(f"Reading guardrail rejected generated task: {last_errors}")
 
 
 def _ensure_pdfs(scope: TaskScope, task: dict):

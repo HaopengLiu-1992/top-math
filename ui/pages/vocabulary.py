@@ -24,7 +24,7 @@ def render(provider_choice: str, embedded: bool = False):
                 <div>
                     <div class="tm-section-label">English vocabulary</div>
                     <h2>Academic Vocabulary</h2>
-                    <p>20 math and science words selected locally, then shaped into practice.</p>
+                    <p>Locally selected math and science words, then shaped into practice.</p>
                 </div>
                 <span class="tm-chip">{today}</span>
             </div>
@@ -40,14 +40,22 @@ def render(provider_choice: str, embedded: bool = False):
     with st.container(border=True):
         st.markdown('<div class="tm-section-label">Vocabulary setup</div>', unsafe_allow_html=True)
         grade_level = st.selectbox("Grade", [5, 6, 7, 8], index=1, key="vocabulary_grade")
+        personal_prompt = st.text_area(
+            "Personal prompt",
+            value=task.get("personal_prompt", "") if task else "",
+            placeholder="Example: focus on words useful for explaining math solutions",
+            help="Optional extra instruction injected into the vocabulary generation prompt.",
+            key="vocabulary_personal_prompt",
+            height=100,
+        )
 
     if not task:
         if st.button("Generate Vocabulary", type="primary", width="stretch", key="vocabulary_generate"):
-            _generate(today, provider, grade_level, force=False)
+            _generate(today, provider, grade_level, personal_prompt, force=False)
     else:
         st.info("Vocabulary already generated for today.")
         if st.button("Regenerate Vocabulary", type="secondary", key="vocabulary_regenerate"):
-            _generate(today, provider, grade_level, force=True)
+            _generate(today, provider, grade_level, personal_prompt, force=True)
 
     if task:
         feedback_service.hydrate_marks_for(ENGLISH_VOCABULARY, today)
@@ -56,11 +64,24 @@ def render(provider_choice: str, embedded: bool = False):
         _render_pdf_downloads(task)
 
 
-def _generate(today: str, provider, grade_level: int, force: bool):
+def _generate(today: str, provider, grade_level: int, personal_prompt: str, force: bool):
     if not _check_api_key(provider):
         return
     with st.spinner("Generating vocabulary..."):
-        vocabulary_service.generate(today, provider, grade_level=grade_level, force=force)
+        try:
+            vocabulary_service.generate(
+                today,
+                provider,
+                grade_level=grade_level,
+                personal_prompt=personal_prompt,
+                force=force,
+            )
+        except vocabulary_service.VocabularySelectionError as exc:
+            st.warning(str(exc))
+            return
+        except vocabulary_service.VocabularyGenerationError as exc:
+            st.error(str(exc))
+            return
     st.rerun()
 
 
@@ -75,6 +96,12 @@ def _render_task(task: dict):
     c3.metric("Review", review_count)
     correct, total = feedback_service.calc_score_for(ENGLISH_VOCABULARY, task["date"])
     c4.metric("Marked", f"{correct}/{total}" if total else "—")
+
+    if words and new_count == 0:
+        st.warning(
+            "The approved new-word pool is exhausted. This task contains review words only; "
+            "enrich the local catalog before expecting new words."
+        )
 
     st.subheader("Words")
     st.markdown('<div class="tm-word-grid">', unsafe_allow_html=True)

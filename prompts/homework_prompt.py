@@ -35,6 +35,15 @@ Forbidden fingerprints — do NOT generate questions with these fingerprints:
 {json.dumps(raw_fps, indent=2)}
 """
 
+    personal_section = ""
+    if context.personal_prompt.strip():
+        personal_section = f"""
+Personal prompt from the learner or parent:
+{context.personal_prompt.strip()}
+Treat this as a learner preference. Follow it when compatible with the grade
+level, requested mode, and required output structure.
+"""
+
     return f"""Generate homework for:
 Day: {day}
 Date: {date_str}
@@ -57,4 +66,5 @@ Cached lesson, if any. Reuse it when present:
 Recently covered topics (past 14 days) — avoid repeating unless it is a review day:
 {json.dumps(recent_topics, indent=2)}
 {forbidden_section}
+{personal_section}
 Output ONLY valid JSON. No markdown, no explanation."""

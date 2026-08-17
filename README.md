@@ -1,7 +1,7 @@
 # Daily Learning Generator
 
-A Streamlit app that generates daily math, vocabulary, English reading, and
-science reading practice for Jessie. It uses scoped daily tasks so multiple
+A Streamlit app that generates daily math, vocabulary, English reading, English
+writing, and science reading practice for Jessie. It uses scoped daily tasks so multiple
 subjects can share providers, storage, PDFs, history, and analysis.
 
 ## Features
@@ -9,6 +9,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
 - Daily Grade 5-8 math homework following CCSS standards — one generation per day (idempotent/cached)
 - Daily math/science academic vocabulary practice — 20 words from a 10,000-word academic candidate bank
 - Daily English reading practice — passage, vocabulary, comprehension, inference, and short response
+- Daily English writing practice — one reusable opinion and three memorized examples
 - Daily science reading practice — science passage, academic vocabulary, evidence/cause-effect questions
 - Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
@@ -29,7 +30,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
 ┌────────▼───────────────▼─────────────────────▼────────────┐
 │                        Services                           │
 │  generator · vocabulary_service · reading_service         │
-│  analysis_service · summary_service                       │
+│  writing_service · analysis_service · summary_service     │
 │  feedback_service · feedback_report_service · dedup       │
 └──────────────┬────────────────────────────────────────────┘
                │
@@ -39,6 +40,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
     │  daily_task_store(subject, task_type, date)          │
     │      │                                              │
     │  homework_store / vocabulary_store / reading_store  │
+    │  writing_store                                      │
     │      │                                              │
     │  scoped mark_buffer ◄── single source of mark truth │
     │      │                                              │
@@ -62,6 +64,7 @@ The app is now organized around a scoped daily task:
 TaskScope(subject="math", task_type="homework")
 TaskScope(subject="english", task_type="vocabulary")
 TaskScope(subject="english", task_type="reading")
+TaskScope(subject="english", task_type="writing")
 TaskScope(subject="science", task_type="reading")
 ```
 
@@ -77,6 +80,7 @@ output/tasks/<subject>/<task_type>/
     ├── questions.pdf      # math
     ├── vocabulary.pdf     # vocabulary
     ├── reading.pdf        # reading
+    ├── writing.pdf        # writing
     └── answers.pdf
 ```
 
@@ -87,11 +91,12 @@ Current task scopes:
 | `math/homework` | Today | `services.generator` | `homework_store` | `questions_pdf`, `answers_pdf` |
 | `english/vocabulary` | Vocabulary | `vocabulary_service` | `vocabulary_store` | `vocabulary_pdf` |
 | `english/reading` | Daily / English Reading | `reading_service` | `reading_store` | `reading_pdf` |
+| `english/writing` | Daily / English Writing | `writing_service` | `writing_store` | `writing_pdf` |
 | `science/reading` | Daily / Science Reading | `reading_service` | `reading_store` | `reading_pdf` |
 
 The top-level UI intentionally stays small:
 
-- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, and Science Reading
+- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, English Writing, and Science Reading
 - **History**: all generated tasks across all scopes
 - **Analysis**: cross-subject activity overview plus math-specific score/topic analysis
 
@@ -170,25 +175,81 @@ output/raw/
 
 ## Vocabulary Bank
 
-Vocabulary practice uses `config/vocabulary/academic_word_bank_10000.json`.
-The bank contains:
+Vocabulary practice uses the checked-in, grade-aware catalog at
+`config/vocabulary/academic_word_bank_10000.json` (`g5-g8-2026.08`). The catalog
+contains exactly 10,000 unique entries:
 
 - 275 curated math/science/academic core words ordered from middle-school basics
-- 10,000 ranked academic candidates drawn from the local English word list
-- `cn_stage` mapping such as `cn_middle_school`, `cn_high_school`, and extension levels
-- `us_band` mapping such as `us_grade_5_8`, `us_grade_8_10`, and `us_grade_10_12`
-- categories for math operations, word-problem signals, geometry, science process, and general academic vocabulary
+- 9,725 locally ranked English words with a WordNet definition and provenance
+- `grade_min` / `grade_max` for US Grades 5-8 selection, with an explicit
+  frequency-band and domain-overlay basis
+- separate labels for math, science process, life science, physical science,
+  earth science, academic verbs, and general academic reading
 
-The model fills any missing Chinese/definition fields at generation time and
-keeps examples tied to math/science reading where possible.
+There is no single official US G5-G8 vocabulary list. The catalog follows the
+Common Core requirement for general academic plus domain-specific vocabulary,
+and uses middle-school textbook vocabulary research as a subject-layering
+reference. Source and license notes are in `config/vocabulary/SOURCES.md`.
+The build recipe is in `scripts/build_vocabulary_catalog.py` with its build-only
+dependencies in `requirements-vocabulary-build.txt`.
 
 Runtime selection does **not** send the 10,000-word bank to the model. The app
 uses `config/vocabulary/vocabulary_index.json` to pick the next 15 new words and
-5 review words locally, starting from curated middle-school math/science basics.
-Only those selected daily words are included in the LLM prompt. The selector also
-filters fallback candidates so unvetted dictionary words are not used for daily
-practice. Regenerating a date ignores that date's previous vocabulary meta so
-bad output can be replaced cleanly.
+5 review words locally, starting from curated middle-school math/science basics
+and then moving through grade-appropriate academic reading words.
+Review words are selected from per-day metadata using correctness, last-seen
+date, and a small spaced-repetition interval, so the same bank prefix is not
+repeated forever. Only those selected daily words are included in the LLM
+prompt. The provider response is then checked against the local word list;
+missing, extra, or duplicate words are rejected, and `is_review` is assigned by
+the application rather than trusted from model output. If the approved new-word
+pool is exhausted, the app generates a review-only task or shows a catalog
+warning; it never asks the model to invent replacement "new" words.
+
+---
+
+## Writing Repetition Guardrail
+
+English writing generation reads only a compact summary of the recent 30-day
+writing history. Before generation it chooses three distinct example types,
+always including one math/science application. After generation it validates
+the opinion sentence, example count, type order, duplicate wording, and
+sentence starters. A failed draft is regenerated with the rejection reason;
+the full writing history is never placed in the prompt.
+
+---
+
+## Reading Guardrail Sidecar
+
+Reading generation uses a low-intrusion sidecar to reduce repeated Grade 5-8
+passages without growing the prompt over time.
+
+`services.reading_guardrail` adds three steps around the existing
+`reading_service.generate()` flow:
+
+1. `prepare(scope, date, grade, focus)` selects a slot:
+   grade, domain, topic, subtopic, text type, and target skill.
+2. `validate(scope, task, plan)` checks structure, rough grade-level length,
+   required vocabulary/question counts, evidence/detail coverage, and concept
+   similarity.
+3. `commit(scope, date, task, plan)` stores long-term concept memory.
+
+The prompt receives only:
+
+- the current slot
+- the selected core concept
+- a small top-k list of similar concepts to avoid
+
+It does **not** receive the full reading history. Concept memory is stored in:
+
+```
+output/reading_guardrail/concepts.json
+```
+
+Each committed record includes concept, deterministic embedding, metadata, and
+an `external_passage_id`. The embedding implementation is local and deterministic
+today, so the sidecar has no extra API cost; it can be swapped for a hosted
+embedding provider later without changing the reading UI.
 
 ---
 

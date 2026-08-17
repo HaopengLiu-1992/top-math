@@ -2,7 +2,7 @@ import streamlit as st
 
 from domain.daily_task import ALL_TASK_SCOPES, MATH_HOMEWORK, TASK_LABELS
 from services import feedback_service
-from storage import daily_task_store, homework_store, history_store, reading_store, vocabulary_store
+from storage import daily_task_store, homework_store, history_store, reading_store, vocabulary_store, writing_store
 from ui.components import marking, question_card
 
 
@@ -69,6 +69,8 @@ def _render_task(record: dict):
         _render_math(task, date_str)
     elif scope.subject == "english" and scope.task_type == "vocabulary":
         _render_vocabulary(scope, task, date_str)
+    elif scope.subject == "english" and scope.task_type == "writing":
+        _render_writing(scope, task, date_str)
     else:
         _render_reading(scope, task, date_str)
 
@@ -109,6 +111,38 @@ def _render_reading(scope, task: dict, date_str: str):
     _render_reading_pdf_downloads(scope, date_str)
 
 
+def _render_writing(scope, task: dict, date_str: str):
+    feedback_service.hydrate_marks_for(scope, date_str)
+    opinion = task.get("opinion", {})
+    st.markdown(f"### {opinion.get('memorize_line') or opinion.get('claim', 'Opinion')}")
+    if opinion.get("chinese"):
+        st.caption(opinion.get("chinese"))
+    marking.render_score(scope, date_str, "Mark each memorized writing sentence.")
+    _render_writing_mark(scope, date_str, "opinion", "Opinion", opinion.get("memorize_line") or opinion.get("claim", ""))
+    for idx, item in enumerate(task.get("examples", []), 1):
+        _render_writing_mark(
+            scope,
+            date_str,
+            item.get("id", f"example_{idx:03d}"),
+            f"Example {idx}",
+            item.get("memorize_line", ""),
+        )
+    _render_writing_pdf_downloads(date_str)
+
+
+def _render_writing_mark(scope, date_str: str, item_id: str, label: str, text: str):
+    with st.container(border=True):
+        st.markdown(f"**{label}**")
+        st.markdown(text)
+        marking.render_mark(
+            scope,
+            date_str,
+            item_id,
+            correct_label="Memorized",
+            wrong_label="Needs practice",
+        )
+
+
 def _render_math_pdf_downloads(date_str: str):
     pdf_d = _existing_math_pdf_dir(date_str)
     _download_pair(pdf_d / "questions.pdf", pdf_d / "answers.pdf", "math", date_str)
@@ -122,6 +156,11 @@ def _render_vocab_pdf_downloads(date_str: str):
 def _render_reading_pdf_downloads(scope, date_str: str):
     pdf_d = reading_store.pdf_dir(scope, date_str)
     _download_pair(pdf_d / "reading.pdf", pdf_d / "answers.pdf", f"{scope.subject}_reading", date_str)
+
+
+def _render_writing_pdf_downloads(date_str: str):
+    pdf_d = writing_store.pdf_dir(date_str)
+    _download_pair(pdf_d / "writing.pdf", pdf_d / "answers.pdf", "writing", date_str)
 
 
 def _download_pair(primary, answers, prefix: str, date_str: str):
