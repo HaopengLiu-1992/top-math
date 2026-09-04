@@ -21,7 +21,10 @@ def build_vocabulary(task: dict) -> Path:
         label = "Review" if item.get("is_review") else "New"
         story.append(Paragraph(
             f"{idx}. <b>{paragraph_text(item['word'])}</b> ({label}) - {paragraph_text(item.get('chinese', ''))}<br/>"
-            f"{paragraph_text(item.get('definition', ''))}<br/><i>{paragraph_text(item.get('example', ''))}</i>",
+            f"{paragraph_text(item.get('definition', ''))}<br/>"
+            f"Use: {paragraph_text(item.get('collocation', ''))} | "
+            f"Family: {paragraph_text(item.get('morphology', ''))}<br/>"
+            f"<i>{paragraph_text(item.get('example', ''))}</i>",
             normal,
         ))
 

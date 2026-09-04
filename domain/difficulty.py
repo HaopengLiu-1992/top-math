@@ -43,9 +43,13 @@ _PROFILES = {
         id="challenge",
         label="Challenge",
         prompt=(
-            "Use rich, non-routine problems that require planning, justification, "
-            "or connecting multiple skills. Keep the worksheet shorter if needed "
-            "but make the reasoning deeper."
+            "Keep the existing Part 1, Part 2, and Part 3 formats and required item "
+            "counts, but use the demanding end of the requested grade-level standard. "
+            "Increase number complexity and combine prerequisite skills where appropriate. "
+            "Part 2 must emphasize multi-step transfer, error analysis, comparing methods, "
+            "missing values, and justification instead of direct substitution. Part 3 must "
+            "require planning across at least three linked conditions or operations. Do not "
+            "move to a later grade's curriculum merely to make the work harder."
         ),
     ),
 }

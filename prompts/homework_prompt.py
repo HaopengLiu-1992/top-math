@@ -16,7 +16,8 @@ def user_prompt(day: int, date_str: str, recent_topics: list[str], forbidden: se
                 include_forbidden: bool = False,
                 context: LearningContext | None = None,
                 topic: CurriculumTopic | None = None,
-                cached_lesson: dict | None = None) -> str:
+                cached_lesson: dict | None = None,
+                validation_feedback: str = "") -> str:
     import re
     _MD5_RE = re.compile(r'^[0-9a-f]{32}$')
     context = context or LearningContext(grade_level=5, include_lesson=False,
@@ -42,6 +43,15 @@ Personal prompt from the learner or parent:
 {context.personal_prompt.strip()}
 Treat this as a learner preference. Follow it when compatible with the grade
 level, requested mode, and required output structure.
+        """
+
+    validation_section = ""
+    if validation_feedback:
+        validation_section = f"""
+The previous worksheet failed these deterministic checks:
+{validation_feedback}
+Regenerate the worksheet and correct every listed issue. Re-solve each final
+question from its displayed values before returning JSON.
 """
 
     return f"""Generate homework for:
@@ -67,4 +77,5 @@ Recently covered topics (past 14 days) — avoid repeating unless it is a review
 {json.dumps(recent_topics, indent=2)}
 {forbidden_section}
 {personal_section}
+{validation_section}
 Output ONLY valid JSON. No markdown, no explanation."""

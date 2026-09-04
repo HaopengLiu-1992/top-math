@@ -100,13 +100,30 @@ Difficulty standard:
 - guided means newly learned, scaffolded, confidence-building work with smaller numbers and hints.
 - standard means normal grade-level practice with moderate numbers and mostly 1-2 step reasoning.
 - advanced means upper-grade-level practice with more multi-step reasoning and subtler error analysis.
-- challenge means rich, non-routine reasoning; do not use challenge unless requested.
+- challenge keeps the same worksheet parts and item counts but uses the demanding
+  end of the selected grade-level standard. Increase numerical complexity and
+  reasoning depth without jumping to a later grade's curriculum.
 - Match the requested grade level without automatically biasing toward the upper end unless Difficulty is advanced or challenge.
 - NEVER generate single-digit arithmetic as a main skill check unless it is embedded in a higher-grade concept.
 - Part 1 should be challenging fluency aligned to the target grade and topic prerequisites.
 - Part 2 must include multi-step problems, not just one operation. At least 3 questions should require 2 or more steps.
 - Part 3 word problems must involve multi-step reasoning, unit conversion, or comparison — not a single multiplication or division.
 - Weekly challenge must require creative thinking and cannot be solved in one step.
+
+Challenge-only difficulty requirements:
+- Keep Part 1 as pure calculations, but use demanding grade-appropriate combinations
+  of integers, rational numbers, exponents, parentheses, and prerequisite operations
+  when they align to the target topic. Avoid repetitive single-operation items.
+- At least 8 of the 12 Part 2 questions must require two or more reasoning steps.
+- At least 4 of the 12 Part 2 questions must require three or more reasoning steps,
+  error analysis, comparing two methods, finding missing information, or justification.
+- Every Part 3 problem must connect at least three conditions or operations and require
+  the student to decide what to do rather than merely follow stated steps.
+- Use exact fractions or terminating decimals where possible. Check every calculation.
+- For multiple-choice questions, independently evaluate every option and ensure exactly
+  one option is correct. If multiple options work, rewrite the item before returning it.
+- Before output, silently solve every problem from the final question text. Confirm that
+  each answer and hint uses exactly the same values as its question.
 
 Rules:
 - Part 1 (Fluency Booster): 20 questions. STRICTLY pure numerical calculations only (e.g., "456 x 23"). NO words, NO sentences, NO instructions other than the numbers and operators. Focus on speed and precision.

@@ -6,11 +6,17 @@ from providers.default_provider import get_default_provider
 from prompts import vocabulary_prompt
 from storage import vocabulary_store
 
-NEW_WORD_COUNT = 15
-REVIEW_WORD_COUNT = 5
-MAX_GENERATION_RETRIES = 2
+NEW_WORD_COUNT = 8
+REVIEW_WORD_COUNT = 2
+MAX_GENERATION_RETRIES = 3
 STAGE_ORDER = ["cn_middle_school", "cn_high_school", "cn_high_school_extension"]
-TRUSTED_SOURCES = {"curated_math_science_core"}
+TRUSTED_SOURCES = {"curated_math_science_core", "curated_academic_core"}
+ADVANCED_GROUP_ORDER = [
+    "reasoning_and_evidence",
+    "history_and_civilization",
+    "scientific_investigation",
+    "mathematical_reasoning",
+]
 TEACHABLE_CATEGORIES = {
     "math_operations",
     "word_problem_signals",
@@ -25,6 +31,10 @@ TEACHABLE_CATEGORIES = {
     "general_academic",
     "math",
     "science",
+    "academic_reasoning",
+    "history_analysis",
+    "science_reasoning",
+    "math_reasoning",
 }
 
 
@@ -56,20 +66,29 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
 
     task = None
     last_error = "unknown vocabulary generation error"
-    for _ in range(MAX_GENERATION_RETRIES):
+    for attempt in range(MAX_GENERATION_RETRIES):
         raw = provider.complete(
             system=vocabulary_prompt.system_prompt(),
             user=vocabulary_prompt.user_prompt(
-                today, grade_level, new_words, review_words, personal_prompt=personal_prompt
+                today,
+                grade_level,
+                new_words,
+                review_words,
+                personal_prompt=personal_prompt,
+                quality_feedback=last_error if attempt else "",
             ),
             max_tokens=16000,
         )
         try:
-            task = _normalize_generated_task(
+            candidate = _normalize_generated_task(
                 _parse_json_response(raw),
                 new_words,
                 review_words,
             )
+            errors = _validate_generated_task(candidate, new_words, review_words)
+            if errors:
+                raise ValueError("; ".join(errors))
+            task = candidate
             break
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
             last_error = str(exc)
@@ -100,8 +119,13 @@ def _select_words(date_str: str, grade_level: int = 6) -> tuple[list[dict], list
     history = _word_history(exclude_date=date_str)
 
     review_words = _select_review_words(bank, seen, history, date_str)
-    new_needed = NEW_WORD_COUNT + max(0, REVIEW_WORD_COUNT - len(review_words))
-    new_words = _select_new_words(index, by_word, seen, new_needed, grade_level=grade_level)
+    new_words = _select_new_words(
+        index,
+        by_word,
+        seen,
+        NEW_WORD_COUNT,
+        grade_level=grade_level,
+    )
     return new_words, review_words
 
 
@@ -129,14 +153,36 @@ def _review_sort_key(word: str, history: dict, today: date | None) -> tuple:
         last_seen = date.min
 
     interval_days = 1 if known is False else min(30, 2 ** min(times_seen - 1, 4))
-    due_rank = 0 if today and last_seen + timedelta(days=interval_days) <= today else 1
-    return (status_rank, due_rank, -times_wrong, last_seen, times_seen, word)
+    due_date = last_seen + timedelta(days=interval_days)
+    due_rank = 0 if today and due_date <= today else 1
+    overdue_days = (today - due_date).days if today else 0
+    return (due_rank, status_rank, -overdue_days, -times_wrong, last_seen, times_seen, word)
 
 
 def _select_new_words(index: dict, by_word: dict[str, dict], seen: set[str], count: int,
                       grade_level: int = 6) -> list[dict]:
     selected: list[dict] = []
     selected_words: set[str] = set()
+
+    # Prefer a coherent, human-curated Tier 2 or disciplinary cluster. This
+    # avoids mistaking obscure dictionary words for useful academic difficulty.
+    priority_items = [
+        item for item in by_word.values()
+        if item.get("source") == "curated_academic_core"
+        and item.get("word") not in seen
+        and _is_grade_appropriate(item, grade_level)
+    ]
+    for group in ADVANCED_GROUP_ORDER:
+        group_items = [item for item in priority_items if item.get("topic_group") == group]
+        for item in group_items:
+            word = item["word"]
+            if word in selected_words:
+                continue
+            selected.append(item)
+            selected_words.add(word)
+            if len(selected) == count:
+                return selected
+
     for word in index.get("learning_sequence", []):
         if (
             word not in by_word
@@ -311,13 +357,56 @@ def _normalize_generated_task(task: dict, new_words: list[dict], review_words: l
         item["word"] = word
         item["category"] = selected_item.get("category", item.get("category", ""))
         item["is_review"] = word in review_set
-        for field in ("cn_stage", "us_band"):
+        for field in ("cn_stage", "us_band", "grade_min", "grade_max",
+                      "topic_group", "morphology", "collocation"):
             if selected_item.get(field):
                 item[field] = selected_item[field]
         normalized.append(item)
 
     task["words"] = normalized
     return task
+
+
+def _validate_generated_task(task: dict, new_words: list[dict], review_words: list[dict]) -> list[str]:
+    errors: list[str] = []
+    words = task.get("words") or []
+    selected_words = [item["word"] for item in new_words + review_words]
+
+    for item in words:
+        word = item.get("word", "")
+        for field in ("chinese", "definition", "example", "quick_check", "answer"):
+            if not str(item.get(field, "")).strip():
+                errors.append(f"{word} is missing {field}")
+
+    practice = task.get("practice") or {}
+    if not isinstance(practice, dict):
+        return ["practice must be an object"]
+    matching = practice.get("matching") or []
+    fill_blank = practice.get("fill_blank") or []
+    keyword_reading = practice.get("keyword_reading") or []
+    if not all(isinstance(group, list) for group in (matching, fill_blank, keyword_reading)):
+        return ["matching, fill_blank, and keyword_reading must be lists"]
+    if any(not isinstance(item, dict) for group in (matching, fill_blank, keyword_reading)
+           for item in group):
+        return ["every vocabulary practice item must be an object"]
+    expected_count = len(selected_words)
+    if len(matching) != expected_count:
+        errors.append(f"matching must contain {expected_count} items")
+    if len(fill_blank) != expected_count:
+        errors.append(f"fill_blank must contain {expected_count} items")
+    if len(keyword_reading) != 3:
+        errors.append("keyword_reading must contain 3 questions")
+
+    matching_words = [item.get("word") for item in matching if isinstance(item, dict)]
+    blank_answers = [item.get("answer") for item in fill_blank if isinstance(item, dict)]
+    if set(matching_words) != set(selected_words):
+        errors.append("matching must practice every selected word exactly once")
+    if set(blank_answers) != set(selected_words):
+        errors.append("fill_blank must practice every selected word exactly once")
+    if any(not str(item.get("question", "")).strip().endswith("?")
+           for item in keyword_reading if isinstance(item, dict)):
+        errors.append("keyword_reading entries must be questions")
+    return errors
 
 
 def _ensure_pdfs(task: dict):

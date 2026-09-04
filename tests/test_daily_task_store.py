@@ -4,9 +4,15 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from domain.daily_task import ENGLISH_READING, ENGLISH_VOCABULARY, ENGLISH_WRITING, MATH_HOMEWORK
+from domain.daily_task import (
+    ENGLISH_READING,
+    ENGLISH_VOCABULARY,
+    ENGLISH_WRITING,
+    MATH_HOMEWORK,
+    SCIENCE_READING,
+)
 from storage import daily_task_store, mark_buffer, reading_store, vocabulary_store, writing_store
-from services import feedback_service, vocabulary_service, writing_service
+from services import feedback_service, math_guardrail, vocabulary_service, writing_service
 from prompts import vocabulary_prompt
 from prompts import reading_prompt
 from services import reading_guardrail
@@ -85,8 +91,8 @@ class DailyTaskStoreTests(unittest.TestCase):
 
     def test_vocabulary_word_bank_has_large_candidate_pool(self):
         bank = vocabulary_store.load_word_bank()
-        self.assertEqual(len(bank), 10000)
-        self.assertEqual(len({item["word"] for item in bank}), 10000)
+        self.assertGreaterEqual(len(bank), 10000)
+        self.assertEqual(len({item["word"] for item in bank}), len(bank))
         self.assertTrue(all(item.get("definition") for item in bank))
         self.assertTrue(all(item.get("grade_min") <= item.get("grade_max") for item in bank))
 
@@ -104,15 +110,15 @@ class DailyTaskStoreTests(unittest.TestCase):
             10000,
         )
 
-    def test_vocabulary_selection_starts_from_basic_stage(self):
+    def test_vocabulary_selection_starts_from_curated_academic_layer(self):
         with patch("services.vocabulary_service._seen_words", return_value=set()):
             new_words, review_words = vocabulary_service._select_words("2099-01-01")
 
-        self.assertEqual(len(new_words), 20)
+        self.assertEqual(len(new_words), 8)
         self.assertEqual(review_words, [])
-        self.assertTrue(all(w["cn_stage"] == "cn_middle_school" for w in new_words))
-        self.assertTrue(all(w["source"] == "curated_math_science_core" for w in new_words))
-        self.assertIn("sum", {w["word"] for w in new_words})
+        self.assertTrue(all(w["source"] == "curated_academic_core" for w in new_words))
+        self.assertEqual({w["topic_group"] for w in new_words}, {"reasoning_and_evidence"})
+        self.assertIn("analyze", {w["word"] for w in new_words})
 
     def test_vocabulary_selection_avoids_unvetted_dictionary_words(self):
         bank = vocabulary_store.load_word_bank()
@@ -126,10 +132,10 @@ class DailyTaskStoreTests(unittest.TestCase):
             new_words, review_words = vocabulary_service._select_words("2099-01-02")
 
         selected = {item["word"] for item in new_words}
-        self.assertEqual(len(new_words), 15)
-        self.assertEqual(len(review_words), 5)
+        self.assertEqual(len(new_words), 8)
+        self.assertEqual(len(review_words), 2)
         self.assertNotIn("aaronic", selected)
-        self.assertTrue(all(item["source"] == "curated_math_science_core" for item in new_words))
+        self.assertTrue(all(item["source"] == "curated_academic_core" for item in new_words))
 
     def test_vocabulary_review_selection_rotates_away_from_bank_prefix(self):
         words = ["sum", "difference", "old_one", "old_two", "old_three", "old_four", "old_five"]
@@ -155,12 +161,15 @@ class DailyTaskStoreTests(unittest.TestCase):
 
         self.assertEqual(
             [item["word"] for item in selected],
-            ["old_one", "old_two", "old_three", "old_four", "old_five"],
+            ["old_one", "old_two"],
         )
 
     def test_vocabulary_selection_never_falls_back_to_seen_words(self):
         bank = vocabulary_store.load_word_bank()
-        seen = {item["word"] for item in bank if item.get("source") == "curated_math_science_core"}
+        seen = {
+            item["word"] for item in bank
+            if item.get("source") in vocabulary_service.TRUSTED_SOURCES
+        }
         history = {
             word: {
                 "last_seen": "2099-01-01",
@@ -175,8 +184,8 @@ class DailyTaskStoreTests(unittest.TestCase):
              patch("services.vocabulary_service._word_history", return_value=history):
             new_words, review_words = vocabulary_service._select_words("2099-01-02")
 
-        self.assertEqual(len(new_words), 15)
-        self.assertEqual(len(review_words), 5)
+        self.assertEqual(len(new_words), 8)
+        self.assertEqual(len(review_words), 2)
         self.assertTrue(set(item["word"] for item in review_words).issubset(seen))
         self.assertTrue(set(item["word"] for item in new_words).isdisjoint(seen))
 
@@ -233,12 +242,28 @@ class DailyTaskStoreTests(unittest.TestCase):
 
             def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
                 self.calls += 1
-                words = [{"word": "alpha", "is_review": True}]
-                if self.calls == 1:
-                    words.append({"word": "invented", "is_review": False})
-                else:
-                    words.append({"word": "beta", "is_review": False})
-                return json.dumps({"words": words})
+                chosen = ["alpha", "invented"] if self.calls == 1 else ["beta", "alpha"]
+                words = [{
+                    "word": word,
+                    "chinese": "测试",
+                    "definition": f"definition of {word}",
+                    "example": f"Use {word} in context.",
+                    "quick_check": f"What does {word} mean?",
+                    "answer": f"definition of {word}",
+                } for word in chosen]
+                return json.dumps({
+                    "words": words,
+                    "practice": {
+                        "matching": [{"word": word, "definition": f"definition of {word}"}
+                                     for word in chosen],
+                        "fill_blank": [{"sentence": "Use ___.", "answer": word}
+                                       for word in chosen],
+                        "keyword_reading": [
+                            {"question": f"Question {index}?", "keyword": "alpha", "meaning": "test"}
+                            for index in range(3)
+                        ],
+                    },
+                })
 
         try:
             with tempfile.TemporaryDirectory() as tmp:
@@ -265,7 +290,8 @@ class DailyTaskStoreTests(unittest.TestCase):
             new_words, review_words = vocabulary_service._select_words("2099-01-01")
         prompt = vocabulary_prompt.user_prompt("2099-01-01", 6, new_words, review_words)
 
-        self.assertIn('"word": "sum"', prompt)
+        self.assertIn('"word": "analyze"', prompt)
+        self.assertIn("There are 8 new words", prompt)
         self.assertLess(len(prompt), 20000)
         self.assertNotIn("academic_word_bank_10000", prompt)
 
@@ -344,6 +370,54 @@ class DailyTaskStoreTests(unittest.TestCase):
         self.assertIn("old concept 1", prompt)
         self.assertLess(len(prompt), 7000)
 
+    def test_grade_six_english_reading_uses_ancient_history_curriculum(self):
+        plan = reading_guardrail.prepare(
+            ENGLISH_READING,
+            "2099-01-01",
+            6,
+            "history and evidence",
+        )
+
+        self.assertEqual(plan.slot.domain, "ancient world history")
+        self.assertTrue(plan.slot.standard.startswith("CA HSS 6."))
+        self.assertGreaterEqual(len(plan.slot.required_content), 3)
+
+    def test_science_curriculum_changes_with_grade(self):
+        grade_five = reading_guardrail.prepare(
+            SCIENCE_READING, "2099-01-01", 5, "science"
+        )
+        grade_eight = reading_guardrail.prepare(
+            SCIENCE_READING, "2099-01-01", 8, "science"
+        )
+
+        self.assertNotEqual(grade_five.slot.standard, grade_eight.slot.standard)
+        self.assertNotEqual(grade_five.slot.learning_goal, grade_eight.slot.learning_goal)
+
+    def test_reading_guardrail_rejects_vocabulary_missing_from_passage(self):
+        plan = reading_guardrail.prepare(
+            ENGLISH_READING, "2099-01-01", 6, "history"
+        )
+        task = {
+            "passage": {"title": "History", "text": "history " * 500},
+            "vocabulary": [{"word": "artifact"}] + [
+                {"word": "history"} for _ in range(7)
+            ],
+            "questions": [
+                {
+                    "id": f"q_{index}",
+                    "type": "detail",
+                    "skill": "evidence",
+                    "question": "What happened?",
+                    "answer": "An event happened.",
+                }
+                for index in range(8)
+            ],
+        }
+
+        errors = reading_guardrail.validate(ENGLISH_READING, task, plan)
+
+        self.assertIn("vocabulary word not used in passage: artifact", errors)
+
     def test_reading_guardrail_commit_stores_concept_memory(self):
         original_path = reading_guardrail_store.MEMORY_PATH
         with tempfile.TemporaryDirectory() as tmp:
@@ -356,10 +430,19 @@ class DailyTaskStoreTests(unittest.TestCase):
                     "main idea",
                 )
                 task = {
-                    "passage": {"title": "A New Tool", "text": "word " * 500},
+                    "passage": {
+                        "title": "A New Tool",
+                        "text": "w0 w1 w2 w3 w4 w5 w6 w7 " + "word " * 492,
+                    },
                     "vocabulary": [{"word": f"w{i}"} for i in range(8)],
                     "questions": [
-                        {"id": f"q_{i:03d}", "type": "detail" if i == 1 else "main_idea", "skill": "text evidence"}
+                        {
+                            "id": f"q_{i:03d}",
+                            "type": "detail" if i == 1 else "main_idea",
+                            "skill": "text evidence",
+                            "question": f"Question {i}?",
+                            "answer": f"Answer {i}",
+                        }
                         for i in range(1, 9)
                     ],
                     "metadata": {},
@@ -379,86 +462,52 @@ class DailyTaskStoreTests(unittest.TestCase):
             finally:
                 reading_guardrail_store.MEMORY_PATH = original_path
 
-    def test_writing_meta_tracks_opinion_and_examples(self):
-        task = {
-            "opinion": {"claim": "Practice helps students improve."},
-            "examples": [
-                {"id": "example_001", "memorize_line": "For example, daily reading builds vocabulary."},
-                {"id": "example_002", "memorize_line": "Also, science notes help students explain evidence."},
-                {"id": "example_003", "memorize_line": "Finally, math practice makes problem solving faster."},
-            ],
-        }
+    def test_writing_meta_tracks_two_revision_rounds(self):
+        meta = writing_store.build_meta({"task_version": 2})
 
-        meta = writing_store.build_meta(task)
+        self.assertEqual(set(meta), {"draft", "revision"})
+        self.assertEqual(meta["draft"]["skill"], "writing_structure_evidence")
+        self.assertEqual(meta["revision"]["skill"], "writing_language_revision")
 
-        self.assertEqual(set(meta), {"opinion", "example_001", "example_002", "example_003"})
-        self.assertTrue(all(item["correct"] is None for item in meta.values()))
-        self.assertTrue(all(item["skill"] == "writing_memorization" for item in meta.values()))
-
-    def test_writing_task_normalization_builds_recitation_checks(self):
-        task = {
-            "opinion": {"claim": "Practice helps.", "memorize_line": "I believe practice helps."},
-            "examples": [
-                {"memorize_line": "For example, reading builds vocabulary."},
-                {"memorize_line": "Also, science notes explain evidence."},
-                {"memorize_line": "Finally, math practice improves speed."},
-            ],
-        }
+    def test_writing_task_normalization_sets_50_word_structure(self):
+        task = {"writing_mode": "opinion", "writing_prompt": "Should school begin later?"}
 
         writing_service._normalize_task(task)
 
-        self.assertEqual([item["id"] for item in task["examples"]],
-                         ["example_001", "example_002", "example_003"])
+        self.assertEqual(task["target_words"], 50)
+        self.assertEqual(task["target_range"], [45, 65])
+        self.assertEqual(len(task["structure"]), 3)
         self.assertEqual(
-            [item["id"] for item in task["practice"]["recitation_check"]],
-            ["opinion", "example_001", "example_002", "example_003"],
+            [item["round"] for item in task["practice"]["revision_rounds"]],
+            [1, 2],
         )
+        self.assertNotIn("focus_words", task)
 
-    def test_writing_guardrail_rotates_example_types_from_recent_history(self):
-        records = [
-            {
-                "date": "2099-01-01",
-                "opinion": "I believe practice helps students.",
-                "examples": [
-                    {"type": "personal_experience", "line": "In my experience, practice helps."},
-                    {"type": "math_science_application", "line": "In math class, practice helps."},
-                ],
-            }
-        ]
-
-        plan = writing_service._choose_example_plan("2099-01-02", records)
-
-        self.assertEqual(len(plan), 3)
-        self.assertEqual(len({item["type"] for item in plan}), 3)
-        self.assertIn("math_science_application", [item["type"] for item in plan])
-
-    def test_writing_guardrail_rejects_repeated_opinion_and_starter(self):
-        plan = [
-            {"position": 1, "type": "personal_experience"},
-            {"position": 2, "type": "math_science_application"},
-            {"position": 3, "type": "reading_evidence"},
-        ]
-        history = {
-            "avoid_opinions": ["I believe reading every day helps students become stronger learners."],
-            "avoid_examples": [],
-            "avoid_starters": ["for example reading"],
-        }
+    def test_writing_guardrail_rejects_repeated_prompt(self):
+        sample = (
+            "Ancient farmers settled near rivers because water helped them grow crops. "
+            "Reliable harvests created food surpluses, so some people became builders, "
+            "traders, or leaders. As villages expanded, communities developed rules and "
+            "shared projects. These changes show how agriculture helped settlements grow "
+            "into more complex societies over time."
+        )
         task = {
-            "opinion": {"memorize_line": "I believe reading every day helps students become stronger learners."},
-            "examples": [
-                {"type": "personal_experience", "memorize_line": "For example, reading books helps me learn."},
-                {"type": "math_science_application", "memorize_line": "For example, reading graphs helps me compare data."},
-                {"type": "reading_evidence", "memorize_line": "In science class, evidence supports a claim."},
-            ],
+            "writing_mode": "opinion",
+            "writing_prompt": "Should students read history every day?",
+            "source": {"title": "", "text": ""},
+            "structure": [{}, {}, {}],
+            "practice": {
+                "revision_rounds": [{"round": 1}, {"round": 2}],
+                "sample_response": sample,
+            },
         }
+        history = {"avoid_prompts": ["Should students read history every day?"]}
 
-        errors = writing_service._validate_task(task, history, plan)
+        errors = writing_service._validate_task(task, history, "opinion")
 
-        self.assertIn("opinion sentence is too similar to recent writing", errors)
-        self.assertIn("examples reuse the same sentence starter", errors)
-        self.assertIn("example sentence starter repeats recent writing", errors)
+        self.assertIn("writing prompt is too similar to recent writing", errors)
 
-    def test_writing_generation_retries_repeated_history(self):
+    def test_writing_generation_retries_repeated_prompt(self):
         original_root = daily_task_store.TASK_ROOT
 
         class FakeWritingProvider:
@@ -478,40 +527,130 @@ class DailyTaskStoreTests(unittest.TestCase):
                 daily_task_store.TASK_ROOT = Path(tmp)
                 writing_store.save_task("2099-01-01", {
                     "date": "2099-01-01",
-                    "opinion": {"memorize_line": "I believe reading every day helps students become stronger learners."},
-                    "examples": [
-                        {"type": "personal", "memorize_line": "For example, reading books helps me learn."},
-                    ],
+                    "task_version": 2,
+                    "writing_prompt": "Should students read history every day?",
+                    "practice": {"sample_response": "old sample"},
                 })
-                plan = writing_service._choose_example_plan(
-                    "2099-01-02",
-                    writing_service._recent_history("2099-01-02"),
+                sample = (
+                    "Ancient farmers settled near rivers because water helped them grow crops. "
+                    "Reliable harvests created food surpluses, so some people became builders, "
+                    "traders, or leaders. As villages expanded, communities developed rules and "
+                    "shared projects. These changes show how agriculture helped settlements grow "
+                    "into more complex societies over time."
                 )
                 invalid = {
-                    "opinion": {"memorize_line": "I believe reading every day helps students become stronger learners."},
-                    "examples": [
-                        {"type": item["type"], "memorize_line": f"In slot {item['position']}, students can practice a useful skill."}
-                        for item in plan
-                    ],
+                    "writing_mode": "opinion",
+                    "writing_prompt": "Should students read history every day?",
+                    "source": {"title": "", "text": ""},
+                    "practice": {"sample_response": sample},
                 }
                 valid = {
-                    "opinion": {"memorize_line": "I believe asking questions helps students understand difficult ideas."},
-                    "examples": [
-                        {"type": plan[0]["type"], "memorize_line": "In my experience, asking questions helps me understand new ideas."},
-                        {"type": plan[1]["type"], "memorize_line": "In math class, I can explain why a formula works."},
-                        {"type": plan[2]["type"], "memorize_line": "A text can show the value of questions through strong evidence."},
-                    ],
+                    "writing_mode": "opinion",
+                    "writing_prompt": "Which ancient invention had the greatest impact on daily life?",
+                    "source": {"title": "", "text": ""},
+                    "practice": {"sample_response": sample},
                 }
                 provider = FakeWritingProvider(invalid, valid)
 
-                with patch("services.writing_service._ensure_pdfs"):
+                with patch("services.writing_service._ensure_pdfs"), patch(
+                    "services.writing_service._writing_context",
+                    return_value={"writing_mode": "opinion", "source": {"title": "", "text": ""}},
+                ):
                     task = writing_service.generate("2099-01-02", provider)
 
                 self.assertEqual(provider.calls, 2)
-                self.assertEqual(task["opinion"]["memorize_line"], valid["opinion"]["memorize_line"])
+                self.assertEqual(task["writing_prompt"], valid["writing_prompt"])
+                self.assertEqual(task["target_words"], 50)
+                self.assertTrue(task["writing_guardrail"]["vocabulary_is_separate"])
                 self.assertEqual(task["writing_guardrail"]["history_days"], 30)
         finally:
             daily_task_store.TASK_ROOT = original_root
+
+    def test_writing_review_uses_actual_draft_and_persists_feedback(self):
+        original_root = daily_task_store.TASK_ROOT
+
+        class FakeReviewProvider:
+            name = "Fake Review"
+
+            def __init__(self):
+                self.user = ""
+
+            def complete(self, system: str, user: str, max_tokens: int = 1800) -> str:
+                self.user = user
+                return json.dumps({
+                    "round": 1,
+                    "focus": "structure_and_evidence",
+                    "strength": "The claim is direct.",
+                    "answer_feedback": "Keep the claim.",
+                    "evidence_feedback": "Add one precise detail.",
+                    "next_step": "Add the date from the passage.",
+                    "ready_for_round_2": True,
+                })
+
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                daily_task_store.TASK_ROOT = Path(tmp)
+                provider = FakeReviewProvider()
+                task = {
+                    "date": "2099-01-01",
+                    "grade_level": 6,
+                    "writing_mode": "opinion",
+                    "writing_prompt": "Which invention mattered most?",
+                    "source": {"title": "", "text": ""},
+                }
+                draft = "I think writing mattered most because it preserved laws and ideas for later generations."
+
+                feedback = writing_service.review_draft(task, draft, 1, provider)
+
+                self.assertEqual(feedback["round"], 1)
+                self.assertIn(draft, provider.user)
+                self.assertEqual(
+                    writing_store.load_submission("2099-01-01")["round_1"]["draft"],
+                    draft,
+                )
+        finally:
+            daily_task_store.TASK_ROOT = original_root
+
+    def test_math_guardrail_checks_unicode_arithmetic_answer(self):
+        homework = {
+            "parts": {
+                "part1": [{
+                    "id": "p1_001",
+                    "question": "5² × 2³ - 100",
+                    "answer": "300",
+                }],
+                "part2": [],
+                "part3": [],
+            }
+        }
+
+        errors = math_guardrail.validate(homework, "standard")
+
+        self.assertTrue(any("expected 100" in error for error in errors))
+
+    def test_math_guardrail_accepts_equivalent_mixed_number_answer(self):
+        homework = {
+            "parts": {
+                "part1": [{
+                    "id": "p1_001",
+                    "question": "3/4 + 2/3",
+                    "answer": "1 5/12",
+                }],
+                "part2": [],
+                "part3": [],
+            }
+        }
+
+        self.assertEqual(math_guardrail.validate(homework, "standard"), [])
+
+    def test_math_challenge_guardrail_keeps_existing_part_counts(self):
+        homework = {"parts": {"part1": [], "part2": [], "part3": []}}
+
+        errors = math_guardrail.validate(homework, "challenge")
+
+        self.assertIn("part1 must contain exactly 20 questions", errors)
+        self.assertIn("part2 must contain exactly 12 questions", errors)
+        self.assertIn("part3 must contain exactly 3 questions", errors)
 
     def test_store_lists_multiple_scopes(self):
         original_root = daily_task_store.TASK_ROOT

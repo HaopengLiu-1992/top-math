@@ -1,26 +1,24 @@
 import json
 
 
+TARGET_WORDS = 50
+MIN_WORDS = 45
+MAX_WORDS = 65
+
+
 def system_prompt() -> str:
-    return """You generate short grade-level English writing practice for an English learner.
+    return """You generate focused grade-level English writing practice for an English learner.
 Output ONLY valid JSON. No markdown.
-The goal is writing a short three-paragraph essay, not memorizing a finished essay.
-Use clear, grade-appropriate language and teach the student to Answer, give
-Evidence, and Explain."""
+The student writes one short paragraph of about 50 words. Teach the student to
+Answer or Claim, give Evidence, and Explain. Do not turn vocabulary memorization
+into part of this writing task."""
 
 
 def user_prompt(date_str: str, grade_level: int, focus: str,
-                plan: list[dict] | None = None, history: dict | None = None,
-                feedback: str = "", writing_mode: str = "opinion",
-                focus_words: list[dict] | None = None,
+                history: dict | None = None, feedback: str = "",
+                writing_mode: str = "opinion",
                 source_context: dict | None = None) -> str:
-    plan = plan or [
-        {"position": 1, "type": "personal_experience"},
-        {"position": 2, "type": "math_science_application"},
-        {"position": 3, "type": "reading_evidence"},
-    ]
     history = history or {}
-    focus_words = focus_words or []
     source_context = source_context or {}
     mode_labels = {
         "summary": "Summary",
@@ -33,24 +31,42 @@ def user_prompt(date_str: str, grade_level: int, focus: str,
         if source_context.get("text"):
             source_instruction = f"""
 
-Use this existing reading passage as the source. Keep it unchanged:
+Use this existing History + English Reading passage as the source. Keep its
+facts unchanged and make the writing prompt answerable from it:
 {json.dumps(source_context, indent=2, ensure_ascii=False)}
 """
         else:
             source_instruction = """
 
-Create a short informational source passage of 180-250 words for the student
-to read. It must be self-contained and suitable for the requested grade.
+Create a self-contained 180-250 word history source passage appropriate for
+the requested grade. Use established historical facts and avoid disputed or
+overly simplified claims.
 """
-    focus_word_instruction = json.dumps(focus_words, indent=2, ensure_ascii=False)
-    guardrail_feedback = ""
-    if feedback:
-        guardrail_feedback = f"""
 
-The previous draft failed this quality check:
+    retry_instruction = ""
+    if feedback:
+        retry_instruction = f"""
+
+The previous draft failed these checks:
 {feedback}
-Generate a genuinely different draft and follow every rule below.
+Correct every issue while keeping the same required JSON shape.
 """
+
+    mode_rules = {
+        "summary": (
+            "Ask for the main idea and two important details. The student must not "
+            "add an opinion. Map Answer to Main Idea, Evidence to Key Details, and "
+            "Explain to how the details connect to the main idea."
+        ),
+        "opinion": (
+            "Ask a grade-appropriate question with more than one defensible answer. "
+            "Require one clear claim, one specific reason or example, and an explanation."
+        ),
+        "text_based_response": (
+            "Ask an analytical question about the source. Require a direct answer, "
+            "at least two accurate source details, and an explanation of how they support the answer."
+        ),
+    }[writing_mode]
 
     return f"""Generate today's English writing practice task.
 
@@ -58,112 +74,123 @@ Date: {date_str}
 Grade level: {grade_level}
 Focus: {focus}
 Writing mode: {writing_mode} ({mode_label})
-
-This is the small vocabulary set to apply in writing. Use exactly these five
-words and do not replace them:
-{focus_word_instruction}
+Target: one paragraph, {MIN_WORDS}-{MAX_WORDS} words, normally 5-7 sentences.
 {source_instruction}
 
-Anti-repetition guardrail:
-Use these exact example types in this exact order:
-{json.dumps(plan, indent=2, ensure_ascii=False)}
+Mode-specific rule:
+{mode_rules}
 
-Do not reuse or closely paraphrase these recent opinion sentences:
-{json.dumps(history.get("avoid_opinions", []), indent=2, ensure_ascii=False)}
+Do not reuse or closely paraphrase these recent prompts:
+{json.dumps(history.get("avoid_prompts", []), indent=2, ensure_ascii=False)}
 
-Do not reuse or closely paraphrase these recent example sentences:
-{json.dumps(history.get("avoid_examples", []), indent=2, ensure_ascii=False)}
-
-Do not reuse these recent example-starter signatures:
-{json.dumps(history.get("avoid_starters", []), indent=2, ensure_ascii=False)}
-{guardrail_feedback}
+Do not reuse or closely paraphrase these recent sample responses:
+{json.dumps(history.get("avoid_samples", []), indent=2, ensure_ascii=False)}
+{retry_instruction}
 
 Return EXACTLY this JSON shape:
 {{
   "date": "{date_str}",
   "subject": "english",
   "task_type": "writing",
+  "task_version": 2,
   "grade_level": {grade_level},
-  "title": "Daily Writing Lab — {mode_label}",
+  "title": "Daily 50-Word Writing — {mode_label}",
   "estimated_minutes": 20,
   "writing_mode": "{writing_mode}",
   "mode_label": "{mode_label}",
+  "target_words": {TARGET_WORDS},
+  "target_range": [{MIN_WORDS}, {MAX_WORDS}],
   "time_plan": [
-    {{"minutes": 5, "activity": "Use each focus word in an original sentence."}},
-    {{"minutes": 10, "activity": "Write a three-paragraph, 8-12 sentence first draft."}},
-    {{"minutes": 5, "activity": "Revise one sentence and complete the checklist."}}
+    {{"minutes": 3, "activity": "Read the prompt and plan Answer/Claim, Evidence, and Explain."}},
+    {{"minutes": 10, "activity": "Write one paragraph of about 50 words."}},
+    {{"minutes": 7, "activity": "Use feedback to revise structure first, then one language skill."}}
   ],
   "source": {{
     "title": "A short source title",
-    "text": "A source passage for summary or text-based response; use an empty string for opinion mode."
+    "text": "Use the supplied source for reading-based modes; use an empty string for opinion mode."
   }},
-  "writing_prompt": "Write a short essay in three paragraphs and 8-12 sentences.",
-  "paragraph_plan": [
-    {{"label": "Introduction", "purpose": "Answer the prompt and state the main idea."}},
-    {{"label": "Body", "purpose": "Give evidence or a specific example and explain it."}},
-    {{"label": "Conclusion", "purpose": "Restate the main idea and close the essay."}}
-  ],
+  "writing_prompt": "One clear question that leads to a focused 50-word paragraph.",
   "structure": [
-    {{"label": "Answer", "instruction": "Answer the prompt directly.", "frame": "I think ___ because ___."}},
-    {{"label": "Evidence", "instruction": "Give a detail, example, or reason.", "frame": "For example, ___."}},
-    {{"label": "Explain", "instruction": "Explain how the evidence supports your answer.", "frame": "This shows that ___."}}
-  ],
-  "focus_words": [
-    {{"word": "evidence", "meaning": "information that supports an idea", "chinese": "证据"}},
-    {{"word": "reason", "meaning": "a cause or explanation", "chinese": "理由"}},
-    {{"word": "explain", "meaning": "to make an idea clear", "chinese": "解释"}},
-    {{"word": "result", "meaning": "what happens because of something", "chinese": "结果"}},
-    {{"word": "support", "meaning": "to provide evidence for an idea", "chinese": "支持"}}
-  ],
-  "opinion": {{
-    "claim": "Reading every day helps students become stronger learners.",
-    "chinese": "每天阅读能帮助学生成为更强的学习者。",
-    "sentence_frame": "I believe ___ because ___.",
-    "memorize_line": "I believe reading every day helps students become stronger learners."
-  }},
-  "examples": [
-    {{
-      "id": "example_001",
-      "type": "personal_experience",
-      "reference_sentence": "For example, reading science articles can teach me new words and facts.",
-      "why_it_works": "This is a model for adding a specific example."
-    }}
+    {{"label": "Answer / Claim", "instruction": "Answer directly in one sentence.", "frame": "The main idea is ___ because ___."}},
+    {{"label": "Evidence", "instruction": "Add one or two accurate details.", "frame": "One important detail is ___."}},
+    {{"label": "Explain", "instruction": "Explain how the evidence supports the answer.", "frame": "This shows that ___."}}
   ],
   "practice": {{
-    "word_sentences": [
-      {{"word": "evidence", "prompt": "Use evidence in one sentence about today's topic.", "model": "Evidence supports a clear answer."}},
-      {{"word": "reason", "prompt": "Use reason in one sentence about today's topic.", "model": "One reason is that practice builds confidence."}},
-      {{"word": "explain", "prompt": "Use explain in one sentence about today's topic.", "model": "I can explain my answer with a detail."}},
-      {{"word": "result", "prompt": "Use result in one sentence about today's topic.", "model": "The result shows what happened after the experiment."}},
-      {{"word": "support", "prompt": "Use support in one sentence about today's topic.", "model": "Details support the writer's main idea."}}
+    "draft_task": "Write one 45-65 word paragraph, normally 5-7 sentences.",
+    "revision_rounds": [
+      {{"round": 1, "focus": "structure_and_evidence", "instruction": "Check only the answer/claim, evidence, and explanation."}},
+      {{"round": 2, "focus": "one_language_skill", "instruction": "After revising ideas, correct only one recurring language category."}}
     ],
-    "draft_task": "Write a short essay in three paragraphs and 8-12 sentences using Answer → Evidence → Explain.",
-    "revision_task": "Revise the essay by improving one sentence, adding a detail, checking the five focus words, and confirming the three paragraphs are clear.",
     "checklist": [
       "I answered the prompt directly.",
-      "I included evidence or a specific detail.",
+      "I included accurate evidence or a specific detail.",
       "I explained how the evidence supports my answer.",
-      "I used all five focus words correctly.",
-      "I used an introduction, body, and conclusion paragraph.",
+      "I wrote one paragraph of about 50 words.",
       "I checked capitals, punctuation, and complete sentences."
     ],
-    "sample_response": "A short 8-12 sentence, three-paragraph model response that demonstrates the structure."
+    "sample_response": "A 45-65 word one-paragraph model that follows the mode-specific rule."
   }}
 }}
 
 Rules:
-- Generate exactly 1 prompt and one source object. For opinion mode, source.text may be empty.
-- For summary mode, ask the student to state the main idea and two key details without adding an opinion.
-- For text_based_response mode, require at least two details from the source and an explanation of each.
-- For opinion mode, require a clear answer, one reason or example, and an explanation.
-- The student target response must be an 8-12 sentence, three-paragraph short essay and fit a 15-20 minute session.
-- Use a simple 5 + 10 + 5 minute plan: word application, first draft, revision.
-- Return exactly five focus_words matching the provided words, and exactly five word_sentences in the same order.
-- Each word_sentence must ask the student to use that focus word in an original sentence and include a short model.
-- Include an 8-12 sentence, three-paragraph sample_response for the answer key; it must model the structure without sounding like an instruction to copy.
-- Generate exactly 1 opinion/claim and exactly 3 reference examples.
-- Set the three example type fields to the exact planned types, in order.
-- Each reference sentence must be one school-friendly sentence that demonstrates a useful move; it is a model, not a memorization requirement.
-- The math_science_application example must connect to math or science.
-- Use three different sentence starters. Do not begin every example with "For example".
+- Generate exactly one prompt and one source object.
+- Never require the student to use the daily vocabulary words.
+- Keep the task to one paragraph. Do not request an introduction, body, and conclusion.
+- The student target is {MIN_WORDS}-{MAX_WORDS} words and normally 5-7 complete sentences.
+- The sample response must also be {MIN_WORDS}-{MAX_WORDS} words in one paragraph.
+- Sentence frames are optional scaffolds, not text to memorize or copy.
+- For opinion mode, source.text must be empty.
 - Keep the full task suitable for 15-20 minutes."""
+
+
+def review_system_prompt() -> str:
+    return """You are a careful writing coach for a grade-level English learner.
+Output ONLY valid JSON. No markdown. Respond to the student's actual draft.
+Preserve the student's ideas and voice. Never rewrite the entire paragraph."""
+
+
+def review_user_prompt(task: dict, draft: str, review_round: int) -> str:
+    source = task.get("source") or {}
+    shared = f"""Writing mode: {task.get('writing_mode', 'opinion')}
+Grade level: {task.get('grade_level', 6)}
+Prompt: {task.get('writing_prompt', '')}
+Source: {json.dumps(source, ensure_ascii=False)}
+Student draft ({len(draft.split())} words):
+{draft}
+"""
+    if review_round == 1:
+        return shared + """
+
+Review ONLY content organization and evidence. Do not correct grammar, spelling,
+punctuation, or word choice in this round. Judge evidence against the source
+when a source is provided.
+
+Return exactly:
+{
+  "round": 1,
+  "focus": "structure_and_evidence",
+  "strength": "one specific thing the student did well",
+  "answer_feedback": "one concise note about the direct answer or claim",
+  "evidence_feedback": "one concise note about evidence and explanation",
+  "next_step": "one concrete revision action",
+  "ready_for_round_2": true
+}"""
+
+    return shared + """
+
+The student has already revised content. Review ONLY ONE recurring language
+category. Choose the highest-impact category from sentence completeness,
+verb tense/agreement, articles, punctuation/capitalization, or word choice.
+Give at most two corrections. Do not add new ideas or rewrite the paragraph.
+
+Return exactly:
+{
+  "round": 2,
+  "focus": "one_language_skill",
+  "language_category": "one category only",
+  "strength": "one specific language success",
+  "corrections": [
+    {"original": "exact short excerpt", "revision": "corrected excerpt", "why": "brief explanation"}
+  ],
+  "next_step": "one concrete proofreading action"
+}"""

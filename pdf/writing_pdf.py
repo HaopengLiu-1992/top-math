@@ -24,7 +24,7 @@ def build_writing(task: dict) -> Path:
         story.append(Paragraph(paragraph_text(source["text"]), normal))
 
     story.append(Paragraph("Writing Prompt", section))
-    story.append(Paragraph(paragraph_text(task.get("writing_prompt", "Write a three-paragraph short essay.")), highlight))
+    story.append(Paragraph(paragraph_text(task.get("writing_prompt", "Write one short paragraph.")), highlight))
 
     paragraph_plan = task.get("paragraph_plan") or []
     if paragraph_plan:
@@ -61,13 +61,20 @@ def build_writing(task: dict) -> Path:
 
     practice = task.get("practice", {})
     story.append(Paragraph("Draft and Revision", section))
-    story.append(Paragraph(paragraph_text(practice.get("draft_task", "Write a three-paragraph, 8-12 sentence first draft.")), normal))
+    story.append(Paragraph(paragraph_text(practice.get("draft_task", "Write one paragraph of about 50 words.")), normal))
     story.append(Paragraph("First draft:", normal))
-    for _ in range(9):
+    line_count = 6 if task.get("task_version") == 2 else 9
+    for _ in range(line_count):
         story.append(Paragraph("__________________________________________________________________", normal))
-    story.append(Paragraph(paragraph_text(practice.get("revision_task", "Revise your draft.")), normal))
+    rounds = practice.get("revision_rounds") or []
+    for item in rounds:
+        story.append(Paragraph(
+            f"<b>Round {item.get('round', '')}</b>: {paragraph_text(item.get('instruction', ''))}",
+            normal,
+        ))
+    story.append(Paragraph(paragraph_text(practice.get("revision_task", "Revise the same paragraph.")), normal))
     story.append(Paragraph("Revised draft:", normal))
-    for _ in range(9):
+    for _ in range(line_count):
         story.append(Paragraph("__________________________________________________________________", normal))
 
     if task.get("examples"):
@@ -82,7 +89,7 @@ def build_writing(task: dict) -> Path:
 
 def build_answers(task: dict) -> Path:
     filename = _path(task, "answers.pdf")
-    story, styles = _base_story(task, "Writing Memory Answer Key")
+    story, styles = _base_story(task, "Writing Reference")
     section = styles["section"]
     normal = styles["normal"]
     answer = styles["answer"]
