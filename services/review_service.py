@@ -6,7 +6,7 @@ Collects incorrect questions from the past 7 days and generates a targeted revie
 import json
 from datetime import date, timedelta
 
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
 from storage.mark_buffer import get_marks
@@ -85,7 +85,7 @@ def _generate_with_retry(date_str: str, incorrect: list[dict],
 
     for attempt in range(1, MAX_RETRIES + 1):
         print(f"  [Review/{provider.name}] attempt {attempt}/{MAX_RETRIES}")
-        raw = provider.complete(system=system, user=user, max_tokens=12000)
+        raw = provider.complete(system=system, user=user, max_tokens=MAX_OUTPUT_TOKENS)
 
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]

@@ -28,7 +28,7 @@ ALL_TASK_SCOPES = [
 TASK_LABELS = {
     MATH_HOMEWORK: "Math Homework",
     ENGLISH_VOCABULARY: "Academic Vocabulary",
-    ENGLISH_READING: "English Reading",
+    ENGLISH_READING: "History + English Reading",
     ENGLISH_WRITING: "English Writing",
     SCIENCE_READING: "Science Reading",
 }

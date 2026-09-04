@@ -6,7 +6,7 @@ A warm parent-facing report distinct from the structured skills analysis.
 import json
 from datetime import date
 
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
 from services.review_service import collect_incorrect_questions
@@ -76,7 +76,7 @@ def _generate_with_retry_for_range(start_date: str, end_date: str,
 
     for attempt in range(1, MAX_RETRIES + 1):
         print(f"  [FeedbackReport/{provider.name}] attempt {attempt}/{MAX_RETRIES}")
-        raw = provider.complete(system=system, user=user, max_tokens=2000)
+        raw = provider.complete(system=system, user=user, max_tokens=MAX_OUTPUT_TOKENS)
 
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]

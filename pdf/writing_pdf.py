@@ -12,36 +12,76 @@ from storage import writing_store
 
 def build_writing(task: dict) -> Path:
     filename = _path(task, "writing.pdf")
-    story, styles = _base_story(task, "Writing Memory Set")
+    story, styles = _base_story(task, task.get("title", "Daily Writing Lab"))
     section = styles["section"]
     normal = styles["normal"]
     highlight = styles["highlight"]
 
-    opinion = task.get("opinion", {})
-    story.append(Paragraph("Opinion", section))
-    story.append(Paragraph(paragraph_text(opinion.get("memorize_line") or opinion.get("claim", "")), highlight))
-    if opinion.get("chinese"):
-        story.append(Paragraph(paragraph_text(opinion.get("chinese")), normal))
-    if opinion.get("sentence_frame"):
-        story.append(Paragraph(f"Frame: {paragraph_text(opinion.get('sentence_frame'))}", normal))
+    source = task.get("source") or {}
+    if source.get("text"):
+        story.append(Paragraph("Read First", section))
+        story.append(Paragraph(f"<b>{paragraph_text(source.get('title', 'Source passage'))}</b>", normal))
+        story.append(Paragraph(paragraph_text(source["text"]), normal))
 
-    story.append(Paragraph("Three Examples to Memorize", section))
-    for idx, item in enumerate(task.get("examples", []), 1):
+    story.append(Paragraph("Writing Prompt", section))
+    story.append(Paragraph(paragraph_text(task.get("writing_prompt", "Write one short paragraph.")), highlight))
+
+    paragraph_plan = task.get("paragraph_plan") or []
+    if paragraph_plan:
+        story.append(Paragraph("Short Essay Plan", section))
+        for item in paragraph_plan:
+            story.append(Paragraph(
+                f"<b>{paragraph_text(item.get('label', 'Paragraph'))}</b>: "
+                f"{paragraph_text(item.get('purpose', ''))}",
+                normal,
+            ))
+
+    structure = task.get("structure") or []
+    if structure:
+        story.append(Paragraph("Answer → Evidence → Explain", section))
+        for item in structure:
+            story.append(Paragraph(
+                f"<b>{paragraph_text(item.get('label', 'Step'))}</b>: "
+                f"{paragraph_text(item.get('instruction', ''))}<br/>"
+                f"Frame: {paragraph_text(item.get('frame', ''))}",
+                normal,
+            ))
+
+    focus_words = task.get("focus_words") or []
+    if focus_words:
+        story.append(Paragraph("Focus Words — Write Your Own Sentences", section))
+        for item in focus_words:
+            story.append(Paragraph(
+                f"<b>{paragraph_text(item.get('word', ''))}</b> "
+                f"({paragraph_text(item.get('chinese', ''))}) — "
+                f"{paragraph_text(item.get('meaning', ''))}<br/>"
+                "Your sentence: ____________________________________________________",
+                normal,
+            ))
+
+    practice = task.get("practice", {})
+    story.append(Paragraph("Draft and Revision", section))
+    story.append(Paragraph(paragraph_text(practice.get("draft_task", "Write one paragraph of about 50 words.")), normal))
+    story.append(Paragraph("First draft:", normal))
+    line_count = 6 if task.get("task_version") == 2 else 9
+    for _ in range(line_count):
+        story.append(Paragraph("__________________________________________________________________", normal))
+    rounds = practice.get("revision_rounds") or []
+    for item in rounds:
         story.append(Paragraph(
-            f"{idx}. <b>{paragraph_text(item.get('memorize_line', ''))}</b><br/>"
-            f"{paragraph_text(item.get('chinese', ''))}<br/>"
-            f"Why it works: {paragraph_text(item.get('why_it_works', ''))}",
+            f"<b>Round {item.get('round', '')}</b>: {paragraph_text(item.get('instruction', ''))}",
             normal,
         ))
+    story.append(Paragraph(paragraph_text(practice.get("revision_task", "Revise the same paragraph.")), normal))
+    story.append(Paragraph("Revised draft:", normal))
+    for _ in range(line_count):
+        story.append(Paragraph("__________________________________________________________________", normal))
 
-    story.append(Paragraph("Mini Outline", section))
-    for item in task.get("mini_outline", []):
-        story.append(Paragraph(f"- {paragraph_text(item)}", normal))
-
-    rewrite = task.get("practice", {}).get("rewrite_task")
-    if rewrite:
-        story.append(Paragraph("Writing Practice", section))
-        story.append(Paragraph(paragraph_text(rewrite), normal))
+    if task.get("examples"):
+        story.append(Paragraph("Reference Sentences — Do Not Memorize", section))
+        for idx, item in enumerate(task.get("examples", []), 1):
+            sentence = item.get("reference_sentence") or item.get("memorize_line") or item.get("example", "")
+            story.append(Paragraph(f"{idx}. {paragraph_text(sentence)}", normal))
 
     _build_doc(filename, story)
     return filename
@@ -49,20 +89,35 @@ def build_writing(task: dict) -> Path:
 
 def build_answers(task: dict) -> Path:
     filename = _path(task, "answers.pdf")
-    story, styles = _base_story(task, "Writing Memory Answer Key")
+    story, styles = _base_story(task, "Writing Reference")
     section = styles["section"]
     normal = styles["normal"]
     answer = styles["answer"]
 
-    story.append(Paragraph("Recitation Check", section))
-    for item in task.get("practice", {}).get("recitation_check", []):
-        story.append(Paragraph(paragraph_text(item.get("prompt", "")), normal))
-        story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
+    practice = task.get("practice", {})
+    word_sentences = practice.get("word_sentences") or []
+    if word_sentences:
+        story.append(Paragraph("Focus Word Sentence Models", section))
+        for item in word_sentences:
+            story.append(Paragraph(paragraph_text(item.get("prompt", "")), normal))
+            story.append(Paragraph(f"Model: {paragraph_text(item.get('model', ''))}", answer))
 
-    story.append(Paragraph("Fill-in Practice", section))
-    for idx, item in enumerate(task.get("examples", []), 1):
-        story.append(Paragraph(f"{idx}. {paragraph_text(item.get('fill_blank', ''))}", normal))
-        story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
+    if practice.get("sample_response"):
+        story.append(Paragraph("Reference Response", section))
+        story.append(Paragraph(paragraph_text(practice["sample_response"]), answer))
+
+    if practice.get("recitation_check"):
+        story.append(Paragraph("Legacy Recitation Check", section))
+        for item in practice["recitation_check"]:
+            story.append(Paragraph(paragraph_text(item.get("prompt", "")), normal))
+            story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
+
+    legacy_fill_blanks = [item for item in task.get("examples", []) if item.get("fill_blank")]
+    if legacy_fill_blanks:
+        story.append(Paragraph("Legacy Fill-in Practice", section))
+        for idx, item in enumerate(legacy_fill_blanks, 1):
+            story.append(Paragraph(f"{idx}. {paragraph_text(item.get('fill_blank', ''))}", normal))
+            story.append(Paragraph(f"Answer: {paragraph_text(item.get('answer', ''))}", answer))
 
     _build_doc(filename, story)
     return filename

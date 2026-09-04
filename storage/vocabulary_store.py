@@ -6,10 +6,15 @@ from storage import daily_task_store
 
 WORD_BANK = Path("config/vocabulary/academic_word_bank_10000.json")
 WORD_INDEX = Path("config/vocabulary/vocabulary_index.json")
+ADVANCED_WORD_BANK = Path("config/vocabulary/advanced_academic_words.json")
 
 
 def load_word_bank() -> list[dict]:
-    return json.loads(WORD_BANK.read_text())
+    base = json.loads(WORD_BANK.read_text())
+    supplemental = json.loads(ADVANCED_WORD_BANK.read_text()) if ADVANCED_WORD_BANK.exists() else []
+    merged = {item["word"]: item for item in base}
+    merged.update({item["word"]: item for item in supplemental})
+    return list(merged.values())
 
 
 def load_word_index() -> dict:

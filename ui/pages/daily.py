@@ -77,14 +77,14 @@ def _daily_task_cards(date_str: str) -> list[dict]:
         {
             "key": "vocabulary",
             "label": "Vocabulary",
-            "eyebrow": "20 academic words",
+            "eyebrow": "8 new + 2 review",
             "status": "Ready" if vocab_task else "Not generated",
             "detail": _vocab_detail(vocab_task),
             "accent": "blue",
         },
         {
             "key": "english_reading",
-            "label": "English Reading",
+            "label": "History + English Reading",
             "eyebrow": "Comprehension",
             "status": "Ready" if english_task else "Not generated",
             "detail": _reading_detail(english_task),
@@ -93,7 +93,7 @@ def _daily_task_cards(date_str: str) -> list[dict]:
         {
             "key": "english_writing",
             "label": "English Writing",
-            "eyebrow": "Opinion + examples",
+            "eyebrow": "Write + revise",
             "status": "Ready" if writing_task else "Not generated",
             "detail": _writing_detail(writing_task),
             "accent": "violet",
@@ -200,6 +200,11 @@ def _reading_detail(task: dict | None) -> str:
 
 def _writing_detail(task: dict | None) -> str:
     if not task:
-        return "One opinion and three examples to memorize."
+        return "One 50-word paragraph with two-stage feedback."
+    if task.get("writing_mode"):
+        mode = task.get("mode_label") or task["writing_mode"].replace("_", " ").title()
+        if task.get("task_version") == 2:
+            return f"{mode} · {task.get('target_words', 50)} words"
+        return f"{mode} · {len(task.get('focus_words', []))} focus words"
     opinion = task.get("opinion", {})
-    return opinion.get("claim") or opinion.get("memorize_line") or "Memory set ready"
+    return opinion.get("claim") or opinion.get("memorize_line") or "Writing practice ready"

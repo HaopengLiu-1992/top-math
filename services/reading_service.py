@@ -2,7 +2,7 @@ import json
 from datetime import date
 
 from domain.daily_task import ENGLISH_READING, SCIENCE_READING, TaskScope
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import reading_prompt
 from services import reading_guardrail
@@ -56,13 +56,33 @@ def _generate_with_guardrail(scope: TaskScope, today: str, provider: ModelProvid
         raw = provider.complete(
             system=reading_prompt.system_prompt(),
             user=user_prompt,
-            max_tokens=9000,
+            max_tokens=MAX_OUTPUT_TOKENS,
         )
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
-        task = json.loads(raw)
+        try:
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
+            task = json.loads(raw)
+            if not isinstance(task, dict):
+                raise ValueError("reading response must be a JSON object")
+            passage = task.setdefault("passage", {})
+            if not isinstance(passage, dict):
+                raise ValueError("reading passage must be an object")
+            passage["curriculum_standard"] = plan.slot.standard
+            metadata = task.setdefault("metadata", {})
+            if not isinstance(metadata, dict):
+                raise ValueError("reading metadata must be an object")
+            metadata["curriculum_target"] = {
+                "standard": plan.slot.standard,
+                "learning_goal": plan.slot.learning_goal,
+                "required_content": list(plan.slot.required_content),
+            }
+        except (json.JSONDecodeError, TypeError, ValueError) as exc:
+            last_errors = [f"invalid JSON: {exc}"]
+            continue
         last_errors = reading_guardrail.validate(scope, task, plan)
         if not last_errors:
+            passage = task.get("passage") or {}
+            passage["word_count"] = len(reading_guardrail._tokens(passage.get("text", "")))
             return task
     raise ValueError(f"Reading guardrail rejected generated task: {last_errors}")
 
@@ -79,7 +99,7 @@ def _ensure_pdfs(scope: TaskScope, task: dict):
 
 def default_focus(scope: TaskScope) -> str:
     if scope == SCIENCE_READING:
-        return "science vocabulary, evidence, cause and effect"
+        return "grade-level science concepts, models, data, and evidence"
     if scope == ENGLISH_READING:
-        return "main idea, inference, vocabulary in context"
+        return "history knowledge, main idea, cause and effect, and text evidence"
     return "academic reading"

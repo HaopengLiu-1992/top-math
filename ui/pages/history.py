@@ -113,6 +113,11 @@ def _render_reading(scope, task: dict, date_str: str):
 
 def _render_writing(scope, task: dict, date_str: str):
     feedback_service.hydrate_marks_for(scope, date_str)
+    if task.get("task_version") == 2 or task.get("focus_words"):
+        _render_structured_writing(task, scope, date_str)
+        _render_writing_pdf_downloads(date_str)
+        return
+
     opinion = task.get("opinion", {})
     st.markdown(f"### {opinion.get('memorize_line') or opinion.get('claim', 'Opinion')}")
     if opinion.get("chinese"):
@@ -128,6 +133,29 @@ def _render_writing(scope, task: dict, date_str: str):
             item.get("memorize_line", ""),
         )
     _render_writing_pdf_downloads(date_str)
+
+
+def _render_structured_writing(task: dict, scope, date_str: str):
+    mode = task.get("mode_label") or task.get("writing_mode", "writing").replace("_", " ").title()
+    st.markdown(f"### {mode}")
+    source = task.get("source") or {}
+    if source.get("text"):
+        st.markdown(f"**{source.get('title', 'Source passage')}**")
+        st.write(source["text"])
+    st.markdown(f"**Prompt:** {task.get('writing_prompt', '')}")
+    st.markdown("**Structure:** Answer / Claim → Evidence → Explain")
+    focus_words = task.get("focus_words", [])
+    if focus_words:
+        st.markdown("**Focus words:** " + ", ".join(item.get("word", "") for item in focus_words))
+    else:
+        target_range = task.get("target_range") or [45, 65]
+        st.markdown(f"**Target:** one paragraph, {target_range[0]}–{target_range[1]} words")
+    marking.render_score(scope, date_str, "Mark the draft and revision work.")
+    for item in task.get("focus_words", []):
+        word = item.get("word", "")
+        marking.render_mark(scope, date_str, f"word_{word}", correct_label="Done", wrong_label="Needs practice")
+    marking.render_mark(scope, date_str, "draft", correct_label="Draft complete", wrong_label="Needs practice")
+    marking.render_mark(scope, date_str, "revision", correct_label="Revision complete", wrong_label="Needs practice")
 
 
 def _render_writing_mark(scope, date_str: str, item_id: str, label: str, text: str):

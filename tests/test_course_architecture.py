@@ -120,7 +120,7 @@ class CourseArchitectureTests(unittest.TestCase):
         )
 
         self.assertEqual(homework["grade_level"], 6)
-        self.assertEqual(provider.max_tokens_seen, 24000)
+        self.assertEqual(provider.max_tokens_seen, 50_000)
         self.assertIn("6.RP.A.1", provider.user_prompt_seen)
         self.assertIn("Difficulty policy: standard", provider.user_prompt_seen)
 

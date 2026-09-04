@@ -1,16 +1,16 @@
 # Daily Learning Generator
 
-A Streamlit app that generates daily math, vocabulary, English reading, English
+A Streamlit app that generates daily math, vocabulary, history-English reading, English
 writing, and science reading practice for Jessie. It uses scoped daily tasks so multiple
 subjects can share providers, storage, PDFs, history, and analysis.
 
 ## Features
 
 - Daily Grade 5-8 math homework following CCSS standards — one generation per day (idempotent/cached)
-- Daily math/science academic vocabulary practice — 20 words from a 10,000-word academic candidate bank
-- Daily English reading practice — passage, vocabulary, comprehension, inference, and short response
-- Daily English writing practice — one reusable opinion and three memorized examples
-- Daily science reading practice — science passage, academic vocabulary, evidence/cause-effect questions
+- Daily academic vocabulary practice — 8 new words plus 2 spaced-review words from curated and large candidate banks
+- Daily History + English Reading — grade-sequenced history content with comprehension, inference, source reasoning, and short response
+- Daily English writing lab — rotating 50-word paragraph practice for summary, opinion, and text-based response with two-stage draft feedback
+- Daily science reading practice — grade-specific curriculum targets, scientific models/data, vocabulary, and evidence questions
 - Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
 - Sunday review: collects incorrectly marked questions from the past 7 days; skipped if no mistakes
@@ -90,13 +90,13 @@ Current task scopes:
 |-------|----|-----------|--------------|-----|
 | `math/homework` | Today | `services.generator` | `homework_store` | `questions_pdf`, `answers_pdf` |
 | `english/vocabulary` | Vocabulary | `vocabulary_service` | `vocabulary_store` | `vocabulary_pdf` |
-| `english/reading` | Daily / English Reading | `reading_service` | `reading_store` | `reading_pdf` |
+| `english/reading` | Daily / History + English Reading | `reading_service` | `reading_store` | `reading_pdf` |
 | `english/writing` | Daily / English Writing | `writing_service` | `writing_store` | `writing_pdf` |
 | `science/reading` | Daily / Science Reading | `reading_service` | `reading_store` | `reading_pdf` |
 
 The top-level UI intentionally stays small:
 
-- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, English Reading, English Writing, and Science Reading
+- **Daily**: command-center overview cards plus a task switcher for Math, Vocabulary, History + English Reading, English Writing, and Science Reading
 - **History**: all generated tasks across all scopes
 - **Analysis**: cross-subject activity overview plus math-specific score/topic analysis
 
@@ -211,11 +211,12 @@ warning; it never asks the model to invent replacement "new" words.
 ## Writing Repetition Guardrail
 
 English writing generation reads only a compact summary of the recent 30-day
-writing history. Before generation it chooses three distinct example types,
-always including one math/science application. After generation it validates
-the opinion sentence, example count, type order, duplicate wording, and
-sentence starters. A failed draft is regenerated with the rejection reason;
-the full writing history is never placed in the prompt.
+writing history. It rotates through summary, opinion/argument, and text-based
+response modes and targets one 45-65 word paragraph using Answer/Claim → Evidence
+→ Explain. Vocabulary memorization remains a separate task. The student can send
+the actual draft for two focused reviews: structure and evidence first, then one
+language category. Prompts and model responses are checked for length and recent
+repetition; failed generations are retried with the rejection reason.
 
 ---
 

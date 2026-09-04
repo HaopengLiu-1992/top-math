@@ -1,32 +1,35 @@
 import json
 import re
-from collections import Counter
 from datetime import date, timedelta
 from difflib import SequenceMatcher
 
-from providers.base import ModelProvider
+from domain.daily_task import ENGLISH_READING
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import writing_prompt
-from storage import writing_store
+from storage import reading_store, writing_store
 
 MAX_GENERATION_RETRIES = 3
 SIMILARITY_THRESHOLD = 0.86
-EXAMPLE_TYPES = [
-    "personal_experience",
-    "math_science_application",
-    "reading_evidence",
-    "school_observation",
-    "cause_and_effect",
-    "comparison",
-]
+WRITING_MODES = ("summary", "opinion", "text_based_response")
+MODE_LABELS = {
+    "summary": "Summary",
+    "opinion": "Opinion / Argument",
+    "text_based_response": "Text-Based Response",
+}
 
 
 class WritingGenerationError(RuntimeError):
-    """The provider could not produce a non-repetitive writing task."""
+    """The provider could not produce a valid writing task."""
+
+
+class WritingReviewError(RuntimeError):
+    """The provider could not produce focused feedback for the student's draft."""
 
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None,
-             grade_level: int = 6, focus: str = "opinion writing",
+             grade_level: int = 6,
+             focus: str = "academic writing: answer, evidence, explanation, and revision",
              force: bool = False) -> dict:
     today = date_str or date.today().isoformat()
     provider = provider or get_default_provider()
@@ -36,10 +39,9 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
         _ensure_pdfs(existing)
         return existing
 
-    history = _recent_history(today)
-    plan = _choose_example_plan(today, history)
-    history_context = _history_context(history)
-    task = None
+    context = _writing_context(today)
+    history_context = _history_context(_recent_history(today))
+    accepted_task = None
     last_error = "unknown writing generation error"
     for attempt in range(MAX_GENERATION_RETRIES):
         raw = provider.complete(
@@ -48,42 +50,104 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
                 today,
                 grade_level,
                 focus,
-                plan=plan,
                 history=history_context,
                 feedback=last_error if attempt else "",
+                writing_mode=context["writing_mode"],
+                source_context=context["source"],
             ),
-            max_tokens=7000,
+            max_tokens=MAX_OUTPUT_TOKENS,
         )
         try:
-            task = _parse_json_response(raw)
-            _normalize_task(task)
-            errors = _validate_task(task, history_context, plan)
+            candidate = _parse_json_response(raw)
+            _normalize_task(candidate, context=context)
+            errors = _validate_task(candidate, history_context, context["writing_mode"])
             if errors:
                 raise ValueError("; ".join(errors))
+            accepted_task = candidate
             break
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
             last_error = str(exc)
 
-    if task is None:
+    if accepted_task is None:
         raise WritingGenerationError(
-            f"Writing generation did not pass the repetition guardrail: {last_error}"
+            f"Writing generation did not pass validation: {last_error}"
         )
 
+    task = accepted_task
     task["date"] = today
     task["subject"] = "english"
     task["task_type"] = "writing"
+    task["task_version"] = 2
     task["grade_level"] = grade_level
     task["focus"] = focus
+    task["writing_mode"] = context["writing_mode"]
+    task["mode_label"] = MODE_LABELS[context["writing_mode"]]
+    task["target_words"] = writing_prompt.TARGET_WORDS
+    task["target_range"] = [writing_prompt.MIN_WORDS, writing_prompt.MAX_WORDS]
     task["model"] = provider.name
     task["writing_guardrail"] = {
         "history_days": 30,
-        "example_type_plan": [item["type"] for item in plan],
+        "writing_mode": context["writing_mode"],
+        "target_words": writing_prompt.TARGET_WORDS,
+        "vocabulary_is_separate": True,
+        "source_task": "history_english_reading" if context["source"].get("text") else None,
     }
 
     writing_store.save_task(today, task)
     writing_store.save_meta(today, writing_store.build_meta(task))
+    if force:
+        writing_store.delete_submission(today)
     _ensure_pdfs(task)
     return task
+
+
+def review_draft(task: dict, draft: str, review_round: int,
+                 provider: ModelProvider | None = None) -> dict:
+    provider = provider or get_default_provider()
+    draft = draft.strip()
+    if review_round not in {1, 2}:
+        raise ValueError("review_round must be 1 or 2")
+    if len(draft.split()) < 10:
+        raise WritingReviewError("Write at least 10 words before requesting feedback.")
+
+    raw = provider.complete(
+        system=writing_prompt.review_system_prompt(),
+        user=writing_prompt.review_user_prompt(task, draft, review_round),
+        max_tokens=MAX_OUTPUT_TOKENS,
+    )
+    try:
+        feedback = _parse_json_response(raw)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise WritingReviewError(f"Writing feedback was not valid JSON: {exc}") from exc
+
+    errors = _validate_review(feedback, review_round)
+    if errors:
+        raise WritingReviewError("; ".join(errors))
+
+    submission = writing_store.load_submission(task["date"])
+    key = f"round_{review_round}"
+    submission[key] = {
+        "draft": draft,
+        "feedback": feedback,
+        "model": provider.name,
+    }
+    writing_store.save_submission(task["date"], submission)
+    return feedback
+
+
+def _writing_context(date_str: str) -> dict:
+    """Use reading as source material while keeping vocabulary practice separate."""
+    reading_task = reading_store.load_task(ENGLISH_READING, date_str) or {}
+    passage = reading_task.get("passage") or {}
+    source = {
+        "title": passage.get("title", ""),
+        "text": passage.get("text", ""),
+    }
+    day_number = date.fromisoformat(date_str).toordinal()
+    return {
+        "writing_mode": WRITING_MODES[day_number % len(WRITING_MODES)],
+        "source": source,
+    }
 
 
 def _parse_json_response(raw: str) -> dict:
@@ -113,134 +177,88 @@ def _recent_history(date_str: str, days: int = 30) -> list[dict]:
         if parsed_date < first_day or parsed_date > today:
             continue
         task = writing_store.load_task(history_date) or {}
-        opinion = task.get("opinion") or {}
-        examples = []
-        for item in task.get("examples") or []:
-            if not isinstance(item, dict):
-                continue
-            line = item.get("memorize_line") or item.get("example") or ""
-            if line:
-                examples.append({
-                    "type": item.get("type", ""),
-                    "line": line,
-                })
-        opinion_line = opinion.get("memorize_line") or opinion.get("claim") or ""
+        practice = task.get("practice") or {}
         records.append({
             "date": history_date,
-            "opinion": opinion_line,
-            "examples": examples,
+            "prompt": task.get("writing_prompt", ""),
+            "sample": practice.get("sample_response", ""),
         })
     return records
 
 
 def _history_context(records: list[dict]) -> dict:
-    opinions = _unique([record.get("opinion", "") for record in records])[:8]
-    examples = _unique([
-        item.get("line", "")
-        for record in records
-        for item in record.get("examples", [])
-    ])[:12]
-    starters = _unique([
-        _starter_signature(item.get("line", ""))
-        for record in records
-        for item in record.get("examples", [])
-    ])[:12]
-    types = Counter(
-        item.get("type", "")
-        for record in records
-        for item in record.get("examples", [])
-        if item.get("type")
-    )
     return {
-        "avoid_opinions": opinions,
-        "avoid_examples": examples,
-        "avoid_starters": starters,
-        "recent_type_counts": dict(types),
+        "avoid_prompts": _unique([item.get("prompt", "") for item in records])[:10],
+        "avoid_samples": _unique([item.get("sample", "") for item in records])[:6],
     }
 
 
-def _choose_example_plan(date_str: str, records: list[dict]) -> list[dict]:
-    context = _history_context(records)
-    counts = Counter(context.get("recent_type_counts", {}))
-    day_offset = date.fromisoformat(date_str).toordinal()
-
-    # Keep one math/science slot every day, then rotate the other two slots
-    # toward the least-used types in the recent window.
-    selected = ["math_science_application"]
-    for position in range(2):
-        candidates = [item for item in EXAMPLE_TYPES if item not in selected]
-        candidates.sort(
-            key=lambda item: (
-                counts[item],
-                (EXAMPLE_TYPES.index(item) + day_offset + position) % len(EXAMPLE_TYPES),
-            )
-        )
-        selected.append(candidates[0])
-        counts[candidates[0]] += 1
-
-    return [
-        {"position": index, "type": item}
-        for index, item in enumerate(selected, 1)
-    ]
-
-
-def _validate_task(task: dict, history: dict, plan: list[dict]) -> list[str]:
+def _validate_task(task: dict, history: dict, writing_mode: str) -> list[str]:
     errors: list[str] = []
-    opinion = task.get("opinion") or {}
-    opinion_line = opinion.get("memorize_line") or opinion.get("claim") or ""
-    examples = task.get("examples")
-    expected_types = [item["type"] for item in plan]
+    if task.get("writing_mode") != writing_mode:
+        errors.append(f"writing mode must be {writing_mode}")
+    if not task.get("writing_prompt"):
+        errors.append("missing writing prompt")
 
-    if not opinion_line:
-        errors.append("missing opinion sentence")
-    if not isinstance(examples, list) or len(examples) != 3:
-        errors.append("expected exactly 3 examples")
-        return errors
+    source = task.get("source") or {}
+    if not isinstance(source, dict):
+        return ["source must be an object"]
+    if writing_mode in {"summary", "text_based_response"} and not source.get("text"):
+        errors.append("reading-based writing needs a source passage")
+    if writing_mode == "opinion" and source.get("text"):
+        errors.append("opinion mode must not include a source passage")
 
-    actual_types = [item.get("type") if isinstance(item, dict) else "" for item in examples]
-    if actual_types != expected_types:
-        errors.append(f"example types must be {expected_types}")
+    structure = task.get("structure")
+    if not isinstance(structure, list) or len(structure) != 3:
+        errors.append("expected exactly three Answer/Evidence/Explain structure steps")
 
-    lines = []
-    starter_signatures = []
-    for index, item in enumerate(examples, 1):
-        if not isinstance(item, dict):
-            errors.append(f"example {index} is not an object")
-            continue
-        line = item.get("memorize_line") or item.get("example") or ""
-        if not line:
-            errors.append(f"example {index} is missing a sentence")
-            continue
-        lines.append(line)
-        starter_signatures.append(_starter_signature(line))
+    practice = task.get("practice") or {}
+    if not isinstance(practice, dict):
+        return errors + ["practice must be an object"]
+    rounds = practice.get("revision_rounds") or []
+    if [item.get("round") for item in rounds if isinstance(item, dict)] != [1, 2]:
+        errors.append("expected two ordered revision rounds")
+    sample = practice.get("sample_response", "")
+    sample_words = len(sample.split())
+    if not writing_prompt.MIN_WORDS <= sample_words <= writing_prompt.MAX_WORDS:
+        errors.append(
+            f"sample response must be {writing_prompt.MIN_WORDS}-{writing_prompt.MAX_WORDS} words"
+        )
 
-    if len(set(_normalize(line) for line in lines)) != len(lines):
-        errors.append("examples contain duplicate sentences")
-    if len(set(starter_signatures)) != len(starter_signatures):
-        errors.append("examples reuse the same sentence starter")
+    recent_prompts = history.get("avoid_prompts", [])
+    if any(_similarity(task.get("writing_prompt", ""), previous) >= SIMILARITY_THRESHOLD
+           for previous in recent_prompts):
+        errors.append("writing prompt is too similar to recent writing")
+    return errors
 
-    recent_opinions = history.get("avoid_opinions", [])
-    if any(_similarity(opinion_line, previous) >= SIMILARITY_THRESHOLD
-           for previous in recent_opinions):
-        errors.append("opinion sentence is too similar to recent writing")
 
-    recent_examples = history.get("avoid_examples", [])
-    if any(_similarity(line, previous) >= SIMILARITY_THRESHOLD for line in lines for previous in recent_examples):
-        errors.append("example sentence is too similar to recent writing")
-
-    recent_starters = set(history.get("avoid_starters", []))
-    if any(signature in recent_starters for signature in starter_signatures):
-        errors.append("example sentence starter repeats recent writing")
+def _validate_review(feedback: dict, review_round: int) -> list[str]:
+    errors = []
+    if feedback.get("round") != review_round:
+        errors.append(f"feedback round must be {review_round}")
+    required = {"strength", "next_step"}
+    if review_round == 1:
+        required.update({"answer_feedback", "evidence_feedback"})
+        forbidden = {"corrections", "language_category"}
+        if forbidden.intersection(feedback):
+            errors.append("round 1 must not include language corrections")
+    else:
+        required.add("language_category")
+        corrections = feedback.get("corrections")
+        if not isinstance(corrections, list) or len(corrections) > 2:
+            errors.append("round 2 must include at most two corrections")
+        elif any(not isinstance(item, dict) or
+                 not all(item.get(field) for field in ("original", "revision", "why"))
+                 for item in corrections):
+            errors.append("each language correction needs original, revision, and why")
+    for field in required:
+        if not feedback.get(field):
+            errors.append(f"missing review field: {field}")
     return errors
 
 
 def _normalize(value: str) -> str:
     return re.sub(r"[^a-z0-9 ]+", " ", value.lower()).strip()
-
-
-def _starter_signature(value: str) -> str:
-    words = _normalize(value).split()
-    return " ".join(words[:3])
 
 
 def _similarity(left: str, right: str) -> float:
@@ -268,34 +286,51 @@ def _ensure_pdfs(task: dict):
         build_answers(task)
 
 
-def _normalize_task(task: dict):
+def _normalize_task(task: dict, context: dict | None = None):
     if not isinstance(task, dict):
         raise ValueError("writing task must be an object")
-    task.setdefault("title", "Opinion Writing Memory Set")
+    context = context or {}
+    mode = context.get("writing_mode", task.get("writing_mode", "opinion"))
+    task.setdefault("task_version", 2)
+    task.setdefault("title", f"Daily 50-Word Writing — {MODE_LABELS.get(mode, 'Writing')}")
     task.setdefault("estimated_minutes", 20)
-    task.setdefault("opinion", {})
-    if not isinstance(task["opinion"], dict):
-        raise ValueError("writing opinion must be an object")
-    examples = task.setdefault("examples", [])
-    if not isinstance(examples, list):
-        raise ValueError("writing examples must be a list")
-    for idx, item in enumerate(examples, 1):
-        if not isinstance(item, dict):
-            raise ValueError(f"writing example {idx} must be an object")
-        item.setdefault("id", f"example_{idx:03d}")
-        item.setdefault("memorize_line", item.get("example", ""))
+    task.setdefault("writing_mode", mode)
+    task.setdefault("mode_label", MODE_LABELS.get(mode, "Opinion / Argument"))
+    task["target_words"] = writing_prompt.TARGET_WORDS
+    task["target_range"] = [writing_prompt.MIN_WORDS, writing_prompt.MAX_WORDS]
+    task.setdefault("time_plan", [
+        {"minutes": 3, "activity": "Plan Answer/Claim, Evidence, and Explain."},
+        {"minutes": 10, "activity": "Write one paragraph of about 50 words."},
+        {"minutes": 7, "activity": "Revise ideas, then one language skill."},
+    ])
 
+    supplied_source = context.get("source") or {}
+    if mode in {"summary", "text_based_response"} and supplied_source.get("text"):
+        task["source"] = supplied_source
+    else:
+        task.setdefault("source", {"title": "", "text": ""})
+    if mode == "opinion":
+        task["source"] = {"title": "", "text": ""}
+
+    task.setdefault("structure", [
+        {"label": "Answer / Claim", "instruction": "Answer directly.", "frame": "I think ___ because ___."},
+        {"label": "Evidence", "instruction": "Add one or two details.", "frame": "One detail is ___."},
+        {"label": "Explain", "instruction": "Connect the evidence.", "frame": "This shows that ___."},
+    ])
     practice = task.setdefault("practice", {})
     if not isinstance(practice, dict):
         raise ValueError("writing practice must be an object")
-    checks = [{
-        "id": "opinion",
-        "prompt": "Say the opinion sentence from memory.",
-        "answer": task["opinion"].get("memorize_line") or task["opinion"].get("claim", ""),
-    }]
-    checks.extend({
-        "id": item.get("id", f"example_{idx:03d}"),
-        "prompt": f"Say example {idx} from memory.",
-        "answer": item.get("memorize_line", ""),
-    } for idx, item in enumerate(examples, 1))
-    practice["recitation_check"] = checks
+    practice.setdefault("draft_task", "Write one 45-65 word paragraph, normally 5-7 sentences.")
+    practice.setdefault("revision_rounds", [
+        {"round": 1, "focus": "structure_and_evidence",
+         "instruction": "Check only the answer/claim, evidence, and explanation."},
+        {"round": 2, "focus": "one_language_skill",
+         "instruction": "Correct only one recurring language category."},
+    ])
+    practice.setdefault("checklist", [
+        "I answered the prompt directly.",
+        "I included accurate evidence or a specific detail.",
+        "I explained how the evidence supports my answer.",
+        "I wrote one paragraph of about 50 words.",
+        "I checked capitals, punctuation, and complete sentences.",
+    ])

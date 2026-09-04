@@ -2,10 +2,10 @@ import json
 from datetime import date
 
 from domain.learning_context import LearningContext
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from storage import homework_store, history_store
-from services import curriculum_service, lesson_service
+from services import curriculum_service, lesson_service, math_guardrail
 from services.dedup_service import check_duplicates, extract_all_fingerprints
 from prompts import homework_prompt
 
@@ -90,9 +90,10 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
                                            include_forbidden=include,
                                            context=context,
                                            topic=topic,
-                                           cached_lesson=cached_lesson)
+                                           cached_lesson=cached_lesson,
+                                           validation_feedback=last_error if attempt > 1 else "")
         print(f"  [{provider.name}] attempt {attempt}/{MAX_RETRIES}")
-        raw = provider.complete(system=system, user=user, max_tokens=24000)
+        raw = provider.complete(system=system, user=user, max_tokens=MAX_OUTPUT_TOKENS)
 
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
@@ -111,6 +112,15 @@ def _generate_with_retry(day: int, date_str: str, recent_topics: list,
             last_error = f"duplicate fingerprints: {len(dupes)}"
             print(f"  {len(dupes)} duplicate(s) found, retrying...")
             forbidden.update(dupes)
+            continue
+
+        validation_errors = math_guardrail.validate(
+            homework,
+            context.difficulty_policy if context else "standard",
+        )
+        if validation_errors:
+            last_error = "; ".join(validation_errors)
+            print(f"  validation error(s): {last_error}")
             continue
 
         return homework

@@ -22,6 +22,10 @@ publisher's grade-level list.
 
 - `curated_math_science_core`: 275 local teaching entries retained in their
   existing order and category labels.
+- `curated_academic_core`: the checked-in `advanced_academic_words.json` layer
+  of high-value Grade 6-8 reasoning, history, science, and mathematics words.
+  These entries include reviewed definitions, word families, collocations, and
+  coherent topic-group metadata and are selected before the broad catalog.
 - [`wordfreq==3.1.1`](https://github.com/rspeer/wordfreq): frequency ranking
   for the general reading pool. Review the package and bundled-data licenses
   before redistributing a modified catalog commercially.
