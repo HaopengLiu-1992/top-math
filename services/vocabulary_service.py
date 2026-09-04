@@ -1,7 +1,7 @@
 import json
 from datetime import date, timedelta
 
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import vocabulary_prompt
 from storage import vocabulary_store
@@ -77,7 +77,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
                 personal_prompt=personal_prompt,
                 quality_feedback=last_error if attempt else "",
             ),
-            max_tokens=16000,
+            max_tokens=MAX_OUTPUT_TOKENS,
         )
         try:
             candidate = _normalize_generated_task(

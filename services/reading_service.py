@@ -2,7 +2,7 @@ import json
 from datetime import date
 
 from domain.daily_task import ENGLISH_READING, SCIENCE_READING, TaskScope
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import reading_prompt
 from services import reading_guardrail
@@ -56,7 +56,7 @@ def _generate_with_guardrail(scope: TaskScope, today: str, provider: ModelProvid
         raw = provider.complete(
             system=reading_prompt.system_prompt(),
             user=user_prompt,
-            max_tokens=9000,
+            max_tokens=MAX_OUTPUT_TOKENS,
         )
         try:
             if raw.startswith("```"):

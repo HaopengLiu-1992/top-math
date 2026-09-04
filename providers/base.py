@@ -1,9 +1,16 @@
 from abc import ABC, abstractmethod
 
+MAX_OUTPUT_TOKENS = 50_000
+
 
 class ModelProvider(ABC):
     @abstractmethod
-    def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
+    def complete(
+        self,
+        system: str,
+        user: str,
+        max_tokens: int = MAX_OUTPUT_TOKENS,
+    ) -> str:
         """Send a system + user prompt, return the raw text response."""
         ...
 

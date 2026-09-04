@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from difflib import SequenceMatcher
 
 from domain.daily_task import ENGLISH_READING
-from providers.base import ModelProvider
+from providers.base import MAX_OUTPUT_TOKENS, ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import writing_prompt
 from storage import reading_store, writing_store
@@ -55,7 +55,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
                 writing_mode=context["writing_mode"],
                 source_context=context["source"],
             ),
-            max_tokens=5000,
+            max_tokens=MAX_OUTPUT_TOKENS,
         )
         try:
             candidate = _parse_json_response(raw)
@@ -113,7 +113,7 @@ def review_draft(task: dict, draft: str, review_round: int,
     raw = provider.complete(
         system=writing_prompt.review_system_prompt(),
         user=writing_prompt.review_user_prompt(task, draft, review_round),
-        max_tokens=1800,
+        max_tokens=MAX_OUTPUT_TOKENS,
     )
     try:
         feedback = _parse_json_response(raw)

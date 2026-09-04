@@ -61,12 +61,23 @@ class DeepSeekProviderTests(unittest.TestCase):
 
     def test_empty_content_raises_clear_error(self):
         response = Mock()
-        response.json.return_value = {"choices": [{"message": {"content": ""}}]}
+        response.json.return_value = {
+            "choices": [
+                {
+                    "finish_reason": "length",
+                    "message": {"content": "", "reasoning_content": "thinking"},
+                }
+            ],
+            "usage": {"completion_tokens_details": {"reasoning_tokens": 50000}},
+        }
 
         with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-key"}, clear=False):
             with patch("settings.secrets._get_streamlit_secret", return_value=None):
                 with patch("providers.deepseek_provider.requests.post", return_value=response):
-                    with self.assertRaisesRegex(RuntimeError, "empty response content"):
+                    with self.assertRaisesRegex(
+                        RuntimeError,
+                        r"finish_reason=length, reasoning_tokens=50000, max_tokens=50000",
+                    ):
                         DeepSeekProvider().complete("Return JSON only.", "Return JSON.")
 
 

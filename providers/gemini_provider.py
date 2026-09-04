@@ -2,7 +2,7 @@ import time
 
 from google import genai
 from google.genai import types
-from .base import ModelProvider
+from .base import MAX_OUTPUT_TOKENS, ModelProvider
 from settings import secrets
 
 _client = None
@@ -26,7 +26,12 @@ class GeminiProvider(ModelProvider):
     def name(self) -> str:
         return f"Gemini ({self.model})"
 
-    def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
+    def complete(
+        self,
+        system: str,
+        user: str,
+        max_tokens: int = MAX_OUTPUT_TOKENS,
+    ) -> str:
         wants_json = "json" in f"{system}\n{user}".lower()
         thinking_budget = min(DEFAULT_THINKING_BUDGET, max_tokens // 3)
         config = types.GenerateContentConfig(

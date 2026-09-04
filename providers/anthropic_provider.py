@@ -1,5 +1,5 @@
 import anthropic
-from .base import ModelProvider
+from .base import MAX_OUTPUT_TOKENS, ModelProvider
 from settings import secrets
 
 _client = None
@@ -20,7 +20,12 @@ class AnthropicProvider(ModelProvider):
     def name(self) -> str:
         return f"Claude ({self.model})"
 
-    def complete(self, system: str, user: str, max_tokens: int = 4000) -> str:
+    def complete(
+        self,
+        system: str,
+        user: str,
+        max_tokens: int = MAX_OUTPUT_TOKENS,
+    ) -> str:
         response = _get_client().messages.create(
             model=self.model,
             max_tokens=max_tokens,
