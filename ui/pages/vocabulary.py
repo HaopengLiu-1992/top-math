@@ -24,7 +24,7 @@ def render(provider_choice: str, embedded: bool = False):
                 <div>
                     <div class="tm-section-label">English vocabulary</div>
                     <h2>Academic Vocabulary</h2>
-                    <p>Locally selected math and science words, then shaped into practice.</p>
+                    <p>Locally selected academic words, then applied in reading and writing.</p>
                 </div>
                 <span class="tm-chip">{today}</span>
             </div>
@@ -39,6 +39,7 @@ def render(provider_choice: str, embedded: bool = False):
 
     with st.container(border=True):
         st.markdown('<div class="tm-section-label">Vocabulary setup</div>', unsafe_allow_html=True)
+        st.caption("每天只挑 5 个词带入写作；重点是会在自己的句子里使用。")
         grade_level = st.selectbox("Grade", [5, 6, 7, 8], index=1, key="vocabulary_grade")
         personal_prompt = st.text_area(
             "Personal prompt",

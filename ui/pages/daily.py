@@ -93,7 +93,7 @@ def _daily_task_cards(date_str: str) -> list[dict]:
         {
             "key": "english_writing",
             "label": "English Writing",
-            "eyebrow": "Opinion + examples",
+            "eyebrow": "Write + revise",
             "status": "Ready" if writing_task else "Not generated",
             "detail": _writing_detail(writing_task),
             "accent": "violet",
@@ -200,6 +200,9 @@ def _reading_detail(task: dict | None) -> str:
 
 def _writing_detail(task: dict | None) -> str:
     if not task:
-        return "One opinion and three examples to memorize."
+        return "15-20 min: use words, write, and revise."
+    if task.get("writing_mode"):
+        mode = task.get("mode_label") or task["writing_mode"].replace("_", " ").title()
+        return f"{mode} · {len(task.get('focus_words', []))} focus words"
     opinion = task.get("opinion", {})
-    return opinion.get("claim") or opinion.get("memorize_line") or "Memory set ready"
+    return opinion.get("claim") or opinion.get("memorize_line") or "Writing practice ready"

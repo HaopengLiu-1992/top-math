@@ -33,6 +33,30 @@ def delete_for_date(date_str: str):
 
 
 def build_meta(task: dict) -> dict:
+    focus_words = task.get("focus_words") or []
+    if focus_words:
+        items = [
+            {
+                "id": f"word_{item.get('word', idx)}",
+                "label": f"Use {item.get('word', f'word {idx}')}",
+                "skill": "writing_vocabulary",
+            }
+            for idx, item in enumerate(focus_words, 1)
+            if isinstance(item, dict)
+        ]
+        items.extend([
+            {"id": "draft", "label": "First draft", "skill": "writing_draft"},
+            {"id": "revision", "label": "Revised draft", "skill": "writing_revision"},
+        ])
+        return {
+            item["id"]: {
+                "correct": None,
+                "skill": item["skill"],
+                "label": item["label"],
+            }
+            for item in items
+        }
+
     opinion = task.get("opinion", {})
     examples = task.get("examples", [])
     items = [{"id": "opinion", "label": opinion.get("claim", "Opinion")}]

@@ -9,7 +9,7 @@ subjects can share providers, storage, PDFs, history, and analysis.
 - Daily Grade 5-8 math homework following CCSS standards — one generation per day (idempotent/cached)
 - Daily math/science academic vocabulary practice — 20 words from a 10,000-word academic candidate bank
 - Daily English reading practice — passage, vocabulary, comprehension, inference, and short response
-- Daily English writing practice — one reusable opinion and three memorized examples
+- Daily English writing lab — rotating short-essay practice for summary, opinion, and text-based response with five focus words, Answer → Evidence → Explain scaffolding, and revision
 - Daily science reading practice — science passage, academic vocabulary, evidence/cause-effect questions
 - Questions and answers in separate PDFs stored under the scoped daily task tree
 - Per-question ✓/✗ marking with real-time score tracking
@@ -211,11 +211,13 @@ warning; it never asks the model to invent replacement "new" words.
 ## Writing Repetition Guardrail
 
 English writing generation reads only a compact summary of the recent 30-day
-writing history. Before generation it chooses three distinct example types,
-always including one math/science application. After generation it validates
-the opinion sentence, example count, type order, duplicate wording, and
-sentence starters. A failed draft is regenerated with the rejection reason;
-the full writing history is never placed in the prompt.
+writing history. It rotates through summary, opinion/argument, and text-based
+response modes, carries five words from the daily vocabulary task into writing,
+and asks the provider for Answer → Evidence → Explain scaffolding plus a first
+draft and revision task. After generation it validates the mode, focus-word set,
+example type order, duplicate wording, and sentence starters. A failed draft is
+regenerated with the rejection reason; the full writing history is never placed
+in the prompt.
 
 ---
 

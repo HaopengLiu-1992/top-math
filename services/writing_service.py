@@ -7,7 +7,8 @@ from difflib import SequenceMatcher
 from providers.base import ModelProvider
 from providers.default_provider import get_default_provider
 from prompts import writing_prompt
-from storage import writing_store
+from storage import reading_store, vocabulary_store, writing_store
+from domain.daily_task import ENGLISH_READING
 
 MAX_GENERATION_RETRIES = 3
 SIMILARITY_THRESHOLD = 0.86
@@ -19,6 +20,19 @@ EXAMPLE_TYPES = [
     "cause_and_effect",
     "comparison",
 ]
+WRITING_MODES = ("summary", "opinion", "text_based_response")
+MODE_LABELS = {
+    "summary": "Summary",
+    "opinion": "Opinion / Argument",
+    "text_based_response": "Text-Based Response",
+}
+FALLBACK_FOCUS_WORDS = [
+    {"word": "evidence", "meaning": "information that supports an idea", "chinese": "证据"},
+    {"word": "reason", "meaning": "a cause or explanation", "chinese": "理由"},
+    {"word": "explain", "meaning": "to make an idea clear", "chinese": "解释"},
+    {"word": "result", "meaning": "what happens because of something", "chinese": "结果"},
+    {"word": "support", "meaning": "to provide evidence for an idea", "chinese": "支持"},
+]
 
 
 class WritingGenerationError(RuntimeError):
@@ -26,7 +40,8 @@ class WritingGenerationError(RuntimeError):
 
 
 def generate(date_str: str | None = None, provider: ModelProvider | None = None,
-             grade_level: int = 6, focus: str = "opinion writing",
+             grade_level: int = 6,
+             focus: str = "academic writing: answer, evidence, explanation, and revision",
              force: bool = False) -> dict:
     today = date_str or date.today().isoformat()
     provider = provider or get_default_provider()
@@ -37,6 +52,7 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
         return existing
 
     history = _recent_history(today)
+    context = _writing_context(today)
     plan = _choose_example_plan(today, history)
     history_context = _history_context(history)
     task = None
@@ -51,13 +67,26 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
                 plan=plan,
                 history=history_context,
                 feedback=last_error if attempt else "",
+                writing_mode=context["writing_mode"],
+                focus_words=context["focus_words"],
+                source_context=context["source"],
             ),
             max_tokens=7000,
         )
         try:
             task = _parse_json_response(raw)
-            _normalize_task(task)
-            errors = _validate_task(task, history_context, plan)
+            enforce_new_fields = any(
+                key in task for key in ("writing_mode", "focus_words", "source", "writing_prompt")
+            )
+            _normalize_task(task, context=context)
+            errors = _validate_task(
+                task,
+                history_context,
+                plan,
+                writing_mode=context["writing_mode"],
+                focus_words=context["focus_words"],
+                enforce_new_fields=enforce_new_fields,
+            )
             if errors:
                 raise ValueError("; ".join(errors))
             break
@@ -74,16 +103,55 @@ def generate(date_str: str | None = None, provider: ModelProvider | None = None,
     task["task_type"] = "writing"
     task["grade_level"] = grade_level
     task["focus"] = focus
+    task["writing_mode"] = context["writing_mode"]
+    task["mode_label"] = MODE_LABELS[context["writing_mode"]]
+    task["focus_words"] = context["focus_words"]
     task["model"] = provider.name
     task["writing_guardrail"] = {
         "history_days": 30,
         "example_type_plan": [item["type"] for item in plan],
+        "writing_mode": context["writing_mode"],
+        "focus_words": [item["word"] for item in context["focus_words"]],
     }
 
     writing_store.save_task(today, task)
     writing_store.save_meta(today, writing_store.build_meta(task))
     _ensure_pdfs(task)
     return task
+
+
+def _writing_context(date_str: str) -> dict:
+    """Build a small bridge from vocabulary/reading into the writing task."""
+    current_vocab = vocabulary_store.load_task(date_str) or {}
+    focus_words = []
+    for item in current_vocab.get("words", []):
+        word = (item.get("word") or "").strip()
+        if not word or any(existing["word"] == word for existing in focus_words):
+            continue
+        focus_words.append({
+            "word": word,
+            "meaning": item.get("definition", ""),
+            "chinese": item.get("chinese", ""),
+        })
+        if len(focus_words) == 5:
+            break
+    if len(focus_words) < 5:
+        used = {item["word"] for item in focus_words}
+        focus_words.extend(item for item in FALLBACK_FOCUS_WORDS if item["word"] not in used)
+        focus_words = focus_words[:5]
+
+    reading_task = reading_store.load_task(ENGLISH_READING, date_str) or {}
+    passage = reading_task.get("passage") or {}
+    source = {
+        "title": passage.get("title", ""),
+        "text": passage.get("text", ""),
+    }
+    day_number = date.fromisoformat(date_str).toordinal()
+    return {
+        "writing_mode": WRITING_MODES[day_number % len(WRITING_MODES)],
+        "focus_words": focus_words,
+        "source": source,
+    }
 
 
 def _parse_json_response(raw: str) -> dict:
@@ -184,8 +252,41 @@ def _choose_example_plan(date_str: str, records: list[dict]) -> list[dict]:
     ]
 
 
-def _validate_task(task: dict, history: dict, plan: list[dict]) -> list[str]:
+def _validate_task(task: dict, history: dict, plan: list[dict],
+                   writing_mode: str | None = None,
+                   focus_words: list[dict] | None = None,
+                   enforce_new_fields: bool = False) -> list[str]:
     errors: list[str] = []
+    actual_mode = task.get("writing_mode", "opinion")
+    if enforce_new_fields and writing_mode and actual_mode != writing_mode:
+        errors.append(f"writing mode must be {writing_mode}")
+    if enforce_new_fields and actual_mode not in WRITING_MODES:
+        errors.append(f"unsupported writing mode: {actual_mode}")
+
+    practice = task.get("practice") or {}
+    prompt = task.get("writing_prompt") or (
+        practice.get("rewrite_task", "") if isinstance(practice, dict) else ""
+    )
+    if enforce_new_fields and not prompt:
+        errors.append("missing writing prompt")
+
+    if enforce_new_fields and focus_words:
+        actual_focus_words = task.get("focus_words") or []
+        expected_words = [item["word"] for item in focus_words]
+        received_words = [item.get("word", "") for item in actual_focus_words if isinstance(item, dict)]
+        if received_words != expected_words:
+            errors.append("focus words must match the selected vocabulary words")
+        word_sentences = practice.get("word_sentences") if isinstance(practice, dict) else []
+        word_sentences = word_sentences or []
+        sentence_words = [item.get("word", "") for item in word_sentences if isinstance(item, dict)]
+        if sentence_words != expected_words:
+            errors.append("writing practice must include one sentence exercise per focus word")
+
+    if enforce_new_fields and actual_mode in {"summary", "text_based_response"}:
+        source = task.get("source") or {}
+        if not source.get("text"):
+            errors.append("summary and text-based response tasks need a source passage")
+
     opinion = task.get("opinion") or {}
     opinion_line = opinion.get("memorize_line") or opinion.get("claim") or ""
     examples = task.get("examples")
@@ -268,11 +369,42 @@ def _ensure_pdfs(task: dict):
         build_answers(task)
 
 
-def _normalize_task(task: dict):
+def _normalize_task(task: dict, context: dict | None = None):
     if not isinstance(task, dict):
         raise ValueError("writing task must be an object")
-    task.setdefault("title", "Opinion Writing Memory Set")
+    task.setdefault("title", "Daily Writing Lab — Opinion / Argument")
     task.setdefault("estimated_minutes", 20)
+    context = context or {}
+    task.setdefault("writing_mode", context.get("writing_mode", "opinion"))
+    task.setdefault("mode_label", MODE_LABELS.get(task["writing_mode"], "Opinion / Argument"))
+    task.setdefault("time_plan", [
+        {"minutes": 5, "activity": "Use each focus word in an original sentence."},
+        {"minutes": 10, "activity": "Write a three-paragraph, 8-12 sentence first draft."},
+        {"minutes": 5, "activity": "Revise one sentence and complete the checklist."},
+    ])
+    if not isinstance(task["time_plan"], list):
+        raise ValueError("writing time_plan must be a list")
+    task.setdefault("source", context.get("source", {}))
+    if not isinstance(task["source"], dict):
+        raise ValueError("writing source must be an object")
+    task.setdefault("writing_prompt", "Write a short essay in three paragraphs and 8-12 sentences using Answer, Evidence, and Explain.")
+    task.setdefault("paragraph_plan", [
+        {"label": "Introduction", "purpose": "Answer the prompt and state the main idea."},
+        {"label": "Body", "purpose": "Give evidence or a specific example and explain it."},
+        {"label": "Conclusion", "purpose": "Restate the main idea and close the essay."},
+    ])
+    if not isinstance(task["paragraph_plan"], list):
+        raise ValueError("writing paragraph_plan must be a list")
+    task.setdefault("structure", [
+        {"label": "Answer", "instruction": "Answer the prompt directly.", "frame": "I think ___ because ___ ."},
+        {"label": "Evidence", "instruction": "Give a detail, example, or reason.", "frame": "For example, ___."},
+        {"label": "Explain", "instruction": "Explain how the evidence supports your answer.", "frame": "This shows that ___."},
+    ])
+    if not isinstance(task["structure"], list):
+        raise ValueError("writing structure must be a list")
+    task.setdefault("focus_words", context.get("focus_words", []))
+    if not isinstance(task["focus_words"], list):
+        raise ValueError("writing focus_words must be a list")
     task.setdefault("opinion", {})
     if not isinstance(task["opinion"], dict):
         raise ValueError("writing opinion must be an object")
@@ -283,11 +415,39 @@ def _normalize_task(task: dict):
         if not isinstance(item, dict):
             raise ValueError(f"writing example {idx} must be an object")
         item.setdefault("id", f"example_{idx:03d}")
-        item.setdefault("memorize_line", item.get("example", ""))
+        item.setdefault("reference_sentence", item.get("memorize_line") or item.get("example", ""))
+        item.setdefault("memorize_line", item.get("reference_sentence", ""))
 
     practice = task.setdefault("practice", {})
     if not isinstance(practice, dict):
         raise ValueError("writing practice must be an object")
+    practice.setdefault("word_sentences", [])
+    if not isinstance(practice["word_sentences"], list):
+        raise ValueError("writing word_sentences must be a list")
+    if not practice["word_sentences"]:
+        practice["word_sentences"] = [
+            {
+                "word": item.get("word", ""),
+                "prompt": f"Use {item.get('word', 'this word')} in one original sentence about today's topic.",
+                "model": f"A clear sentence can use {item.get('word', 'this word')} to explain an idea.",
+            }
+            for item in task["focus_words"]
+            if isinstance(item, dict) and item.get("word")
+        ]
+    practice.setdefault("draft_task", task["writing_prompt"])
+    practice.setdefault(
+        "revision_task",
+        "Revise one sentence, add a specific detail, check your focus words, and confirm the three paragraphs.",
+    )
+    practice.setdefault("checklist", [
+        "I answered the prompt directly.",
+        "I included evidence or a specific detail.",
+        "I explained how the evidence supports my answer.",
+        "I used an introduction, body, and conclusion paragraph.",
+        "I checked capitals, punctuation, and complete sentences.",
+    ])
+    if not isinstance(practice["checklist"], list):
+        raise ValueError("writing checklist must be a list")
     checks = [{
         "id": "opinion",
         "prompt": "Say the opinion sentence from memory.",
